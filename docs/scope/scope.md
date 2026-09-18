@@ -13,7 +13,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---------|-------|--------|
 | 1 | Stack & architecture | Foundation | done |
 | 2 | Coding standards & tooling | Foundation | done |
-| 3 | Content model | Foundation | in-progress |
+| 3 | Content model | Foundation | done |
 | 4 | Design system & UI foundation | Foundation | planned |
 | 5 | Hero & about | Release 1 | planned |
 | 6 | Projects section | Release 1 | planned |
@@ -42,7 +42,7 @@ Capture conventions from the real scaffold, then install lint, format, and pre-c
 code in `AGENTS.md`, `biome.json`, `.prettierrc.json` (repo root)
 - [x] Capture conventions + tooling choices: `/audit`
 
-### 3. Content model
+### 3. Content model · done
 The shape of the content files in the repo (bio, projects, skills, links) that every section reads from.
 **Done when:** adding a project or skill means editing one data file, with no code changes, and a bad entry fails the build.
 spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config.ts`, `src/content/`, `image-optimisation.test.ts`
@@ -53,7 +53,7 @@ spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config
   - [x] The four YAML files filled with your real content, plus assets (AC-2, AC-9, AC-11)
   - [x] The consumer contract recorded in `src/content/AGENTS.md` (AC-7, AC-10)
   - [x] Schema tests, and a deliberate bad entry proving the build fails (AC-3 to AC-7)
-- [ ] Verify it: `/check verify content model`
+- [x] Verify it: `/check verify content model`
 
 ### 4. Design system & UI foundation · needs a decision
 Type, color, spacing, and base components, with color tokens ready for both themes and focus styles that meet AA.

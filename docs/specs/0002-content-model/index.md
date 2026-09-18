@@ -1,7 +1,7 @@
 # 0002. Model site content as four YAML backed content collections
 
 **Date**: 2026-09-17
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
