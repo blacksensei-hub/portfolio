@@ -1,0 +1,5 @@
+# Git decides which files are text, and every text file is checked out with LF
+# endings regardless of platform. Without this, `core.autocrlf=true` on Windows
+# writes CRLF while Prettier and Biome both expect LF, so `pnpm lint` fails on
+# files nobody edited.
+* text=auto eol=lf
