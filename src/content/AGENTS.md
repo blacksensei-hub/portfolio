@@ -59,6 +59,12 @@ nothing to join at render time.
 - A path pointing at a missing file **fails the build** (`image-not-found`),
   but only once a page actually reads the collection. An unread collection
   never forces resolution, so the check is real in practice and not in theory.
+- The optimiser behind it is **`sharp`, a direct dependency in
+  `package.json`**. Astro treats it as an optional peer, so removing it leaves
+  the build dying with `MissingSharp` while the HTML still looks right. Keep it,
+  and do not swap in the passthrough image service: the asset must be optimised
+  at build time. `image-optimisation.test.ts` at the repo root builds a fixture
+  site and proves a real `.webp` lands in `dist/_astro/`.
 
 ## Editing rules
 

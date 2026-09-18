@@ -1,0 +1,17 @@
+---
+import { Image } from 'astro:assets';
+
+import pixel from '../assets/pixel.png';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Image optimisation fixture</title>
+  </head>
+  <body>
+    <!-- A width below the source's 600 forces a real resize, so the optimiser
+         cannot satisfy this by copying the original through. -->
+    <Image src={pixel} alt="A solid blue rectangle" width={240} />
+  </body>
+</html>

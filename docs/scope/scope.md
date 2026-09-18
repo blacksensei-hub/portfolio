@@ -45,7 +45,7 @@ code in `AGENTS.md`, `biome.json`, `.prettierrc.json` (repo root)
 ### 3. Content model
 The shape of the content files in the repo (bio, projects, skills, links) that every section reads from.
 **Done when:** adding a project or skill means editing one data file, with no code changes, and a bad entry fails the build.
-spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config.ts`, `src/content/`
+spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config.ts`, `src/content/`, `image-optimisation.test.ts`
 - [x] Design it (spec): `/architect content model`
 - [x] Build it: `/develop content model`
   - [x] Spike the image field on the `file()` loader, take the fallback if it does not resolve (AC-8)
