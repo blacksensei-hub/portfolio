@@ -1,0 +1,29 @@
+- slug: attendx
+  title: AttendX
+  summary: >-
+    A class attendance management system designed to simplify attendance
+    tracking, verification, reporting, and administration.
+  tech:
+    - React Native
+    - Expo
+    - Node.js
+    - Express.js
+    - Sequelize
+    - PostgreSQL
+  demoUrl: https://atttend-x.vercel.app
+  repoUrl: https://github.com/blacksensei-hub/AttendX.git
+  order: 0
+
+- slug: urbanpulse
+  title: UrbanPulse
+  summary: >-
+    A modern e-commerce platform for a Ghanaian streetwear brand (frontend code
+    linked; backend available separately).
+  tech:
+    - React
+    - Node.js
+    - Express.js
+    - PostgreSQL
+  demoUrl: https://urbanpulsee.vercel.app
+  repoUrl: https://github.com/blacksensei-hub/UrbanPulse-frontend.git
+  order: 1

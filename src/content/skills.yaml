@@ -1,0 +1,37 @@
+- group: Languages
+  items:
+    - JavaScript
+    - Python
+    - C++
+    - HTML
+    - CSS
+    - SQL
+  order: 0
+
+- group: Frontend & Mobile
+  items:
+    - React
+    - React Native
+    - Expo
+    - Bootstrap
+  order: 1
+
+- group: Backend
+  items:
+    - Node.js
+    - Express.js
+  order: 2
+
+- group: Databases
+  items:
+    - PostgreSQL
+    - MySQL
+    - MongoDB
+  order: 3
+
+- group: Tools
+  items:
+    - Git
+    - GitHub
+    - VS Code
+  order: 4

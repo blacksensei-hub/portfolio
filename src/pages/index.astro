@@ -1,17 +1,31 @@
 ---
+import { getCollection, getEntry } from 'astro:content';
 
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// A deliberately minimal read, so the content collections actually resolve at
+// build time (an unread collection never forces image resolution, so AC-8's
+// missing file check would never fire). Features 5 to 8 replace this with the
+// real sections; the reading rules they follow live in `src/content/AGENTS.md`.
+const profile = await getEntry('profile', 'profile');
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Portfolio"
+  description="A personal portfolio. Sections arrive with the Release 1 features."
+>
+  <main class="mx-auto max-w-2xl px-gutter py-16">
+    <h1 class="text-4xl font-bold tracking-tight">{profile?.data.name ?? 'Portfolio'}</h1>
+    <p class="text-muted mt-4">
+      The scaffold is running. Content sections arrive with the Release 1 features.
+    </p>
+    {projects.length > 0 && (
+      <ul class="mt-8">
+        {projects.map((project) => (
+          <li>{project.data.title}</li>
+        ))}
+      </ul>
+    )}
+  </main>
+</BaseLayout>

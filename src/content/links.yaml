@@ -1,0 +1,19 @@
+- label: GitHub
+  href: https://github.com/blacksensei-hub
+  icon: github
+  order: 0
+
+- label: Email
+  href: mailto:jeffreyankrah2004@gmail.com
+  icon: email
+  order: 1
+
+- label: WhatsApp
+  href: 'https://wa.me/233530297282?text=Hello%20Jeffrey,%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20get%20in%20touch.'
+  icon: whatsapp
+  order: 2
+
+- label: Phone
+  href: tel:+233530297282
+  icon: phone
+  order: 3
