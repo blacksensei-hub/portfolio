@@ -90,13 +90,13 @@ spec [0004](../specs/0004-projects-section.md) · code in `src/components/sectio
 ### 7. Skills section
 A grouped list of your skills, read from the content files.
 **Done when:** skills render grouped and readable, and screen readers announce the groups.
-spec [0005](../specs/0005-skills-section.md)
+spec [0005](../specs/0005-skills-section.md) · code in `src/components/sections/Skills.astro`, `src/pages/index.astro`, `tests/e2e/skills.spec.ts`
 - [x] Design it (spec): `/architect skills section`
-- [ ] Build it: `/develop skills section`
-  - [ ] `Skills` component wired into the page after Projects (AC-1, AC-2, AC-4, AC-6)
-  - [ ] Responsive one, two, three column grid with wrapping chips (AC-3)
-  - [ ] E2E for groups, list names, layout, and axe in both schemes (AC-1, AC-2, AC-3, AC-5)
-  - [ ] Container unit tests for the empty and sort cases (AC-1, AC-4)
+- [x] Build it: `/develop skills section`
+  - [x] `Skills` component wired into the page after Projects (AC-1, AC-2, AC-4, AC-6)
+  - [x] Responsive one, two, three column grid with wrapping chips (AC-3)
+  - [x] E2E for groups, list names, layout, and axe in both schemes (AC-1, AC-2, AC-3, AC-5)
+  - [x] Container unit tests for the empty and sort cases (AC-1, AC-4)
 - [ ] Verify it: `/check verify skills section`
 
 ### 8. Contact links & resume
