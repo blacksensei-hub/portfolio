@@ -16,7 +16,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Content model | Foundation | done |
 | 4 | Design system & UI foundation | Foundation | done |
 | 5 | Hero & about | Release 1 | done |
-| 6 | Projects section | Release 1 | in-progress |
+| 6 | Projects section | Release 1 | done |
 | 7 | Skills section | Release 1 | planned |
 | 8 | Contact links & resume | Release 1 | planned |
 | 9 | SEO & social cards | Release 1 | planned |
@@ -75,7 +75,7 @@ Name, role, a one line pitch, and a short bio at the top of the page.
 code in `src/components/sections/`, `src/pages/index.astro`
 - [x] Build it: `/develop hero & about`
 
-### 6. Projects section · in-progress
+### 6. Projects section · done
 Project cards (title, summary, tech, links to live demo and code) read from the content files.
 **Done when:** every project in the data file renders as a card with working links, and the layout holds from phone to desktop.
 spec [0004](../specs/0004-projects-section.md) · code in `src/components/sections/`, `src/pages/index.astro`, `tests/e2e/projects.spec.ts`
@@ -85,7 +85,7 @@ spec [0004](../specs/0004-projects-section.md) · code in `src/components/sectio
   - [x] Responsive one to two column grid (AC-5)
   - [x] E2E for cards, links, layout, and axe in both schemes (AC-1, AC-3, AC-5, AC-7)
   - [x] Container unit tests for image and empty states (AC-1, AC-4, AC-6)
-- [ ] Verify it: `/check verify projects section`
+- [x] Verify it: `/check verify projects section`
 
 ### 7. Skills section
 A grouped list of your skills, read from the content files.
