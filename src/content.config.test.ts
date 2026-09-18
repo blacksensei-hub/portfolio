@@ -284,11 +284,15 @@ describe('profileSchema', () => {
   });
 
   it('rejects an unknown key', () => {
-    // covers: AC-4. `.strict()` means a mistyped field name is an error rather
-    // than content that silently never renders.
+    // covers: AC-4. The `never` catchall means a mistyped field name is an
+    // error rather than content that silently never renders.
     const result = profileSchema.safeParse({ ...validProfile, twitter: '@ada' });
 
     expect(result.success).toBe(false);
+    // The issue is pinned to the offending key, not to the entry as a whole.
+    // An empty path here is what made Astro print a bare `****` instead of a
+    // field name, so this assertion is the guard against that coming back.
+    expect(result.error?.issues[0]?.path).toEqual(['twitter']);
   });
 
   it('rejects an entry missing a required field', () => {

@@ -211,6 +211,27 @@ export function reportProfileDefect<T extends z.ZodTypeAny>(schema: T) {
 
 const nonEmpty = z.string().min(1);
 
+/*
+ * The catchall every schema below uses in place of `.strict()`.
+ *
+ * `.strict()` reports an unknown key with an *empty* issue path, and Astro
+ * formats each issue as `**${issue.path.join('.')}**: ${message}`, so an empty
+ * path collapses the bold markers into a bare `****`. Failing the key against
+ * `never` puts the key itself on the path, so the message names the field that
+ * is actually wrong.
+ *
+ * The `unknown().pipe(...)` is load bearing: zod special cases a catchall that
+ * is *literally* `z.never()` back into `.strict()`, empty path and all. Behind
+ * a pipe it is an ordinary catchall again, and the output type stays `never`,
+ * so the index signature this adds to the entry type never widens a field.
+ */
+const unknownKey = z.unknown().pipe(
+  z.never({
+    error:
+      'is not a field in this collection. Remove it, or add it to the schema in `src/content.config.ts`.',
+  }),
+);
+
 export const profileSchema = z
   .object({
     name: nonEmpty,
@@ -225,7 +246,7 @@ export const profileSchema = z
       .regex(/^\//, 'must be a root relative path into `public/`, for example `/resume.pdf`')
       .optional(),
   })
-  .strict();
+  .catchall(unknownKey);
 
 export const projectSchema = (image: ImageFunction) =>
   z
@@ -242,7 +263,7 @@ export const projectSchema = (image: ImageFunction) =>
       image: image().optional(),
       order: z.number().int().min(0),
     })
-    .strict()
+    .catchall(unknownKey)
     .refine((entry) => entry.demoUrl !== undefined || entry.repoUrl !== undefined, {
       message: 'needs at least one of `demoUrl` or `repoUrl`, so the card has somewhere to link',
       path: ['demoUrl'],
@@ -254,7 +275,7 @@ export const skillGroupSchema = z
     items: z.array(nonEmpty).min(1),
     order: z.number().int().min(0),
   })
-  .strict();
+  .catchall(unknownKey);
 
 export const linkSchema = z
   .object({
@@ -265,7 +286,7 @@ export const linkSchema = z
     icon: z.enum(['github', 'linkedin', 'email', 'x', 'whatsapp', 'phone']),
     order: z.number().int().min(0),
   })
-  .strict();
+  .catchall(unknownKey);
 
 const profile = defineCollection({
   loader: file('src/content/profile.yaml', { parser: singleProfile }),
