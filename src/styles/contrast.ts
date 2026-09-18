@@ -14,7 +14,8 @@ export interface Oklch {
 
 const clamp = (v: number): number => Math.min(1, Math.max(0, v));
 
-export function relativeLuminance({ l, c, h }: Oklch): number {
+/** OKLCH to linear sRGB, each channel clamped to [0, 1] (out of gamut clips). */
+function toLinearSrgb({ l, c, h }: Oklch): [number, number, number] {
   const rad = (h * Math.PI) / 180;
   const a = c * Math.cos(rad);
   const b = c * Math.sin(rad);
@@ -23,11 +24,31 @@ export function relativeLuminance({ l, c, h }: Oklch): number {
   const mc = (l - 0.1055613458 * a - 0.0638541728 * b) ** 3;
   const sc = (l - 0.0894841775 * a - 1.291485548 * b) ** 3;
 
-  const r = clamp(4.0767416621 * lc - 3.3077115913 * mc + 0.2309699292 * sc);
-  const g = clamp(-1.2684380046 * lc + 2.6097574011 * mc - 0.3413193965 * sc);
-  const bl = clamp(-0.0041960863 * lc - 0.7034186147 * mc + 1.707614701 * sc);
+  return [
+    clamp(4.0767416621 * lc - 3.3077115913 * mc + 0.2309699292 * sc),
+    clamp(-1.2684380046 * lc + 2.6097574011 * mc - 0.3413193965 * sc),
+    clamp(-0.0041960863 * lc - 0.7034186147 * mc + 1.707614701 * sc),
+  ];
+}
 
-  return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+export function relativeLuminance(color: Oklch): number {
+  const [r, g, b] = toLinearSrgb(color);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * `#rrggbb` for an OKLCH color, for renderers that cannot read `oklch()`
+ * (satori, for the social card). Gamma encodes with the sRGB transfer curve.
+ */
+export function toHex(color: Oklch): string {
+  return `#${toLinearSrgb(color)
+    .map((v) => {
+      const encoded = v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055;
+      return Math.round(encoded * 255)
+        .toString(16)
+        .padStart(2, '0');
+    })
+    .join('')}`;
 }
 
 export function contrastRatio(x: Oklch, y: Oklch): number {
