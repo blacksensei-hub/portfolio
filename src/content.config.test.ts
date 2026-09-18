@@ -7,6 +7,7 @@ import {
   profileSchema,
   projectSchema,
   reportDefects,
+  reportProfileDefect,
   singleProfile,
   skillGroupSchema,
 } from './content.config';
@@ -176,30 +177,76 @@ describe('reportDefects', () => {
 });
 
 describe('singleProfile', () => {
+  /*
+   * covers: AC-9. The single entry rule is found by the parser and reported by
+   * the schema, so these run the pair together the way the duplicate key cases
+   * do. That pairing is the whole point: `file()` swallows a thrown parser into
+   * a logged error and an empty collection, leaving the build green, while a
+   * schema failure is a build failure. This is the same mechanism AC-3 relies
+   * on for every other rule.
+   */
+  const profileEntry = reportProfileDefect(profileSchema);
+
+  // Parses the file, then validates the entry it produced. Returns both, so a
+  // case can assert the parser did not throw and that the schema rejected.
+  function parseFile(text: string) {
+    const parsed = singleProfile(text);
+
+    return { parsed, result: profileEntry.safeParse(parsed['profile']) };
+  }
+
   it('accepts a file holding exactly one profile key', () => {
-    // covers: AC-9. `getEntry('profile', 'profile')` is the contract, so the
-    // key has to be that exact string.
-    const parsed = singleProfile('profile:\n  name: Ada\n');
-
-    expect(parsed).toEqual({ profile: { name: 'Ada' } });
-  });
-
-  it('rejects a file with no keys', () => {
-    expect(() => singleProfile('')).toThrow(/exactly one top level key/);
-  });
-
-  it('rejects a file with more than one key', () => {
-    expect(() => singleProfile('profile:\n  name: Ada\nother:\n  name: Bob\n')).toThrow(
-      /exactly one top level key/,
+    // `getEntry('profile', 'profile')` is the contract, so the key has to be
+    // that exact string.
+    const { parsed, result } = parseFile(
+      `profile:\n  name: ${validProfile.name}\n  role: ${validProfile.role}\n  tagline: ${validProfile.tagline}\n  bio: ${validProfile.bio}\n  email: ${validProfile.email}\n`,
     );
+
+    expect(Object.keys(parsed)).toEqual(['profile']);
+    expect(result.success).toBe(true);
   });
 
-  it('rejects a file whose single key is not `profile`', () => {
-    expect(() => singleProfile('me:\n  name: Ada\n')).toThrow(/exactly one top level key/);
+  it('leaves no defect behind after a good file', () => {
+    // A bad parse must not poison the next good one: the register is cleared
+    // per parse, so a fixed file builds without a restart.
+    parseFile('');
+    const { result } = parseFile(
+      `profile:\n  name: ${validProfile.name}\n  role: ${validProfile.role}\n  tagline: ${validProfile.tagline}\n  bio: ${validProfile.bio}\n  email: ${validProfile.email}\n`,
+    );
+
+    expect(result.success).toBe(true);
   });
 
-  it('rejects a list', () => {
-    expect(() => singleProfile('- name: Ada\n')).toThrow(/single `profile:` mapping/);
+  it('fails the build on a file with no keys', () => {
+    const { parsed, result } = parseFile('');
+
+    // The parser returns rather than throwing, so the loader cannot swallow it.
+    expect(Object.keys(parsed)).toEqual(['profile']);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toMatch(/exactly one top level key/);
+  });
+
+  it('fails the build on a file with more than one key', () => {
+    const { parsed, result } = parseFile('profile:\n  name: Ada\nother:\n  name: Bob\n');
+
+    expect(Object.keys(parsed)).toEqual(['profile']);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toMatch(/exactly one top level key.*other/s);
+  });
+
+  it('fails the build on a file whose single key is not `profile`', () => {
+    const { result } = parseFile('me:\n  name: Ada\n');
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toMatch(/exactly one top level key/);
+  });
+
+  it('fails the build on a list', () => {
+    const { parsed, result } = parseFile('- name: Ada\n');
+
+    expect(Object.keys(parsed)).toEqual(['profile']);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toMatch(/single `profile:` mapping/);
   });
 });
 

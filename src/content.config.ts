@@ -114,30 +114,51 @@ export function keyedList(collection: string, keyField: string) {
  * so it needs its own parser: one that proves there is exactly one key and that
  * the key is `profile`, since `getEntry('profile', 'profile')` is the contract.
  *
- * This one has nowhere to pin a defect (the violation is the set of keys, not a
- * field on an entry), so it throws. The loader swallows that into a logged
- * error and an empty collection, which is why consumers must handle an absent
- * profile per AC-10.
+ * Like the parser above it never throws, for the same reason: a thrown parser
+ * leaves the build green with the profile silently missing. The violation here
+ * is the set of top level keys rather than a field on an entry, so there is
+ * nothing to pin it to. The parser therefore always returns a `profile` entry,
+ * even when it had to invent an empty one, and records the defect against it.
+ * The entry then reaches the schema, the schema fails, and the build fails.
  */
 export function singleProfile(text: string): Record<string, Record<string, unknown>> {
   // An empty file parses to undefined. It is still a rule violation, but the
   // "exactly one key" message below locates it better than a shape complaint.
   const parsed: unknown = yamlLoad(text) ?? {};
 
+  defects.delete('profile');
+
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new Error('[profile] profile.yaml must contain a single `profile:` mapping.');
+    recordDefect('profile', 'profile', {
+      field: 'profile',
+      message: 'profile.yaml must contain a single `profile:` mapping.',
+    });
+    return { profile: {} };
   }
 
-  const keys = Object.keys(parsed);
+  const entries = parsed as Record<string, unknown>;
+  const keys = Object.keys(entries);
+
   if (keys.length !== 1 || keys[0] !== 'profile') {
-    throw new Error(
-      `[profile] profile.yaml must hold exactly one top level key, \`profile\`. Found: ${
+    recordDefect('profile', 'profile', {
+      field: 'profile',
+      message: `profile.yaml must hold exactly one top level key, \`profile\`. Found: ${
         keys.length === 0 ? 'nothing' : keys.join(', ')
       }.`,
-    );
+    });
+
+    // Keep whatever was under `profile`, if anything, so the failure message is
+    // about the keys rather than about five fields that were never missing.
+    const existing = entries['profile'];
+    const usable =
+      typeof existing === 'object' && existing !== null && !Array.isArray(existing)
+        ? (existing as Record<string, unknown>)
+        : {};
+
+    return { profile: usable };
   }
 
-  return parsed as Record<string, Record<string, unknown>>;
+  return entries as Record<string, Record<string, unknown>>;
 }
 
 /*
@@ -163,6 +184,29 @@ export function reportDefects<T extends z.ZodTypeAny>(
       message: defect.message,
     });
   });
+}
+
+/*
+ * The same replay for `profile`, whose entry has no key field to read: its key
+ * is always the entry id `profile`. The check runs *before* the object schema
+ * and pipes into it, because a `superRefine` attached to an object never runs
+ * when the object itself fails to parse, and the invented empty entry does fail
+ * it. Zod short circuits a pipe, so the recorded message is the only error.
+ */
+export function reportProfileDefect<T extends z.ZodTypeAny>(schema: T) {
+  return z
+    .unknown()
+    .superRefine((_entry, ctx) => {
+      const defect = defects.get('profile')?.get('profile');
+      if (defect === undefined) return;
+
+      ctx.addIssue({
+        code: 'custom',
+        path: [defect.field],
+        message: defect.message,
+      });
+    })
+    .pipe(schema);
 }
 
 const nonEmpty = z.string().min(1);
@@ -225,7 +269,7 @@ export const linkSchema = z
 
 const profile = defineCollection({
   loader: file('src/content/profile.yaml', { parser: singleProfile }),
-  schema: profileSchema,
+  schema: reportProfileDefect(profileSchema),
 });
 
 const projects = defineCollection({
