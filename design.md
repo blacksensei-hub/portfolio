@@ -65,6 +65,13 @@ Props: `href: string`, any other `<a>` attributes, and a default slot. Renders a
 ```astro
 <Link href="https://github.com/me">GitHub</Link>
 ```
+When a Link starts a new line inside a sentence, end the line before it with `{' '}`. Astro drops the line break space, so without it the words run together ("anexternal link"). Prettier keeps the `{' '}` when it rewraps.
+```astro
+<p>
+  Find the code on{' '}
+  <Link href="https://github.com/me">GitHub</Link>.
+</p>
+```
 
 ### ButtonLink
 Props: `href: string`, `variant?: 'primary' | 'secondary'` (default `primary`), `download?: boolean`, and a default slot. It is an `<a>` styled as a button: primary is an accent fill, secondary an accent outline. It follows the same external rule as Link. Use it for calls to action. It is always a link, never a `<button>`, because every action here navigates or downloads.

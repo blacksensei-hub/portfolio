@@ -1,7 +1,7 @@
 # 0003. Build a token based design system with hand built Astro components
 
 **Date**: 2026-09-18
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

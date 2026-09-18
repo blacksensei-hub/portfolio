@@ -14,7 +14,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 1 | Stack & architecture | Foundation | done |
 | 2 | Coding standards & tooling | Foundation | done |
 | 3 | Content model | Foundation | done |
-| 4 | Design system & UI foundation | Foundation | in-progress |
+| 4 | Design system & UI foundation | Foundation | done |
 | 5 | Hero & about | Release 1 | planned |
 | 6 | Projects section | Release 1 | planned |
 | 7 | Skills section | Release 1 | planned |
@@ -55,7 +55,7 @@ spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config
   - [x] Schema tests, and a deliberate bad entry proving the build fails (AC-3 to AC-7)
 - [x] Verify it: `/check verify content model`
 
-### 4. Design system & UI foundation · in-progress
+### 4. Design system & UI foundation · done
 Type, color, spacing, and base components, with color tokens ready for both themes and focus styles that meet AA.
 **Done when:** `design.md` covers tokens and components, text contrast meets WCAG 2.2 AA, and base components work with the keyboard.
 spec [0003](../specs/0003-design-system/index.md) · code in `src/styles/`, `src/components/ui/`, `src/pages/styleguide.astro`, `design.md`
@@ -65,7 +65,7 @@ spec [0003](../specs/0003-design-system/index.md) · code in `src/styles/`, `src
   - [x] Base components and the noindexed `/styleguide` page (AC-5, AC-7, AC-10)
   - [x] Contrast unit test and axe/keyboard e2e in both color schemes (AC-2 to AC-8, AC-10)
   - [x] `design.md` at the repo root (AC-9)
-- [ ] Verify it: `/check verify design system & UI foundation`
+- [x] Verify it: `/check verify design system & UI foundation`
 
 ## Release 1: the smallest live portfolio
 

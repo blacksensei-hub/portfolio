@@ -153,6 +153,28 @@ test('external links open in a new tab safely and say so', async ({ page }) => {
   await expect(internal).not.toHaveAttribute('target', /.*/);
 });
 
+for (const path of pages) {
+  test(`${path} keeps the spaces around links inside sentences`, async ({ page }) => {
+    // Astro drops the line break space before a component that starts a new
+    // line, so "an\n<Link>" renders as "anexternal link". Catch it on real pages.
+    await page.goto(path);
+
+    const glued = await page.locator('p a, li a').evaluateAll((links) =>
+      links.flatMap((a) => {
+        // Only text neighbors form a sentence; sibling elements are laid out by CSS.
+        const text = (n: ChildNode | null) =>
+          n?.nodeType === Node.TEXT_NODE ? (n.textContent ?? '') : '';
+        const before = text(a.previousSibling).slice(-1);
+        const after = text(a.nextSibling).charAt(0);
+        return /[\p{L}\p{N}]/u.test(before) || /[\p{L}\p{N}]/u.test(after)
+          ? [`${before}|${a.textContent?.trim()}|${after}`]
+          : [];
+      }),
+    );
+    expect(glued).toEqual([]);
+  });
+}
+
 test('the styleguide is noindexed and left out of the sitemap', async ({ page, request }) => {
   // covers: AC-7
   await page.goto('/styleguide/');
