@@ -7,10 +7,23 @@ interface Props {
   description?: string | undefined;
   /** Keeps the page out of search results (the styleguide). */
   noindex?: boolean | undefined;
+  /** Open Graph, X, and JSON-LD for a shareable page (spec 0006). */
+  social?:
+    | {
+        /** Site relative path to the 1200 by 630 PNG card. */
+        image: string;
+        imageAlt: string;
+        siteName: string;
+        jsonLd: object;
+      }
+    | undefined;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, social } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const image = social && new URL(social.image, Astro.site).href;
+// Escaping `<` keeps content from ever closing the script tag early.
+const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
 ---
 
 <html lang="en">
@@ -24,6 +37,27 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
+    {social && (
+      <>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        {description && <meta property="og:description" content={description} />}
+        <meta property="og:url" content={canonical.href} />
+        <meta property="og:image" content={image} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:alt" content={social.imageAlt} />
+        <meta property="og:site_name" content={social.siteName} />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        {description && <meta name="twitter:description" content={description} />}
+        <meta name="twitter:image" content={image} />
+        <meta name="twitter:image:alt" content={social.imageAlt} />
+        <script is:inline type="application/ld+json" set:html={jsonLd}></script>
+      </>
+    )}
     <slot name="head" />
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">

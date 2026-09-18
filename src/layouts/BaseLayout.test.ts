@@ -22,7 +22,12 @@ beforeEach(async () => {
 });
 
 async function render(
-  props: { title: string; description?: string | undefined; noindex?: boolean },
+  props: {
+    title: string;
+    description?: string | undefined;
+    noindex?: boolean;
+    social?: { image: string; imageAlt: string; siteName: string; jsonLd: object };
+  },
   slots: Record<string, string> = {},
 ): Promise<string> {
   return container.renderToString(BaseLayout, { props, slots });
@@ -110,5 +115,35 @@ describe('BaseLayout', () => {
       '<meta name="robots" content="noindex">',
     );
     expect(await render({ title: 'Portfolio' })).not.toContain('name="robots"');
+  });
+
+  it('renders no Open Graph, X, or JSON-LD without the social prop', async () => {
+    // covers: spec 0006 AC-9, the styleguide passes no social prop.
+    const html = await render({ title: 'Styleguide', noindex: true });
+
+    expect(html).not.toContain('og:');
+    expect(html).not.toContain('twitter:');
+    expect(html).not.toContain('application/ld+json');
+  });
+
+  it('renders the social tags and one JSON-LD script with the social prop', async () => {
+    // covers: spec 0006 AC-2, AC-3, AC-5.
+    const html = await render({
+      title: 'Ada · Engineer',
+      description: 'Builds engines.',
+      social: {
+        image: '/og.png',
+        imageAlt: 'Ada, Engineer',
+        siteName: 'Ada',
+        jsonLd: { name: '</script><b>x' },
+      },
+    });
+
+    expect(html).toContain('<meta property="og:title" content="Ada · Engineer">');
+    expect(html).toMatch(/<meta property="og:image" content="https?:\/\/[^"]+\/og\.png">/);
+    expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(html.match(/application\/ld\+json/g)).toHaveLength(1);
+    // A `<` in content never closes the script early.
+    expect(html).toContain(String.raw`"\u003c/script>\u003cb>x"`);
   });
 });

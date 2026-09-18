@@ -7,8 +7,11 @@ import Hero from '../components/sections/Hero.astro';
 import Projects from '../components/sections/Projects.astro';
 import Skills from '../components/sections/Skills.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { buildJsonLd } from '../lib/seo';
 
 const profile = (await getEntry('profile', 'profile'))?.data;
+// No generic fallback: a preview that says "Portfolio" is worse than a failed build.
+if (!profile) throw new Error('profile.yaml is missing');
 
 // Also what makes image paths resolve at build time, so a missing project image
 // fails the build (spec 0002, AC-8).
@@ -18,21 +21,22 @@ const links = await getCollection('links');
 ---
 
 <BaseLayout
-  title={profile ? `${profile.name} · ${profile.role}` : 'Portfolio'}
-  description={profile?.tagline ?? 'A personal portfolio.'}
+  title={`${profile.name} · ${profile.role}`}
+  description={profile.tagline}
+  social={{
+    image: '/og.png',
+    imageAlt: `${profile.name}, ${profile.role}`,
+    siteName: profile.name,
+    jsonLd: buildJsonLd(
+      profile,
+      links.map((link) => link.data),
+      new URL('/', Astro.site),
+    ),
+  }}
 >
-  {profile && (
-    <>
-      <Hero
-        name={profile.name}
-        role={profile.role}
-        tagline={profile.tagline}
-        email={profile.email}
-      />
-      <About bio={profile.bio} />
-    </>
-  )}
+  <Hero name={profile.name} role={profile.role} tagline={profile.tagline} email={profile.email} />
+  <About bio={profile.bio} />
   <Projects projects={projects} />
   <Skills skills={skills} />
-  <Contact links={links} resume={profile?.resume} />
+  <Contact links={links} resume={profile.resume} />
 </BaseLayout>
