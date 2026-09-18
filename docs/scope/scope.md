@@ -58,13 +58,13 @@ spec [0002](../specs/0002-content-model/index.md) · code in `src/content.config
 ### 4. Design system & UI foundation · in-progress
 Type, color, spacing, and base components, with color tokens ready for both themes and focus styles that meet AA.
 **Done when:** `design.md` covers tokens and components, text contrast meets WCAG 2.2 AA, and base components work with the keyboard.
-spec [0003](../specs/0003-design-system/index.md)
+spec [0003](../specs/0003-design-system/index.md) · code in `src/styles/`, `src/components/ui/`, `src/pages/styleguide.astro`, `design.md`
 - [x] Design it (spec): `/architect design system & UI foundation`
-- [ ] Build it: `/develop design system & UI foundation`
-  - [ ] Tokens, Inter font, dark media block, focus and reduced motion rules, skip link in BaseLayout (AC-1, AC-3, AC-4, AC-5, AC-8)
-  - [ ] Base components and the noindexed `/styleguide` page (AC-5, AC-7, AC-10)
-  - [ ] Contrast unit test and axe/keyboard e2e in both color schemes (AC-2 to AC-8, AC-10)
-  - [ ] `design.md` at the repo root (AC-9)
+- [x] Build it: `/develop design system & UI foundation`
+  - [x] Tokens, Inter font, dark media block, focus and reduced motion rules, skip link in BaseLayout (AC-1, AC-3, AC-4, AC-5, AC-8)
+  - [x] Base components and the noindexed `/styleguide` page (AC-5, AC-7, AC-10)
+  - [x] Contrast unit test and axe/keyboard e2e in both color schemes (AC-2 to AC-8, AC-10)
+  - [x] `design.md` at the repo root (AC-9)
 - [ ] Verify it: `/check verify design system & UI foundation`
 
 ## Release 1: the smallest live portfolio
