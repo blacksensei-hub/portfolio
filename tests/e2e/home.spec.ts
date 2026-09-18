@@ -5,7 +5,7 @@ test.describe('home page', () => {
   test('renders the page shell', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle(/Portfolio/);
+    await expect(page).toHaveTitle(/Jeffrey Nii Akwei Ankrah/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByRole('main')).toBeVisible();
   });

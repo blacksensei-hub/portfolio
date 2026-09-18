@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Coding standards & tooling | Foundation | done |
 | 3 | Content model | Foundation | done |
 | 4 | Design system & UI foundation | Foundation | done |
-| 5 | Hero & about | Release 1 | planned |
+| 5 | Hero & about | Release 1 | in-progress |
 | 6 | Projects section | Release 1 | planned |
 | 7 | Skills section | Release 1 | planned |
 | 8 | Contact links & resume | Release 1 | planned |
@@ -69,10 +69,11 @@ spec [0003](../specs/0003-design-system/index.md) · code in `src/styles/`, `src
 
 ## Release 1: the smallest live portfolio
 
-### 5. Hero & about
+### 5. Hero & about · in-progress
 Name, role, a one line pitch, and a short bio at the top of the page.
 **Done when:** a visitor sees who you are and what you do before they scroll, on mobile and desktop.
-- [ ] Build it: `/develop hero & about`
+code in `src/components/sections/`, `src/pages/index.astro`
+- [x] Build it: `/develop hero & about`
 
 ### 6. Projects section · needs a decision
 Project cards (title, summary, tech, links to live demo and code) read from the content files.

@@ -1,0 +1,27 @@
+---
+import ButtonLink from '../ui/ButtonLink.astro';
+import Container from '../ui/Container.astro';
+
+interface Props {
+  name: string;
+  role: string;
+  tagline: string;
+  email: string;
+}
+
+// The top of the page and its only <h1>, so it is not a Section (which owns an <h2>).
+const { name, role, tagline, email } = Astro.props;
+---
+
+<section aria-labelledby="hero-heading" class="py-section">
+  <Container>
+    <h1 id="hero-heading" class="text-display font-bold tracking-tight">
+      {name}
+    </h1>
+    <p class="text-h3 text-accent mt-3 font-semibold">{role}</p>
+    <p class="text-muted mt-6 max-w-prose text-lg">{tagline}</p>
+    <div class="mt-8">
+      <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>
+    </div>
+  </Container>
+</section>
