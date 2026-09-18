@@ -35,7 +35,7 @@ Build the portfolio as a single Astro 7 project with `output: 'static'` and no s
 Not needed for this product, so omitted: database, auth, background jobs, file storage, observability. Lint and format are decided by feature 2 (`/audit`), hosting by feature 10, analytics by feature 13.
 
 **Configuration required**:
-- `SITE_URL`: the public origin of the site, used for canonical links and the sitemap. Optional; defaults to `https://example.com` until feature 10 sets the real URL. Not a secret.
+- `SITE_URL`: the public origin of the site, used for canonical links and the sitemap. Production sets it to `https://jeffrey-ankrah.pages.dev` in `.github/workflows/deploy.yml` (mirrored in `.env.example`). Optional; local builds without it fall back to `https://example.com`. Not a secret.
 
 **Constraints the build must honor**:
 - No server adapter and no on demand rendered routes. Anything dynamic runs in the browser inside an island.
@@ -70,7 +70,7 @@ Not needed for this product, so omitted: database, auth, background jobs, file s
 - Astro 7 is a recent major, so some third party integrations and tutorials may still target older versions.
 - Tailwind 4 configures in CSS (`@theme`), not `tailwind.config.js`, so many older guides do not apply.
 - `strictest` TypeScript adds friction (indexed access returns `T | undefined`).
-- Until feature 10 sets `SITE_URL`, the sitemap and canonical links point at `https://example.com`; they are knowingly wrong until deploy.
+- Builds without `SITE_URL` (local builds and tests) point the sitemap and canonical links at `https://example.com`; production sets the real origin, so only local output carries the fallback.
 - No server means a future contact form or CMS (deferred in scope) needs an external service or a later spec to add an adapter.
 
 **Neutral**:
@@ -82,7 +82,7 @@ Not needed for this product, so omitted: database, auth, background jobs, file s
 - [ ] `astro`, `tailwind-4-docs`, `vitest`, and `playwright-cli` skills are installed but not yet in root `AGENTS.md` `## Agent skills`; they apply project wide and belong at root. The `astro` and `tailwind-4-docs` skills are community made: check they match Astro 7 and Tailwind 4 before trusting them.
 - [ ] MCP servers not connected yet (your choice for now): Astro Docs MCP (`https://mcp.docs.astro.build/mcp`) for live Astro docs, Playwright MCP (`npx @playwright/mcp@latest`) for browser driven checks.
 - [ ] Feature 10: Vercel Hobby is limited to non commercial use, and freelance work may count as commercial. Weigh that when choosing the host.
-- [ ] Feature 10: replace the `SITE_URL` placeholder with the real URL.
+- [x] Feature 10: replace the `SITE_URL` placeholder with the real URL (done, `https://jeffrey-ankrah.pages.dev`).
 - [ ] Feature 3: content validation runs at build time only; if content ever comes from a remote source, that source needs its own validation.
 
 ## Rationale
