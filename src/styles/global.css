@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/*
+ * Starter design tokens.
+ *
+ * Deliberately thin: the design system feature owns the real palette, type
+ * scale and spacing. These exist so the token pattern is in place and the
+ * dark/light theme feature has somewhere to hang its second set of values.
+ */
+@theme {
+  --color-surface: oklch(99% 0 0);
+  --color-on-surface: oklch(25% 0.01 260);
+  --color-muted: oklch(50% 0.01 260);
+  --color-accent: oklch(55% 0.17 260);
+
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+
+  --spacing-gutter: 1.5rem;
+}
