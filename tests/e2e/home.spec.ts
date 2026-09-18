@@ -18,13 +18,14 @@ test.describe('home page', () => {
   });
 
   test('links a canonical URL on the site origin', async ({ page }) => {
-    // covers: `site` from SITE_URL feeds canonical links. The build runs with no
-    // SITE_URL set, so the placeholder origin from the spec is what ships.
+    // covers: `site` from SITE_URL feeds canonical links. CI builds with the real
+    // origin (spec 0007); a local build without SITE_URL ships the placeholder.
+    const origin = process.env['SITE_URL'] || 'https://example.com';
     await page.goto('/');
 
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      'https://example.com/',
+      new URL('/', origin).href,
     );
   });
 
