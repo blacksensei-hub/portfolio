@@ -24,11 +24,11 @@ The site is one page, fully static, with no server. All text lives in the conten
 - **AC-1**: The home page `<title>` is `{profile.name} · {profile.role}` and the meta description is `profile.tagline`.
 - **AC-2**: The home page head has `og:type` = `website`, `og:title` and `og:description` (same text as AC-1), `og:url` equal to the canonical URL, `og:image` as an absolute URL to `/og.png`, `og:image:width` = `1200`, `og:image:height` = `630`, `og:image:type` = `image/png`, `og:image:alt`, `og:site_name` = `profile.name`, and `og:locale` = `en_US`.
 - **AC-3**: The home page head has `twitter:card` = `summary_large_image`, plus `twitter:title`, `twitter:description`, `twitter:image` (same absolute URL as `og:image`), and `twitter:image:alt`.
-- **AC-4**: `/og.png` is built as a 1200 by 630 PNG. It shows `profile.name`, `profile.role`, and `profile.tagline` in Inter, on the light theme surface color with the accent color, and nothing overflows the frame.
+- **AC-4**: `/og.png` is built as a 1200 by 630 PNG on the light theme surface color. A 12px accent bar runs the full height of the left edge. A text block sits top left, after the bar, and holds three blocks with a 24px gap between them: `profile.name` (Inter 700, dark text color, line height 1.1), `profile.role` (Inter 500, 40px, accent color, line height 1.2), and `profile.tagline` (Inter 400, 32px, muted text color, line height 1.4). The name is 72px when it fits on one line, 64px when it fits in two lines, and 56px otherwise, wrapping as needed. It is never truncated. The tagline stops at 3 lines and ends with an ellipsis. Nothing overflows the frame.
 - **AC-5**: The home page has exactly one `<script type="application/ld+json">`. It parses as JSON and holds an `@graph` with a `Person` node (`name`, `jobTitle`, `email`, `url`, `sameAs`) and a `WebSite` node (`url`, `name`). `sameAs` lists the `href` of every `links` entry whose `icon` is `github`, `linkedin`, or `x`, in `order`. It is left out when that list is empty.
 - **AC-6**: `/robots.txt` returns `User-agent: *`, `Allow: /`, and `Sitemap: {origin}/sitemap-index.xml`.
 - **AC-7**: Every absolute URL (canonical, `og:url`, `og:image`, `twitter:image`, the JSON-LD `url`, the robots sitemap line) uses the `SITE_URL` origin, and falls back to `https://example.com` when it is unset.
-- **AC-8**: A missing profile entry fails the build. There is no generic `Portfolio` fallback anymore.
+- **AC-8**: A missing profile entry fails the build. There is no generic `Portfolio` fallback anymore. If satori or resvg throws while it builds `/og.png`, the build fails with `Error('og.png: failed to render the social card', { cause })`. There is no fallback image.
 - **AC-9**: `/styleguide` keeps `noindex`, stays out of the sitemap, and renders no `og:*`, `twitter:*`, or JSON-LD.
 
 ## Options considered
@@ -87,9 +87,13 @@ The profile is already the single source of the page's words, so the title, desc
 | `og:locale` | `en_US` | Decided here, matches `<html lang="en">` |
 | `Person.jobTitle`, `Person.email` | role, email | `profile.role`, `profile.email` |
 | `sameAs` | profile URLs | `links` entries with `icon` in `SAME_AS_ICONS`, sorted by `order` (today only GitHub) |
-| Card colors | surface, text, accent | The light theme `--color-surface`, `--color-on-surface`, and `--color-accent` in `src/styles/global.css`. Read that file at build, parse with `parseOklch` from `src/styles/contrast.ts`, and convert with a new `toHex(Oklch)` added there. The hex values are never hand copied |
-| Card font | Inter 400 and 700 `.woff` | New dependency `@fontsource/inter`, read from `node_modules/@fontsource/inter/files/inter-latin-{400,700}-normal.woff` with `fs.readFile` at build. No network |
-| Card layout | 1200 by 630, 80px padding. Name at 72px bold, role at 40px in accent, tagline at 32px regular (up to 3 lines), a 12px accent bar on the left edge | Decided here |
+| Card colors | surface, name, role, tagline, bar | The light theme tokens in `src/styles/global.css`: `--color-surface` (background), `--color-on-surface` (name), `--color-accent` (role and bar), `--color-muted` (tagline). Read that file at build, parse with `parseOklch` from `src/styles/contrast.ts`, and convert with a new `toHex(Oklch)` added there. `toHex` goes from oklch to linear sRGB, clamps each channel to [0, 1] so out of gamut colors are clipped, then gamma encodes to 8 bit hex. The hex values are never hand copied |
+| Card font | Inter 400, 500, and 700 `.woff` | New dependency `@fontsource/inter`, read from `node_modules/@fontsource/inter/files/inter-latin-{400,500,700}-normal.woff` with `fs.readFile` at build. No network |
+| Card layout | 1200 by 630. A 12px accent bar runs the full height on the left edge. The text block sits top left: 80px after the bar, with 80px padding at the top, right, and bottom, so the text column is 1028px wide. Name, role, and tagline stack with a 24px gap | Decided here |
+| Name type | Inter 700, line height 1.1, size 72, 64, or 56px | `pickNameSize(name, measure)` in `src/lib/og.ts` returns 72 when the name fits on one line in 1028px, 64 when it fits in two lines, and 56 otherwise (the name then wraps as needed and is never truncated). `measure(text, size)` returns the text width from `opentype.js` loading the same Inter 700 woff. Runner up: a character count estimate, rejected because it is inaccurate for proportional type |
+| Role type | Inter 500, 40px, line height 1.2 | Decided here |
+| Tagline type | Inter 400, 32px, line height 1.4, up to 3 lines | satori `lineClamp: 3` with an ellipsis |
+| Render failure | build error | `og.png.ts` wraps the satori and resvg calls and throws `Error('og.png: failed to render the social card', { cause })` (AC-8) |
 | Sitemap URL | `{origin}/sitemap-index.xml` | The file name `@astrojs/sitemap` writes by default |
 
 **Key invariants**: One JSON-LD script at most per page. No page without `social` renders OG or X tags. Every absolute URL comes from `Astro.site`, never a hardcoded string.
@@ -104,7 +108,8 @@ The profile is already the single source of the page's words, so the title, desc
 - Robots: request `/robots.txt` and check the three lines, with the sitemap line under the built origin. Verifies **AC-6**, **AC-7**
 - Styleguide: no `meta[property^="og:"]`, no `meta[name^="twitter:"]`, no JSON-LD, and `robots` is `noindex`. Verifies **AC-9**
 - Unit (`src/lib/seo.test.ts`): `sameAs` filters and sorts, it is left out when empty, and `url` follows the given origin. Verifies **AC-5**, **AC-7**
-- Unit (`src/styles/contrast.test.ts` or beside `toHex`): `toHex` maps known `oklch` values to their hex. Verifies **AC-4**
+- Unit (`src/styles/contrast.test.ts` or beside `toHex`): `toHex` maps known `oklch` values to their hex, and an out of gamut `oklch` clamps to a valid hex. Verifies **AC-4**
+- Unit (`src/lib/og.test.ts`): with a stub `measure`, `pickNameSize` returns 72 for a short name, 64 for a medium one, and 56 for a very long one. Verifies **AC-4**
 - Build failure: covered by the throw in `index.astro` and `og.png.ts`, checked by review at `/check verify` (a test that breaks the build is not worth the setup). Verifies **AC-8**
 
 ## Build plan
@@ -113,7 +118,7 @@ Skateboard, one pass: the page is already live, so the whole feature lands toget
 
 1. Add `toHex` to `src/styles/contrast.ts` and `buildJsonLd` and `SAME_AS_ICONS` to `src/lib/seo.ts`, each with unit tests. Satisfies **AC-4**, **AC-5**, **AC-7**
 2. Extend `BaseLayout.astro` with the optional `social` prop (OG, X, JSON-LD), and wire `index.astro` to require the profile and pass `social`. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-5**, **AC-7**, **AC-8**, **AC-9**
-3. Add `satori`, `@resvg/resvg-js`, and `@fontsource/inter`, then build `src/pages/og.png.ts`. Satisfies **AC-4**, **AC-8**
+3. Add `satori`, `@resvg/resvg-js`, `@fontsource/inter`, and `opentype.js`. Add `pickNameSize` in `src/lib/og.ts` with its unit test, then build `src/pages/og.png.ts` with the 400, 500, and 700 weights and the render failure error. Satisfies **AC-4**, **AC-8**
 4. Add `src/pages/robots.txt.ts`. Satisfies **AC-6**, **AC-7**
 5. Add `tests/e2e/seo.spec.ts` for the scenarios above. Satisfies **AC-1** to **AC-7**, **AC-9**
 
@@ -123,7 +128,7 @@ Skateboard, one pass: the page is already live, so the whole feature lands toget
 - Link previews and search results show your name, role, and tagline, always in sync with `profile.yaml`.
 
 **Negative / tradeoffs**:
-- Three new dependencies, one of them a native binary (`@resvg/resvg-js`). It ships prebuilt binaries for Windows, macOS, and Linux, so the build host needs no toolchain.
+- Four new dependencies, one of them a native binary (`@resvg/resvg-js`). It ships prebuilt binaries for Windows, macOS, and Linux, so the build host needs no toolchain.
 - The card uses only the light theme colors, whatever the viewer's theme.
 
 **Neutral**:
