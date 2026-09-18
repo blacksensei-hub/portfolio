@@ -2,6 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 
 import About from '../components/sections/About.astro';
+import Contact from '../components/sections/Contact.astro';
 import Hero from '../components/sections/Hero.astro';
 import Projects from '../components/sections/Projects.astro';
 import Skills from '../components/sections/Skills.astro';
@@ -13,6 +14,7 @@ const profile = (await getEntry('profile', 'profile'))?.data;
 // fails the build (spec 0002, AC-8).
 const projects = await getCollection('projects');
 const skills = await getCollection('skills');
+const links = await getCollection('links');
 ---
 
 <BaseLayout
@@ -32,4 +34,5 @@ const skills = await getCollection('skills');
   )}
   <Projects projects={projects} />
   <Skills skills={skills} />
+  <Contact links={links} resume={profile?.resume} />
 </BaseLayout>
