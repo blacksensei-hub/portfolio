@@ -41,7 +41,7 @@
   --default-transition-duration: 150ms;
 }
 
-/* Dark colors, from the OS setting. Feature 11 adds :root[data-theme="dark"]. */
+/* Dark colors, from the OS setting, unless the visitor forced light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --color-surface: oklch(17% 0.015 260);
@@ -52,6 +52,26 @@
     --color-on-accent: oklch(17% 0.015 260);
     --color-border: oklch(32% 0.02 260);
   }
+}
+
+/*
+ * Forced themes from the toggle (spec 0008). The dark values must match the
+ * media block above; tokens.test.ts checks they do. Unlayered, so color-scheme
+ * here beats the `light dark` default in @layer base.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-surface: oklch(17% 0.015 260);
+  --color-surface-raised: oklch(22% 0.02 260);
+  --color-on-surface: oklch(94% 0.01 260);
+  --color-muted: oklch(72% 0.02 260);
+  --color-accent: oklch(75% 0.13 262);
+  --color-on-accent: oklch(17% 0.015 260);
+  --color-border: oklch(32% 0.02 260);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {

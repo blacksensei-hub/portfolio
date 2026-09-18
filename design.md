@@ -8,7 +8,7 @@ The look of the portfolio: its tokens and base components. Decided in [spec 0003
 
 ## Color tokens
 
-Named by role, not by hue. Light values live in `@theme`. Dark values override them in `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }`, so `data-theme="light"` on `<html>` forces light. Feature 11 adds `:root[data-theme="dark"]`.
+Named by role, not by hue. Light values live in `@theme`. Dark values override them in `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }`, so `data-theme="light"` on `<html>` forces light. `:root[data-theme="dark"]` forces dark with the same values; the test keeps the two dark blocks equal, so a dark token change touches both. Each forced theme also sets `color-scheme` (spec 0008).
 
 | Token | Light | Dark | Purpose |
 |---|---|---|---|
@@ -46,7 +46,7 @@ Spacing inside components uses Tailwind's default 0.25rem scale.
 
 ## Components
 
-All live in `src/components/ui/`. They are `.astro` only and ship no client JavaScript.
+All live in `src/components/ui/`. They are `.astro` only and ship no client JavaScript, except ThemeToggle's small bundled script.
 
 ### Container
 The one width wrapper: `max-w-content`, centered, with the side gutter. No props. Use it when content needs the column but not a full Section.
@@ -93,3 +93,6 @@ Props: `as?: 'article' | 'div'` (default `article`), and a default slot. A `surf
 
 ### SkipLink
 No props. "Skip to content", pointing at `#main` and visually hidden until focused. `BaseLayout` renders it first in `<body>`, then wraps the page in `<main id="main" tabindex="-1">`. Pages must not render their own `<main>`.
+
+### ThemeToggle
+No props. A round 44px icon button fixed to the top right (`top-4 right-4`, `bg-surface-raised`, border, `hover:text-accent`) that cycles the theme: system, light, dark (spec 0008). Its `aria-label` names the current choice and the next one, and one Lucide icon (monitor, sun, moon) shows, picked by CSS from `data-theme-choice` on `<html>`. It renders `hidden` and its script reveals it, so without JavaScript it never shows. `BaseLayout` renders it right after SkipLink, and an inline head script (`THEME_HEAD_SCRIPT` in `src/lib/theme.ts`) applies the saved choice before first paint. It uses `z-50`, the one raw z-index on the site, since there is no z-index scale.

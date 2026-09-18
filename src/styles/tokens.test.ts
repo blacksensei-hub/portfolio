@@ -53,9 +53,11 @@ const light = colorTokens(block(css, /@theme\s*\{/));
 const darkOverrides = colorTokens(
   block(block(css, /@media \(prefers-color-scheme: dark\)/), /:root/),
 );
+const forcedDark = colorTokens(block(css, /:root\[data-theme="dark"\]\s*\{/));
 const themes = {
   light: resolve(light),
   dark: resolve(new Map([...light, ...darkOverrides])),
+  'forced dark': resolve(new Map([...light, ...forcedDark])),
 };
 
 const pairs: [fg: string, bg: string, min: number][] = [
@@ -86,6 +88,10 @@ describe('token sets', () => {
     expect([...darkOverrides.keys()].sort()).toEqual(
       [...light.keys()].filter((k) => k !== 'focus').sort(),
     );
+  });
+
+  it('forces the same dark values as the OS dark block', () => {
+    expect(Object.fromEntries(forcedDark)).toEqual(Object.fromEntries(darkOverrides));
   });
 });
 

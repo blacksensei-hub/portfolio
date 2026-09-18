@@ -1,5 +1,7 @@
 ---
 import SkipLink from '../components/ui/SkipLink.astro';
+import ThemeToggle from '../components/ui/ThemeToggle.astro';
+import { THEME_HEAD_SCRIPT } from '../lib/theme';
 import '../styles/global.css';
 
 interface Props {
@@ -29,6 +31,7 @@ const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script is:inline set:html={THEME_HEAD_SCRIPT}></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
@@ -62,6 +65,7 @@ const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">
     <SkipLink />
+    <ThemeToggle />
     <main id="main" tabindex="-1">
       <slot />
     </main>
