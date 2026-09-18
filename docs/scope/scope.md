@@ -110,13 +110,13 @@ _Built without LinkedIn (skipped by choice). Resume download deferred: add `publ
 ### 9. SEO & social cards
 Title, description, canonical URL, sitemap, structured data, and link previews.
 **Done when:** the page has complete metadata and a sitemap, and a shared link shows a correct preview card.
-spec [0006](../specs/0006-seo-social-cards.md) · code in `src/layouts/BaseLayout.astro`, `src/lib/seo.ts`, `src/pages/og.png.ts`, `src/pages/robots.txt.ts`, `tests/e2e/seo.spec.ts`
+spec [0006](../specs/0006-seo-social-cards.md) · code in `src/layouts/BaseLayout.astro`, `src/lib/seo.ts`, `src/pages/og.png.ts`, `src/pages/robots.txt.ts`, `src/lib/og.ts`, `tests/e2e/seo.spec.ts`
 - [x] Design it (spec): `/architect seo & social cards`
-- [ ] Build it: `/develop seo & social cards`
-  - [ ] `toHex` and `buildJsonLd` helpers with unit tests (AC-4, AC-5, AC-7)
-  - [ ] Layout social props, and the page requiring the profile (AC-1, AC-2, AC-3, AC-5, AC-7, AC-8, AC-9)
-  - [ ] Build time `/og.png` card and `/robots.txt` (AC-4, AC-6, AC-7, AC-8)
-  - [ ] E2E for tags, JSON-LD, card, robots, and styleguide (AC-1 to AC-7, AC-9)
+- [x] Build it: `/develop seo & social cards`
+  - [x] `toHex` and `buildJsonLd` helpers with unit tests (AC-4, AC-5, AC-7)
+  - [x] Layout social props, and the page requiring the profile (AC-1, AC-2, AC-3, AC-5, AC-7, AC-8, AC-9)
+  - [x] Build time `/og.png` card and `/robots.txt` (AC-4, AC-6, AC-7, AC-8)
+  - [x] E2E for tags, JSON-LD, card, robots, and styleguide (AC-1 to AC-7, AC-9)
 - [ ] Verify it: `/check verify seo & social cards`
 
 ### 10. Deploy to free hosting · needs a decision
