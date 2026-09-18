@@ -18,7 +18,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Hero & about | Release 1 | done |
 | 6 | Projects section | Release 1 | done |
 | 7 | Skills section | Release 1 | done |
-| 8 | Contact links & resume | Release 1 | in-progress |
+| 8 | Contact links & resume | Release 1 | done |
 | 9 | SEO & social cards | Release 1 | planned |
 | 10 | Deploy to free hosting | Release 1 | planned |
 | 11 | Dark/light theme | Release 2 | planned |
@@ -99,13 +99,13 @@ spec [0005](../specs/0005-skills-section.md) · code in `src/components/sections
   - [x] Container unit tests for the empty and sort cases (AC-1, AC-4)
 - [x] Verify it: `/check verify skills section`
 
-### 8. Contact links & resume
+### 8. Contact links & resume · done
 Email, GitHub, and LinkedIn links plus a resume PDF download.
 **Done when:** every link works, the resume downloads, and every link has an accessible name.
 code in `src/components/sections/Contact.astro`, `src/pages/index.astro`, `tests/e2e/contact.spec.ts`
-_Built without LinkedIn (skipped by choice). The resume button appears once `public/resume.pdf` and a `resume: /resume.pdf` line in `profile.yaml` are added._
+_Built without LinkedIn (skipped by choice). Resume download deferred: add `public/resume.pdf` and a `resume: /resume.pdf` line in `profile.yaml` before deploy (feature 10); the button appears on its own once both exist._
 - [x] Build it: `/develop contact links & resume`
-- [ ] Verify it: `/check verify contact links & resume`
+- [x] Verify it: `/check verify contact links & resume`
 
 ### 9. SEO & social cards
 Title, description, canonical URL, sitemap, structured data, and link previews.
