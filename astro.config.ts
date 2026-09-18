@@ -12,7 +12,11 @@ const { SITE_URL } = loadEnv(process.env['NODE_ENV'] ?? '', process.cwd(), '');
 export default defineConfig({
   site: SITE_URL || 'https://example.com',
   output: 'static',
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    // The styleguide is a build check, not content: keep it out of the sitemap.
+    sitemap({ filter: (page) => !new URL(page).pathname.startsWith('/styleguide') }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

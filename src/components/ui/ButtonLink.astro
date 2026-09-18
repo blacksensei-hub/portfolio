@@ -1,0 +1,28 @@
+---
+import { isExternal } from './isExternal';
+
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary';
+  download?: boolean;
+}
+
+// A link styled as a button: every call to action here navigates or downloads.
+const { href, variant = 'primary', download = false } = Astro.props;
+const external = isExternal(href);
+---
+
+<a
+  href={href}
+  download={download || undefined}
+  class:list={[
+    'rounded-card inline-flex items-center justify-center border-2 border-accent px-5 py-2.5 font-medium transition-colors',
+    variant === 'primary'
+      ? 'bg-accent text-on-accent hover:bg-transparent hover:text-accent'
+      : 'text-accent hover:bg-accent hover:text-on-accent',
+  ]}
+  {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+>
+  <slot />
+  {external && <span class="sr-only"> (opens in a new tab)</span>}
+</a>

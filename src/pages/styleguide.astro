@@ -1,0 +1,89 @@
+---
+import ButtonLink from '../components/ui/ButtonLink.astro';
+import Card from '../components/ui/Card.astro';
+import Container from '../components/ui/Container.astro';
+import Link from '../components/ui/Link.astro';
+import Section from '../components/ui/Section.astro';
+import Tag from '../components/ui/Tag.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Every token and base component in one place: the e2e and axe target until
+// real sections exist. Noindexed and filtered out of the sitemap.
+const colors = [
+  'surface',
+  'surface-raised',
+  'on-surface',
+  'muted',
+  'accent',
+  'on-accent',
+  'border',
+  'focus',
+];
+---
+
+<BaseLayout title="Styleguide" description="Design tokens and base components." noindex>
+  <Container>
+    <h1 class="text-display pt-16 font-bold tracking-tight">Styleguide</h1>
+  </Container>
+
+  <Section id="colors" title="Colors">
+    <ul class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {colors.map((name) => (
+        <li class="text-sm">
+          <span
+            class="rounded-card border-border block h-16 border"
+            style={`background: var(--color-${name})`}
+          />
+          <code class="text-muted mt-2 block">--color-{name}</code>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section id="type" title="Type">
+    <p class="text-display font-bold tracking-tight">Display</p>
+    <p class="text-h2 font-semibold">Heading 2</p>
+    <p class="text-h3 font-semibold">Heading 3</p>
+    <p>Body text sets the reading rhythm at 1rem with a 1.6 line height.</p>
+    <p class="text-muted text-sm">Small muted text for meta lines.</p>
+  </Section>
+
+  <Section id="links" title="Links and buttons">
+    <p>
+      An <Link href="#type">internal link</Link>, an
+      <Link href="https://github.com">external link</Link>, and a
+      <Link href="mailto:hello@example.com">mail link</Link>.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-4">
+      <ButtonLink href="#colors">Primary</ButtonLink>
+      <ButtonLink href="#colors" variant="secondary">
+        Secondary
+      </ButtonLink>
+      <ButtonLink href="/favicon.svg" variant="secondary" download>
+        Download
+      </ButtonLink>
+    </div>
+  </Section>
+
+  <Section id="cards" title="Cards and tags">
+    <Card>
+      <h3 class="text-h3 font-semibold">Project title</h3>
+      <p class="text-muted mt-2">A one line summary of what the project does.</p>
+      <ul class="mt-4 flex flex-wrap gap-2" aria-label="Tech used">
+        <li>
+          <Tag>Astro</Tag>
+        </li>
+        <li>
+          <Tag>TypeScript</Tag>
+        </li>
+        <li>
+          <Tag>Tailwind</Tag>
+        </li>
+      </ul>
+      <p class="mt-4 flex gap-4">
+        <Link href="https://example.com">Live demo</Link>
+        <Link href="https://github.com">Code</Link>
+      </p>
+    </Card>
+  </Section>
+</BaseLayout>

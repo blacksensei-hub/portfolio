@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { isExternal } from './isExternal';
+
+type Props = HTMLAttributes<'a'> & { href: string };
+
+const { href, class: className, ...rest } = Astro.props;
+const external = isExternal(href);
+---
+
+<a
+  href={href}
+  class:list={[
+    'text-accent underline decoration-1 underline-offset-2 transition-[text-underline-offset] hover:underline-offset-4',
+    className,
+  ]}
+  {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+  {...rest}
+>
+  <slot />
+  {external && <span class="sr-only"> (opens in a new tab)</span>}
+</a>
