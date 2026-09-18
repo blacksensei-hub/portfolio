@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Projects section | Release 1 | done |
 | 7 | Skills section | Release 1 | done |
 | 8 | Contact links & resume | Release 1 | done |
-| 9 | SEO & social cards | Release 1 | in-progress |
+| 9 | SEO & social cards | Release 1 | done |
 | 10 | Deploy to free hosting | Release 1 | planned |
 | 11 | Dark/light theme | Release 2 | planned |
 | 12 | Work with me section | Release 2 | planned |
@@ -117,7 +117,7 @@ spec [0006](../specs/0006-seo-social-cards.md) · code in `src/layouts/BaseLayou
   - [x] Layout social props, and the page requiring the profile (AC-1, AC-2, AC-3, AC-5, AC-7, AC-8, AC-9)
   - [x] Build time `/og.png` card and `/robots.txt` (AC-4, AC-6, AC-7, AC-8)
   - [x] E2E for tags, JSON-LD, card, robots, and styleguide (AC-1 to AC-7, AC-9)
-- [ ] Verify it: `/check verify seo & social cards`
+- [x] Verify it: `/check verify seo & social cards`
 
 ### 10. Deploy to free hosting · needs a decision
 Put the site live on a free host, with automatic deploys when you push.
