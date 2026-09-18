@@ -1,19 +1,94 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter/wght.css";
 
 /*
- * Starter design tokens.
+ * Design tokens: the single source of truth for every color, font, type size,
+ * radius, and duration on the site (spec 0003, documented in design.md).
  *
- * Deliberately thin: the design system feature owns the real palette, type
- * scale and spacing. These exist so the token pattern is in place and the
- * dark/light theme feature has somewhere to hang its second set of values.
+ * The @theme block holds the light colors and every non color token. The dark
+ * colors override the same names in an unlayered rule below; Tailwind emits
+ * @theme inside @layer theme, and an unlayered rule always wins over a layered
+ * one. The contrast test (tokens.test.ts) parses both blocks, so keep every
+ * color as an oklch(L% C H) literal or a var(--color-*) reference.
  */
 @theme {
   --color-surface: oklch(99% 0 0);
-  --color-on-surface: oklch(25% 0.01 260);
-  --color-muted: oklch(50% 0.01 260);
-  --color-accent: oklch(55% 0.17 260);
+  --color-surface-raised: oklch(97% 0.005 260);
+  --color-on-surface: oklch(22% 0.02 260);
+  --color-muted: oklch(45% 0.02 260);
+  --color-accent: oklch(50% 0.19 262);
+  --color-on-accent: oklch(99% 0 0);
+  --color-border: oklch(88% 0.01 260);
+  --color-focus: var(--color-accent);
 
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
+  --text-display--line-height: 1.1;
+  --text-h2: clamp(1.5rem, 1.25rem + 1.2vw, 2rem);
+  --text-h2--line-height: 1.25;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.4;
 
   --spacing-gutter: 1.5rem;
+  --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
+
+  --container-content: 48rem;
+
+  --radius-card: 0.75rem;
+  --radius-tag: 9999px;
+
+  --default-transition-duration: 150ms;
+}
+
+/* Dark colors, from the OS setting. Feature 11 adds :root[data-theme="dark"]. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-surface: oklch(17% 0.015 260);
+    --color-surface-raised: oklch(22% 0.02 260);
+    --color-on-surface: oklch(94% 0.01 260);
+    --color-muted: oklch(72% 0.02 260);
+    --color-accent: oklch(75% 0.13 262);
+    --color-on-accent: oklch(17% 0.015 260);
+    --color-border: oklch(32% 0.02 260);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every utility (AC-8). */
+    transition: none !important;
+  }
+}
+
+/* Metric matched stand in, so the swap to Inter barely shifts the layout. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22.5%;
+  line-gap-override: 0%;
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    line-height: 1.6;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* #main is a skip target, not a control: no ring around the whole page. */
+  main:focus {
+    outline: none;
+  }
 }

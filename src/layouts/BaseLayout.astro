@@ -1,12 +1,15 @@
 ---
+import SkipLink from '../components/ui/SkipLink.astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description?: string | undefined;
+  /** Keeps the page out of search results (the styleguide). */
+  noindex?: boolean | undefined;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -20,9 +23,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <slot name="head" />
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">
-    <slot />
+    <SkipLink />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
   </body>
 </html>

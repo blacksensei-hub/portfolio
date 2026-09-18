@@ -22,7 +22,7 @@ beforeEach(async () => {
 });
 
 async function render(
-  props: { title: string; description?: string | undefined },
+  props: { title: string; description?: string | undefined; noindex?: boolean },
   slots: Record<string, string> = {},
 ): Promise<string> {
   return container.renderToString(BaseLayout, { props, slots });
@@ -50,10 +50,10 @@ describe('BaseLayout', () => {
   });
 
   it('renders default slot content inside the body', async () => {
-    const html = await render({ title: 'Portfolio' }, { default: '<main>Hello</main>' });
+    const html = await render({ title: 'Portfolio' }, { default: '<p>Hello</p>' });
 
-    const body = html.slice(html.indexOf('<body'));
-    expect(body).toContain('<main>Hello</main>');
+    const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+    expect(main).toContain('<p>Hello</p>');
   });
 
   it('renders head slot content inside the head', async () => {
@@ -61,11 +61,11 @@ describe('BaseLayout', () => {
     // so it has to land before </head> or it is useless to them.
     const html = await render(
       { title: 'Portfolio' },
-      { head: '<meta name="robots" content="noindex">' },
+      { head: '<meta name="theme-color" content="#ffffff">' },
     );
 
     const head = html.slice(0, html.indexOf('</head>'));
-    expect(head).toContain('<meta name="robots" content="noindex">');
+    expect(head).toContain('<meta name="theme-color" content="#ffffff">');
   });
 
   it('declares the document language as English', async () => {
@@ -88,5 +88,27 @@ describe('BaseLayout', () => {
     const html = await render({ title: 'Portfolio' });
 
     expect(html).toMatch(/<link rel="canonical" href="https?:\/\/[^"]+"/);
+  });
+
+  it('renders the skip link as the first element in the body', async () => {
+    // Keyboard users: the skip link must be the first Tab stop.
+    const html = await render({ title: 'Portfolio' });
+
+    const body = html.slice(html.indexOf('<body'));
+    expect(body.slice(body.indexOf('>') + 1).trimStart()).toMatch(/^<a href="#main"/);
+  });
+
+  it('wraps the page in exactly one focusable main landmark', async () => {
+    const html = await render({ title: 'Portfolio' });
+
+    expect(html.match(/<main\b/g)).toHaveLength(1);
+    expect(html).toContain('<main id="main" tabindex="-1">');
+  });
+
+  it('emits the robots noindex meta only when noindex is set', async () => {
+    expect(await render({ title: 'Styleguide', noindex: true })).toContain(
+      '<meta name="robots" content="noindex">',
+    );
+    expect(await render({ title: 'Portfolio' })).not.toContain('name="robots"');
   });
 });
