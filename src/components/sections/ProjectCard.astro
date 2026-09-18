@@ -1,0 +1,58 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
+import Card from '../ui/Card.astro';
+import Link from '../ui/Link.astro';
+import Tag from '../ui/Tag.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>['data'];
+}
+
+const { title, summary, tech, demoUrl, repoUrl, image } = Astro.props.project;
+---
+
+<Card>
+  {/* Card takes no class, so the flex column lives inside it to pin the links low. */}
+  <div class="flex h-full flex-col gap-4">
+    {
+      image && (
+        <Image
+          src={image}
+          alt={title}
+          widths={[400, 800]}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          class="rounded-card aspect-video w-full object-cover"
+        />
+      )
+    }
+    <h3 class="text-h3 font-semibold tracking-tight">{title}</h3>
+    <p class="text-muted">{summary}</p>
+    <ul class="flex flex-wrap gap-2" aria-label="Tech used">
+      {
+        tech.map((item) => (
+          <li>
+            <Tag>{item}</Tag>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-auto flex flex-wrap gap-4">
+      {
+        demoUrl && (
+          <Link href={demoUrl}>
+            Live demo<span class="sr-only">, {title}</span>
+          </Link>
+        )
+      }
+      {
+        repoUrl && (
+          <Link href={repoUrl}>
+            Source code<span class="sr-only">, {title}</span>
+          </Link>
+        )
+      }
+    </p>
+  </div>
+</Card>

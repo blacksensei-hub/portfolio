@@ -3,14 +3,14 @@ import { getCollection, getEntry } from 'astro:content';
 
 import About from '../components/sections/About.astro';
 import Hero from '../components/sections/Hero.astro';
+import Projects from '../components/sections/Projects.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const profile = (await getEntry('profile', 'profile'))?.data;
 
-// Read so the projects collection resolves at build time (an unread collection
-// never forces image resolution, so AC-8's missing file check would never fire).
-// The projects section (feature 6) replaces this with the real read.
-await getCollection('projects');
+// Also what makes image paths resolve at build time, so a missing project image
+// fails the build (spec 0002, AC-8).
+const projects = await getCollection('projects');
 ---
 
 <BaseLayout
@@ -28,4 +28,6 @@ await getCollection('projects');
       <About bio={profile.bio} />
     </>
   )}
+  <Projects projects={projects} />
+
 </BaseLayout>
