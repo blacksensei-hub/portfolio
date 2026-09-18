@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4 | Design system & UI foundation | Foundation | done |
 | 5 | Hero & about | Release 1 | done |
 | 6 | Projects section | Release 1 | done |
-| 7 | Skills section | Release 1 | planned |
+| 7 | Skills section | Release 1 | in-progress |
 | 8 | Contact links & resume | Release 1 | planned |
 | 9 | SEO & social cards | Release 1 | planned |
 | 10 | Deploy to free hosting | Release 1 | planned |
@@ -90,7 +90,14 @@ spec [0004](../specs/0004-projects-section.md) · code in `src/components/sectio
 ### 7. Skills section
 A grouped list of your skills, read from the content files.
 **Done when:** skills render grouped and readable, and screen readers announce the groups.
+spec [0005](../specs/0005-skills-section.md)
+- [x] Design it (spec): `/architect skills section`
 - [ ] Build it: `/develop skills section`
+  - [ ] `Skills` component wired into the page after Projects (AC-1, AC-2, AC-4, AC-6)
+  - [ ] Responsive one, two, three column grid with wrapping chips (AC-3)
+  - [ ] E2E for groups, list names, layout, and axe in both schemes (AC-1, AC-2, AC-3, AC-5)
+  - [ ] Container unit tests for the empty and sort cases (AC-1, AC-4)
+- [ ] Verify it: `/check verify skills section`
 
 ### 8. Contact links & resume
 Email, GitHub, and LinkedIn links plus a resume PDF download.
