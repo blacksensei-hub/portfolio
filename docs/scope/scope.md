@@ -78,13 +78,13 @@ code in `src/components/sections/`, `src/pages/index.astro`
 ### 6. Projects section · in-progress
 Project cards (title, summary, tech, links to live demo and code) read from the content files.
 **Done when:** every project in the data file renders as a card with working links, and the layout holds from phone to desktop.
-spec [0004](../specs/0004-projects-section.md)
+spec [0004](../specs/0004-projects-section.md) · code in `src/components/sections/`, `src/pages/index.astro`, `tests/e2e/projects.spec.ts`
 - [x] Design it (spec): `/architect projects section`
-- [ ] Build it: `/develop projects section`
-  - [ ] `Projects` and `ProjectCard` components wired into the page (AC-1 to AC-4, AC-6)
-  - [ ] Responsive one to two column grid (AC-5)
-  - [ ] E2E for cards, links, layout, and axe in both schemes (AC-1, AC-3, AC-5, AC-7)
-  - [ ] Container unit tests for image and empty states (AC-1, AC-4, AC-6)
+- [x] Build it: `/develop projects section`
+  - [x] `Projects` and `ProjectCard` components wired into the page (AC-1 to AC-4, AC-6)
+  - [x] Responsive one to two column grid (AC-5)
+  - [x] E2E for cards, links, layout, and axe in both schemes (AC-1, AC-3, AC-5, AC-7)
+  - [x] Container unit tests for image and empty states (AC-1, AC-4, AC-6)
 - [ ] Verify it: `/check verify projects section`
 
 ### 7. Skills section
