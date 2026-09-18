@@ -126,7 +126,7 @@ spec [0007](../specs/0007-deploy-free-hosting.md)
 - [x] Design it (spec): `/architect deploy to free hosting`
 - [ ] Build it: `/develop deploy to free hosting`
   - [ ] GitHub repo, Cloudflare Pages project, token, and secrets (AC-1, AC-2)
-  - [ ] Real `SITE_URL` and the `check` job with concurrency (AC-3, AC-5, AC-7)
+  - [x] Real `SITE_URL` and the `check` job with concurrency (AC-3, AC-5, AC-7)
   - [ ] `deploy` job with the fork guard, production and previews (AC-2, AC-4, AC-6)
   - [ ] First live deploy and a test PR (AC-1 to AC-7)
 - [ ] Verify it: `/check verify deploy to free hosting`

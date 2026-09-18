@@ -1,7 +1,7 @@
 # 0007. Deploy to Cloudflare Pages behind a GitHub Actions gate
 
 **Date**: 2026-09-18
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
