@@ -62,6 +62,26 @@ test.describe('projects section', () => {
     expect(second?.x).toBeGreaterThan(first?.x ?? 0);
   });
 
+  test('lines up the link rows across cards on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+
+    // Cards in a row share one height, and the link row is pinned to each card's bottom.
+    const section = page.getByRole('region', { name: 'Projects' });
+    const cards = await section.getByRole('article').all();
+    const links = await section.getByRole('link', { name: /^Source code/ }).all();
+    const heights = await Promise.all(cards.map(async (c) => (await c.boundingBox())?.height));
+    const bottoms = await Promise.all(
+      links.map(async (l) => {
+        const box = await l.boundingBox();
+        return (box?.y ?? 0) + (box?.height ?? 0);
+      }),
+    );
+
+    for (const height of heights) expect(height).toBeCloseTo(heights[0] ?? 0, 0);
+    for (const bottom of bottoms) expect(bottom).toBeCloseTo(bottoms[0] ?? 0, 0);
+  });
+
   test('reaches every card link with Tab (AC-7)', async ({ page }) => {
     await page.goto('/');
 
