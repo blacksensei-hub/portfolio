@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import Card from '../ui/Card.astro';
+import Section from '../ui/Section.astro';
+import Tag from '../ui/Tag.astro';
+
+interface Props {
+  skills: CollectionEntry<'skills'>[];
+}
+
+const sorted = [...Astro.props.skills].sort((a, b) => a.data.order - b.data.order);
+---
+
+{/* An empty skills.yaml is valid content, so the section simply disappears. */}
+{sorted.length > 0 && (
+  <Section id="skills" title="Skills">
+    <ul role="list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {sorted.map((entry, n) => {
+        // Position based, so the id is always unique and valid whatever the group name holds.
+        const headingId = `skill-group-${n}`;
+        return (
+          <li class="grid">
+            <Card>
+              <div class="flex h-full flex-col gap-4">
+                <h3 id={headingId} class="text-h3 font-semibold tracking-tight">
+                  {entry.data.group}
+                </h3>
+                <ul role="list" aria-labelledby={headingId} class="flex flex-wrap gap-2">
+                  {entry.data.items.map((item) => (
+                    <li>
+                      <Tag>{item}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Card>
+          </li>
+        );
+      })}
+    </ul>
+  </Section>
+)}

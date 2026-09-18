@@ -4,6 +4,7 @@ import { getCollection, getEntry } from 'astro:content';
 import About from '../components/sections/About.astro';
 import Hero from '../components/sections/Hero.astro';
 import Projects from '../components/sections/Projects.astro';
+import Skills from '../components/sections/Skills.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const profile = (await getEntry('profile', 'profile'))?.data;
@@ -11,6 +12,7 @@ const profile = (await getEntry('profile', 'profile'))?.data;
 // Also what makes image paths resolve at build time, so a missing project image
 // fails the build (spec 0002, AC-8).
 const projects = await getCollection('projects');
+const skills = await getCollection('skills');
 ---
 
 <BaseLayout
@@ -29,4 +31,5 @@ const projects = await getCollection('projects');
     </>
   )}
   <Projects projects={projects} />
+  <Skills skills={skills} />
 </BaseLayout>
