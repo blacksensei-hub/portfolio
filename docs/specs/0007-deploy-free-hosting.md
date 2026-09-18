@@ -1,7 +1,7 @@
 # 0007. Deploy to Cloudflare Pages behind a GitHub Actions gate
 
 **Date**: 2026-09-18
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -156,5 +156,6 @@ Skateboard: get the thinnest real site live first, then add the gate and preview
 - [ ] Resume: add `public/resume.pdf` and `resume: /resume.pdf` in `profile.yaml` (feature 8 deferred it to here, and you chose to ship without it).
 - [ ] After the first deploy, check the live social card with a link preview debugger (spec 0006 follow up).
 - [ ] Tick the spec 0001 feature 10 follow ups (the host chosen with commercial use in mind, and `SITE_URL` replaced).
+- [ ] Exercise the AC-4 fork clause: open a pull request from a fork and confirm `check` passes and `deploy` shows as skipped (accepted untested at verify on 2026-09-18).
 - [ ] Optional: turn on branch protection for `main` that requires the `check` job, so merges wait for green.
 - [ ] Optional: ask whether to look for a Cloudflare or wrangler Agent Skill or MCP server before building.
