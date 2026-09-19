@@ -20,6 +20,9 @@ Named by role, not by hue. Light values live in `@theme`. Dark values override t
 | `--color-on-accent` | `oklch(99% 0 0)` | `oklch(17% 0.015 260)` | text on an accent fill |
 | `--color-border` | `oklch(88% 0.01 260)` | `oklch(32% 0.02 260)` | Card and Tag outline (decorative) |
 | `--color-focus` | `var(--color-accent)` | follows the dark accent | focus outline |
+| `--color-status-open` | `oklch(55% 0.15 150)` | `oklch(75% 0.15 150)` | status dot, available (non text, 3:1) |
+| `--color-status-limited` | `oklch(62% 0.15 75)` | `oklch(80% 0.14 80)` | status dot, limited availability |
+| `--color-status-closed` | `oklch(55% 0.19 25)` | `oklch(72% 0.16 25)` | status dot, booked |
 
 `src/styles/tokens.test.ts` proves WCAG 2.2 AA for both themes: text pairs at least 4.5:1, focus at least 3:1. If you add a color token, give it both values, keep it an `oklch(L% C H)` literal, and add a pair to that test if it carries text.
 
@@ -89,6 +92,12 @@ Default slot only. A small pill of muted text on `surface-raised` with a border.
 Props: `as?: 'article' | 'div'` (default `article`), and a default slot. A `surface-raised` box with a border and `rounded-card`. Never wrap the whole card in a link. Links inside stay separate Tab stops.
 ```astro
 <Card><h3 class="text-h3 font-semibold">Title</h3>…</Card>
+```
+
+### Status badge
+Not a component: the pattern lives inline in `src/components/sections/WorkWithMe.astro` (spec 0009). A `<p>` with a decorative `aria-hidden` dot (`size-2.5 rounded-full` plus a `bg-status-*` class) followed by a bold text label, then a note. The label always carries the meaning; the color only reinforces it. Map a status to its class through a `Record` of full literal class names, never `bg-status-${status}`, because Tailwind 4 only generates classes it finds written out.
+```astro
+<p class="inline-flex items-center gap-2"><span aria-hidden="true" class="size-2.5 rounded-full bg-status-open" /><span><strong>Available</strong>. Taking new projects.</span></p>
 ```
 
 ### SkipLink

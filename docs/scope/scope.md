@@ -147,13 +147,13 @@ spec [0008](../specs/0008-dark-light-theme.md) · code in `src/lib/theme.ts`, `s
 ### 12. Work with me section · in-progress
 A short services and availability block, so freelance clients know what to hire you for.
 **Done when:** services and a call to action render from the content files and link to your contact options.
-spec [0009](../specs/0009-work-with-me-section.md)
+spec [0009](../specs/0009-work-with-me-section.md) · code in `src/content.config.ts`, `src/content/services.yaml`, `src/components/sections/WorkWithMe.astro`, `src/styles/global.css`, `tests/e2e/work-with-me.spec.ts`
 - [x] Design it (spec): `/architect work with me section`
-- [ ] Build it: `/develop work with me section`
-  - [ ] `services` collection, `profile.availability`, YAML content, and schema tests (AC-2)
-  - [ ] Three status tokens and their contrast pairs (AC-7)
-  - [ ] `WorkWithMe` component wired between Skills and Contact, with container tests (AC-1, AC-3 to AC-6, AC-8)
-  - [ ] E2E for content, placement, layout, and axe per theme; `design.md` badge entry (AC-1, AC-3, AC-4, AC-6 to AC-8)
+- [x] Build it: `/develop work with me section`
+  - [x] `services` collection, `profile.availability`, YAML content, and schema tests (AC-2)
+  - [x] Three status tokens and their contrast pairs (AC-7)
+  - [x] `WorkWithMe` component wired between Skills and Contact, with container tests (AC-1, AC-3 to AC-6, AC-8)
+  - [x] E2E for content, placement, layout, and axe per theme; `design.md` badge entry (AC-1, AC-3, AC-4, AC-6 to AC-8)
 - [ ] Verify it: `/check verify work with me section`
 
 ## Release 3: learn who visits
