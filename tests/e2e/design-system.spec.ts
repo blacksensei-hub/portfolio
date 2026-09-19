@@ -105,13 +105,19 @@ test('Inter loads from the site origin and nothing loads from another host', asy
   const origin = new URL(test.info().project.use.baseURL ?? '').origin;
   const requests: string[] = [];
   page.on('request', (request) => requests.push(request.url()));
+  // The production only analytics beacon (spec 0010) is the one allowed
+  // outside host; block it so tests never count a visit.
+  const isBeacon = (url: string) => new URL(url).hostname.endsWith('cloudflareinsights.com');
+  await page.route('**/*cloudflareinsights.com/**', (route) => route.abort());
 
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
 
   const fonts = requests.filter((url) => url.includes('.woff2'));
   expect(fonts.some((url) => url.includes('inter-latin-wght-normal'))).toBe(true);
-  expect(requests.filter((url) => !url.startsWith(origin) && !url.startsWith('data:'))).toEqual([]);
+  expect(
+    requests.filter((url) => !url.startsWith(origin) && !url.startsWith('data:') && !isBeacon(url)),
+  ).toEqual([]);
 });
 
 test.describe('motion', () => {
