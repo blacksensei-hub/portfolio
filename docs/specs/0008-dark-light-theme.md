@@ -1,7 +1,7 @@
 # 0008. Three state theme toggle with an inline head script
 
 **Date**: 2026-09-18
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -147,7 +147,7 @@ Skateboard: step 1 alone gives a working, flash free saved theme (settable from 
 
 **Negative / tradeoffs**:
 - The dark values are written twice in `global.css`; a test keeps them equal, but a token change touches both blocks.
-- A fixed button floats over content; at 375px it can overlap the top of the hero, so the hero keeps enough top padding (checked in the e2e at phone width).
+- A fixed button floats over content; at narrow widths it can overlap the first heading, so `BaseLayout`'s `<main>` reserves extra top space below `sm` (the e2e checks a 16px margin at 375px on every page).
 
 **Neutral**:
 - Other open tabs pick up a new choice only on their next load (no cross tab sync, by choice).

@@ -148,16 +148,26 @@ test('without JavaScript the toggle is hidden and the OS scheme applies', async 
   await page.close();
 });
 
-test('at phone width the toggle does not cover the hero heading', async ({ page }) => {
-  // spec 0008 consequences: the fixed button must not overlap the hero
-  await page.setViewportSize({ width: 375, height: 800 });
-  await page.goto('/');
+for (const path of ['/', '/styleguide/']) {
+  test(`at phone width the toggle clears the ${path} heading with room to spare`, async ({
+    page,
+  }) => {
+    // spec 0008 consequences: the fixed button must not overlap the first
+    // heading. A 16px margin keeps zoom or font differences from closing it.
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto(path);
 
-  const button = await toggle(page).boundingBox();
-  const heading = await page.getByRole('heading', { level: 1 }).boundingBox();
-  if (!button || !heading) throw new Error('Missing box');
-  expect(button.y + button.height).toBeLessThanOrEqual(heading.y);
-});
+    const button = await toggle(page).boundingBox();
+    if (!button) throw new Error('Missing box');
+    // The top of the heading text, not its box: padding on the h1 is empty space.
+    const textTop = await page.getByRole('heading', { level: 1 }).evaluate((h) => {
+      const range = document.createRange();
+      range.selectNodeContents(h);
+      return range.getBoundingClientRect().top;
+    });
+    expect(button.y + button.height + 16).toBeLessThanOrEqual(textTop);
+  });
+}
 
 for (const [forced, colorScheme] of [
   ['light', 'dark'],

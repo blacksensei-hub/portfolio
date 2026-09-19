@@ -66,7 +66,8 @@ const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
   <body class="bg-surface text-on-surface font-sans antialiased">
     <SkipLink />
     <ThemeToggle />
-    <main id="main" tabindex="-1">
+    <!-- Below sm, reserve room so the fixed theme toggle never sits on the first heading. -->
+    <main id="main" tabindex="-1" class="max-sm:pt-16">
       <slot />
     </main>
   </body>

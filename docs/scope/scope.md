@@ -21,7 +21,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8 | Contact links & resume | Release 1 | done |
 | 9 | SEO & social cards | Release 1 | done |
 | 10 | Deploy to free hosting | Release 1 | done |
-| 11 | Dark/light theme | Release 2 | in-progress |
+| 11 | Dark/light theme | Release 2 | done |
 | 12 | Work with me section | Release 2 | planned |
 | 13 | Visitor analytics | Release 3 | planned |
 
@@ -133,7 +133,7 @@ spec [0007](../specs/0007-deploy-free-hosting.md)
 
 ## Release 2: polish and reach clients
 
-### 11. Dark/light theme · in-progress
+### 11. Dark/light theme · done
 A theme toggle that follows the system setting by default and remembers your choice.
 **Done when:** the theme matches the system on first visit, the toggle persists, there is no flash of the wrong theme, and both themes meet AA contrast.
 spec [0008](../specs/0008-dark-light-theme.md) · code in `src/lib/theme.ts`, `src/components/ui/ThemeToggle.astro`, `src/layouts/BaseLayout.astro`, `src/styles/global.css`, `tests/e2e/theme.spec.ts`
@@ -142,7 +142,7 @@ spec [0008](../specs/0008-dark-light-theme.md) · code in `src/lib/theme.ts`, `s
   - [x] Head script, `[data-theme="dark"]` block, and token parity test (AC-1, AC-2, AC-5, AC-8)
   - [x] `ThemeToggle` cycling button in `BaseLayout` (AC-3, AC-4, AC-6, AC-7)
   - [x] E2E for cycle, persistence, no flash, blocked storage, and axe per forced theme; `design.md` entry (AC-1 to AC-8)
-- [ ] Verify it: `/check verify dark/light theme`
+- [x] Verify it: `/check verify dark/light theme`
 
 ### 12. Work with me section
 A short services and availability block, so freelance clients know what to hire you for.

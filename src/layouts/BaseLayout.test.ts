@@ -107,7 +107,7 @@ describe('BaseLayout', () => {
     const html = await render({ title: 'Portfolio' });
 
     expect(html.match(/<main\b/g)).toHaveLength(1);
-    expect(html).toContain('<main id="main" tabindex="-1">');
+    expect(html).toContain('<main id="main" tabindex="-1" class="max-sm:pt-16">');
   });
 
   it('emits the robots noindex meta only when noindex is set', async () => {
