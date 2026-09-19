@@ -81,7 +81,7 @@ Starting content in `services.yaml` (your copy, as given):
 | 2 | API & Backend Development | REST APIs, database design, and backend services with Node.js and PostgreSQL. Built for correctness first: typed inputs, safe migrations, and tests that catch mistakes before your users do. |
 | 3 | Technical Consulting | Code reviews, architecture feedback, and pair-programming sessions for teams or solo developers. Practical, specific advice you can act on. |
 
-`profile.yaml` gains `availability: { status: open, note: "Available for freelance projects and part-time contracts." }`.
+`profile.yaml` gains `availability: { status: open, note: "Open to freelance projects and part-time contracts." }`.
 
 **State transitions**: None at runtime. `status` is set by hand in YAML.
 

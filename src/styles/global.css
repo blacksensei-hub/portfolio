@@ -112,6 +112,11 @@
     line-height: 1.6;
   }
 
+  /* Give the last section a full viewport of height so an anchor jump to it (e.g. #contact) lands at the top. */
+  #main > section:last-child {
+    min-height: 100svh;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
