@@ -70,6 +70,10 @@ const pairs: [fg: string, bg: string, min: number][] = [
   ['on-accent', 'accent', 4.5],
   ['focus', 'surface', 3],
   ['focus', 'surface-raised', 3],
+  // Spec 0009: non text contrast for the availability dot.
+  ['status-open', 'surface', 3],
+  ['status-limited', 'surface', 3],
+  ['status-closed', 'surface', 3],
 ];
 
 describe.each(Object.entries(themes))('%s theme contrast', (_theme, colors) => {

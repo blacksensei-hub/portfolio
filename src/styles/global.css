@@ -20,6 +20,10 @@
   --color-on-accent: oklch(99% 0 0);
   --color-border: oklch(88% 0.01 260);
   --color-focus: var(--color-accent);
+  /* Availability status (spec 0009). Always paired with a text label. */
+  --color-status-open: oklch(55% 0.15 150);
+  --color-status-limited: oklch(62% 0.15 75);
+  --color-status-closed: oklch(55% 0.19 25);
 
   --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
 
@@ -51,6 +55,9 @@
     --color-accent: oklch(75% 0.13 262);
     --color-on-accent: oklch(17% 0.015 260);
     --color-border: oklch(32% 0.02 260);
+    --color-status-open: oklch(75% 0.15 150);
+    --color-status-limited: oklch(80% 0.14 80);
+    --color-status-closed: oklch(72% 0.16 25);
   }
 }
 
@@ -68,6 +75,9 @@
   --color-accent: oklch(75% 0.13 262);
   --color-on-accent: oklch(17% 0.015 260);
   --color-border: oklch(32% 0.02 260);
+  --color-status-open: oklch(75% 0.15 150);
+  --color-status-limited: oklch(80% 0.14 80);
+  --color-status-closed: oklch(72% 0.16 25);
 }
 
 :root[data-theme="light"] {
