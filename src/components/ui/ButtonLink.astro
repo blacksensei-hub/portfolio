@@ -16,7 +16,8 @@ const external = isExternal(href);
   href={href}
   download={download || undefined}
   class:list={[
-    'rounded-card inline-flex items-center justify-center border-2 border-accent px-5 py-2.5 font-medium transition-colors',
+    'group rounded-tag inline-flex min-h-11 items-center justify-center gap-2 border-2 border-accent px-6 py-2.5 font-medium transition-[background-color,color,translate]',
+    'hover:-translate-y-0.5',
     variant === 'primary'
       ? 'bg-accent text-on-accent hover:bg-transparent hover:text-accent'
       : 'text-accent hover:bg-accent hover:text-on-accent',
@@ -24,5 +25,8 @@ const external = isExternal(href);
   {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
 >
   <slot />
+  <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">
+    →
+  </span>
   {external && <span class="sr-only"> (opens in a new tab)</span>}
 </a>

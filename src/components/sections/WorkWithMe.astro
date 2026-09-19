@@ -2,30 +2,15 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ButtonLink from '../ui/ButtonLink.astro';
-import Card from '../ui/Card.astro';
 import Section from '../ui/Section.astro';
+import StatusPill from '../ui/StatusPill.astro';
 
 type Availability = NonNullable<CollectionEntry<'profile'>['data']['availability']>;
-type Status = Availability['status'];
 
 interface Props {
   services: CollectionEntry<'services'>[];
   availability?: Availability | undefined;
 }
-
-// Keyed on the schema enum, so a new status fails type checking until it has a label.
-const labels: Record<Status, string> = {
-  open: 'Available',
-  limited: 'Limited availability',
-  closed: 'Booked',
-};
-
-// Full literal class names: Tailwind 4 only generates classes written out in source.
-const dots: Record<Status, string> = {
-  open: 'bg-status-open',
-  limited: 'bg-status-limited',
-  closed: 'bg-status-closed',
-};
 
 const { availability } = Astro.props;
 const sorted = [...Astro.props.services].sort((a, b) => a.data.order - b.data.order);
@@ -33,29 +18,31 @@ const sorted = [...Astro.props.services].sort((a, b) => a.data.order - b.data.or
 
 {/* An empty services.yaml is valid content, so the section simply disappears. */}
 {sorted.length > 0 && (
-  <Section id="work-with-me" title="Work with me">
+  <Section id="work-with-me" title="Work with me" index="04">
     {availability && (
-      <p class="mb-6 inline-flex items-center gap-2 text-on-surface">
-        <span
-          aria-hidden="true"
-          class:list={['size-2.5 shrink-0 rounded-full', dots[availability.status]]}
-        />
-        <span>
-          <strong>{labels[availability.status]}</strong>. {availability.note}
-        </span>
-      </p>
+      <div class="reveal mb-12">
+        <StatusPill status={availability.status} note={availability.note} />
+      </div>
     )}
-    <ul role="list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {sorted.map((entry) => (
-        <li class="grid">
-          <Card>
+    {/* Numbered, open columns under a gold rule: two by two, so four services never leave a hole. */}
+    <ol role="list" class="grid gap-x-12 gap-y-12 md:grid-cols-2">
+      {sorted.map((entry, n) => (
+        <li class="reveal grid">
+          <article class="group/svc border-border relative border-t pt-6">
+            <span
+              aria-hidden="true"
+              class="bg-accent absolute -top-px left-0 h-0.5 w-12 transition-[width] duration-(--duration-hover) ease-(--ease-out-soft) group-hover/svc:w-full"
+            />
+            <p class="font-mono text-label text-accent mb-3 uppercase" aria-hidden="true">
+              {String(n + 1).padStart(2, '0')}
+            </p>
             <h3 class="text-h3 font-semibold tracking-tight">{entry.data.title}</h3>
-            <p class="mt-2 text-muted">{entry.data.blurb}</p>
-          </Card>
+            <p class="text-muted mt-3 max-w-[48ch]">{entry.data.blurb}</p>
+          </article>
         </li>
       ))}
-    </ul>
-    <div class="mt-8">
+    </ol>
+    <div class="reveal mt-14">
       <ButtonLink href="#contact">Get in touch</ButtonLink>
     </div>
   </Section>

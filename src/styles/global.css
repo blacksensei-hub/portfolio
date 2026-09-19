@@ -1,9 +1,12 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/bricolage-grotesque/wght.css";
+@import "@fontsource-variable/instrument-sans/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
 
 /*
  * Design tokens: the single source of truth for every color, font, type size,
- * radius, and duration on the site (spec 0003, documented in design.md).
+ * radius, and duration on the site (spec 0003, restyled by spec 0011 "Woven
+ * threads", documented in design.md).
  *
  * The @theme block holds the light colors and every non color token. The dark
  * colors override the same names in an unlayered rule below; Tailwind emits
@@ -12,52 +15,81 @@
  * color as an oklch(L% C H) literal or a var(--color-*) reference.
  */
 @theme {
-  --color-surface: oklch(99% 0 0);
-  --color-surface-raised: oklch(97% 0.005 260);
-  --color-on-surface: oklch(22% 0.02 260);
-  --color-muted: oklch(45% 0.02 260);
-  --color-accent: oklch(50% 0.19 262);
-  --color-on-accent: oklch(99% 0 0);
-  --color-border: oklch(88% 0.01 260);
+  /* Light: a pale canvas tinted toward indigo, ink text, a deep kente gold. */
+  --color-surface: oklch(97.5% 0.012 280);
+  --color-surface-raised: oklch(95% 0.018 280);
+  --color-on-surface: oklch(22% 0.05 275);
+  --color-muted: oklch(44% 0.04 275);
+  --color-accent: oklch(46% 0.1 65);
+  --color-on-accent: oklch(98% 0.01 85);
+  --color-border: oklch(87% 0.025 280);
   --color-focus: var(--color-accent);
   /* Availability status (spec 0009). Always paired with a text label. */
   --color-status-open: oklch(55% 0.15 150);
   --color-status-limited: oklch(62% 0.15 75);
   --color-status-closed: oklch(55% 0.19 25);
+  /* The kente threads (spec 0011). Decorative only, never carry text. */
+  --color-thread-gold: oklch(72% 0.14 80);
+  --color-thread-green: oklch(56% 0.12 155);
+  --color-thread-red: oklch(56% 0.17 28);
 
-  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    "Instrument Sans Variable", "Instrument Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    "Bricolage Grotesque Variable", "Instrument Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
 
-  --text-display: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
-  --text-display--line-height: 1.1;
-  --text-h2: clamp(1.5rem, 1.25rem + 1.2vw, 2rem);
-  --text-h2--line-height: 1.25;
-  --text-h3: 1.25rem;
-  --text-h3--line-height: 1.4;
+  --text-hero: clamp(3rem, 1.2rem + 7.4vw, 8.5rem);
+  --text-hero--line-height: 0.92;
+  --text-display: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+  --text-display--line-height: 1;
+  --text-h2: clamp(2rem, 1.3rem + 2.8vw, 3.75rem);
+  --text-h2--line-height: 1.05;
+  --text-h3: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
+  --text-h3--line-height: 1.25;
+  --text-lede: clamp(1.25rem, 1.05rem + 0.9vw, 1.875rem);
+  --text-lede--line-height: 1.4;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.14em;
 
   --spacing-gutter: 1.5rem;
-  --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
+  --spacing-section: clamp(5rem, 3.5rem + 6vw, 10rem);
+  --spacing-header: 4.75rem;
 
-  --container-content: 48rem;
+  --container-content: 76rem;
 
-  --radius-card: 0.75rem;
+  --radius-card: 1.25rem;
   --radius-tag: 9999px;
 
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-duration: 150ms;
+  --duration-hover: 400ms;
+  --duration-draw: 2400ms;
+  --duration-drift: 90s;
+
+  --animate-draw: draw var(--duration-draw) var(--ease-out-soft) both;
+  --animate-rise: rise 1s var(--ease-out-soft) both;
+  --animate-scroll-cue: scroll-cue 2.4s var(--ease-out-soft) infinite;
+  --animate-drift: drift var(--duration-drift) ease-in-out infinite;
 }
 
-/* Dark colors, from the OS setting, unless the visitor forced light. */
+/* Dark: a deep indigo night, never pure black, with gold as the rare light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-surface: oklch(17% 0.015 260);
-    --color-surface-raised: oklch(22% 0.02 260);
-    --color-on-surface: oklch(94% 0.01 260);
-    --color-muted: oklch(72% 0.02 260);
-    --color-accent: oklch(75% 0.13 262);
-    --color-on-accent: oklch(17% 0.015 260);
-    --color-border: oklch(32% 0.02 260);
+    --color-surface: oklch(19% 0.045 275);
+    --color-surface-raised: oklch(23.5% 0.05 275);
+    --color-on-surface: oklch(95% 0.015 85);
+    --color-muted: oklch(77% 0.03 275);
+    --color-accent: oklch(84% 0.14 85);
+    --color-on-accent: oklch(19% 0.045 275);
+    --color-border: oklch(35% 0.05 275);
     --color-status-open: oklch(75% 0.15 150);
     --color-status-limited: oklch(80% 0.14 80);
     --color-status-closed: oklch(72% 0.16 25);
+    --color-thread-gold: oklch(80% 0.14 85);
+    --color-thread-green: oklch(68% 0.13 155);
+    --color-thread-red: oklch(66% 0.16 28);
   }
 }
 
@@ -68,20 +100,51 @@
  */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-surface: oklch(17% 0.015 260);
-  --color-surface-raised: oklch(22% 0.02 260);
-  --color-on-surface: oklch(94% 0.01 260);
-  --color-muted: oklch(72% 0.02 260);
-  --color-accent: oklch(75% 0.13 262);
-  --color-on-accent: oklch(17% 0.015 260);
-  --color-border: oklch(32% 0.02 260);
+  --color-surface: oklch(19% 0.045 275);
+  --color-surface-raised: oklch(23.5% 0.05 275);
+  --color-on-surface: oklch(95% 0.015 85);
+  --color-muted: oklch(77% 0.03 275);
+  --color-accent: oklch(84% 0.14 85);
+  --color-on-accent: oklch(19% 0.045 275);
+  --color-border: oklch(35% 0.05 275);
   --color-status-open: oklch(75% 0.15 150);
   --color-status-limited: oklch(80% 0.14 80);
   --color-status-closed: oklch(72% 0.16 25);
+  --color-thread-gold: oklch(80% 0.14 85);
+  --color-thread-green: oklch(68% 0.13 155);
+  --color-thread-red: oklch(66% 0.16 28);
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    translate: 0 2.5rem;
+  }
+}
+
+@keyframes scroll-cue {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 200%;
+  }
+}
+
+@keyframes drift {
+  50% {
+    translate: -6% 4%;
+    rotate: 8deg;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -90,31 +153,51 @@
   *::after {
     /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every utility (AC-8). */
     transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: every animation rests at its final frame (spec 0011). */
+    animation: none !important;
   }
 }
 
-/* Metric matched stand in, so the swap to Inter barely shifts the layout. */
+/* Metric matched stand in, so the swap to Instrument Sans barely shifts the layout. */
 @font-face {
-  font-family: "Inter Fallback";
+  font-family: "Instrument Fallback";
   src: local("Arial");
-  size-adjust: 107%;
-  ascent-override: 90%;
-  descent-override: 22.5%;
+  size-adjust: 97%;
+  ascent-override: 96%;
+  descent-override: 25%;
   line-gap-override: 0%;
 }
 
 @layer base {
   :root {
     color-scheme: light dark;
+    scroll-padding-top: var(--spacing-header);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
     line-height: 1.6;
   }
 
-  /* Give the last section a full viewport of height so an anchor jump to it (e.g. #contact) lands at the top. */
-  #main > section:last-child {
-    min-height: 100svh;
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
   :focus-visible {
@@ -125,5 +208,31 @@
   /* #main is a skip target, not a control: no ring around the whole page. */
   main:focus {
     outline: none;
+  }
+}
+
+@layer components {
+  /*
+   * Scroll reveal (spec 0011): content rises into place as it enters the
+   * viewport. Transform only, never opacity, so text is always readable and
+   * axe always sees its real contrast. Browsers without scroll driven
+   * animations, and reduced motion, show the final state.
+   */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: var(--animate-rise);
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+
+    .thread-draw path {
+      animation: draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+
+  .thread-draw path {
+    stroke-dasharray: 1;
   }
 }

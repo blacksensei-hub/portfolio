@@ -1,5 +1,8 @@
 ---
+import { getCollection, getEntry } from 'astro:content';
+
 import Container from '../components/ui/Container.astro';
+import Link from '../components/ui/Link.astro';
 import SkipLink from '../components/ui/SkipLink.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
 import { beaconAttr } from '../lib/analytics';
@@ -30,6 +33,11 @@ const image = social && new URL(social.image, Astro.site).href;
 const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
 // Production only: deploy.yml sets the token just for pushes to main (spec 0010).
 const beacon = beaconAttr(import.meta.env.PUBLIC_CF_BEACON_TOKEN);
+
+// The footer signs the page with the profile and the GitHub link from links.yaml.
+const profile = (await getEntry('profile', 'profile'))?.data;
+const github = (await getCollection('links')).find((link) => link.data.icon === 'github')?.data;
+const year = new Date().getFullYear();
 ---
 
 <html lang="en">
@@ -77,16 +85,41 @@ const beacon = beaconAttr(import.meta.env.PUBLIC_CF_BEACON_TOKEN);
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">
     <SkipLink />
+    {/*
+      One fixed environment layer behind everything (spec 0011): two soft thread
+      colored glows drifting over 90 seconds. Decorative, and still under reduced motion.
+    */}
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div class="animate-drift absolute -top-1/3 -right-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-gold)_16%,transparent),transparent)]"></div>
+      <div class="animate-drift absolute -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
+    </div>
     <ThemeToggle />
+    <slot name="header" />
     <!-- Below sm, reserve room so the fixed theme toggle never sits on the first heading. -->
     <main id="main" tabindex="-1" class="max-sm:pt-16">
       <slot />
     </main>
-    <footer class="border-border border-t py-8">
+    <footer class="border-border border-t py-12">
       <Container>
-        <p class="text-muted text-sm">
-          Cookie free, anonymous visit counts via Cloudflare Web Analytics.
-        </p>
+        <div class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          {profile && (
+            <div>
+              <p class="font-display text-h3 font-semibold tracking-tight">{profile.name}</p>
+            </div>
+          )}
+          <div class="text-muted flex flex-col gap-2 text-sm md:items-end">
+            <p>
+              © {year}. Built with Astro
+              {github && (
+                <>
+                  {' '}
+                  · <Link href={github.href}>{github.label}</Link>
+                </>
+              )}
+            </p>
+            <p>Cookie free, anonymous visit counts via Cloudflare Web Analytics.</p>
+          </div>
+        </div>
       </Container>
     </footer>
   </body>

@@ -92,11 +92,13 @@ test.describe('work with me section', () => {
     expect(await columnsInFirstRow(page)).toBe(2);
   });
 
-  test('shows three columns on desktop (AC-6)', async ({ page }) => {
+  test('keeps two balanced columns on desktop, so four services leave no hole (spec 0011)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
-    expect(await columnsInFirstRow(page)).toBe(3);
+    expect(await columnsInFirstRow(page)).toBe(2);
   });
 
   for (const theme of ['light', 'dark'] as const) {

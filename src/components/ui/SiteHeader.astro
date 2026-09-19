@@ -1,0 +1,47 @@
+---
+import Container from './Container.astro';
+
+interface Props {
+  name: string;
+  sections: { id: string; label: string }[];
+}
+
+// Slim fixed nav for the one page site (spec 0011). Desktop only: below md the
+// page is one short column and the nav would crowd the theme toggle.
+const { name, sections } = Astro.props;
+const initials = name
+  .split(/\s+/)
+  .filter((_, n, all) => n === 0 || n === all.length - 1)
+  .map((word) => word.charAt(0))
+  .join('');
+---
+
+<header class="bg-surface/75 border-border/60 fixed inset-x-0 top-0 z-40 hidden border-b backdrop-blur-md md:block">
+  <Container>
+    {/* The right padding keeps every link clear of the fixed theme toggle. */}
+    <nav aria-label="Sections" class="flex h-(--spacing-header) items-center gap-8 pr-14">
+      <a
+        href="#hero"
+        class="font-display hover:text-accent mr-auto text-xl font-bold tracking-tight transition-colors"
+      >
+        {initials}
+        <span class="text-accent" aria-hidden="true">
+          .
+        </span>
+        <span class="sr-only">, back to top</span>
+      </a>
+      <ul role="list" class="flex items-center gap-7">
+        {sections.map(({ id, label }) => (
+          <li>
+            <a
+              href={`#${id}`}
+              class="text-muted hover:text-on-surface font-mono text-label relative uppercase transition-colors after:bg-accent after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-0 after:transition-[width] hover:after:w-full"
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Container>
+</header>

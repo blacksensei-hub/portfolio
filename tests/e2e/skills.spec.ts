@@ -11,12 +11,19 @@ const groups = (load(readFileSync('src/content/skills.yaml', 'utf8')) as SkillGr
   (a, b) => a.order - b.order,
 );
 
-// Distinct left edges among the cards sharing the first card's row = the column count.
-async function columnsInFirstRow(page: Page): Promise<number> {
-  const cards = page.getByRole('region', { name: 'Skills' }).getByRole('article');
-  const boxes = await Promise.all((await cards.all()).map((c) => c.boundingBox()));
-  const top = boxes[0]?.y ?? 0;
-  return new Set(boxes.filter((b) => Math.abs((b?.y ?? 0) - top) < 1).map((b) => b?.x)).size;
+// Spec 0011: one ruled row per group. Is each group's heading beside its item list (true) or above it (false)?
+async function headingsBesideItems(page: Page): Promise<boolean[]> {
+  const section = page.getByRole('region', { name: 'Skills' });
+  return Promise.all(
+    groups.map(async ({ group }) => {
+      const heading = await section
+        .getByRole('heading', { level: 3, name: group, exact: true })
+        .boundingBox();
+      const list = await section.getByRole('list', { name: group, exact: true }).boundingBox();
+      if (!heading || !list) throw new Error(`Missing ${group}`);
+      return list.x >= heading.x + heading.width && list.y < heading.y + heading.height;
+    }),
+  );
 }
 
 test.describe('skills section', () => {
@@ -51,26 +58,26 @@ test.describe('skills section', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
 
-    expect(await columnsInFirstRow(page)).toBe(1);
+    expect(await headingsBesideItems(page)).toEqual(groups.map(() => false));
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow).toBe(0);
   });
 
-  test('shows two columns on a tablet (AC-3)', async ({ page }) => {
-    await page.setViewportSize({ width: 900, height: 800 });
-    await page.goto('/');
+  for (const [label, width] of [
+    ['tablet', 900],
+    ['desktop', 1280],
+  ] as const) {
+    test(`puts each group's name beside its items on ${label}, one row per group (spec 0011)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/');
 
-    expect(await columnsInFirstRow(page)).toBe(2);
-  });
-
-  test('shows three columns on desktop (AC-3)', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/');
-
-    expect(await columnsInFirstRow(page)).toBe(3);
-  });
+      expect(await headingsBesideItems(page)).toEqual(groups.map(() => true));
+    });
+  }
 
   for (const colorScheme of ['light', 'dark'] as const) {
     test(`has no detectable accessibility violations in ${colorScheme} (AC-5)`, async ({

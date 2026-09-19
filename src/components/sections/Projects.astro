@@ -13,11 +13,12 @@ const sorted = [...Astro.props.projects].sort((a, b) => a.data.order - b.data.or
 
 {/* An empty projects.yaml is valid content, so the section simply disappears. */}
 {sorted.length > 0 && (
-  <Section id="projects" title="Projects">
-    <ul role="list" class="grid gap-6 md:grid-cols-2">
-      {sorted.map((entry) => (
-        <li class="grid">
-          <ProjectCard project={entry.data} />
+  <Section id="projects" title="Projects" index="02">
+    {/* One full width feature row per project; the image side alternates on desktop. */}
+    <ul role="list" class="grid gap-8 md:gap-12">
+      {sorted.map((entry, n) => (
+        <li class="reveal grid">
+          <ProjectCard project={entry.data} number={n + 1} flip={n % 2 === 1} />
         </li>
       ))}
     </ul>

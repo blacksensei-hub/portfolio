@@ -30,31 +30,50 @@ const glyphs: Record<IconKey, string> = {
 
 const { resume } = Astro.props;
 const sorted = [...Astro.props.links].sort((a, b) => a.data.order - b.data.order);
+
+// The quiet second line under each label: the address itself, minus the scheme and query.
+function detail(href: string): string {
+  return href.replace(/^(https?:\/\/|mailto:|tel:)/, '').replace(/\?.*$/, '');
+}
 ---
 
 {/* No links and no resume is valid content, so the section simply disappears. */}
 {(sorted.length > 0 || resume !== undefined) && (
-  <Section id="contact" title="Contact">
+  <Section id="contact" title="Contact" index="05">
+    <p class="reveal font-display text-display mb-14 max-w-[16ch] font-semibold tracking-tight">
+      Have a project in mind? <span class="text-accent">Let's talk.</span>
+    </p>
     {sorted.length > 0 && (
-      <ul role="list" class="flex flex-wrap gap-3">
+      <ul role="list" class="border-border grid border-t md:grid-cols-2 md:gap-x-12">
         {sorted.map(({ data }) => {
           const external = isExternal(data.href);
           return (
-            <li>
+            <li class="reveal border-border border-b">
               <a
                 href={data.href}
-                class="rounded-card inline-flex items-center gap-2 border-2 border-accent px-4 py-2 font-medium text-accent transition-colors hover:bg-accent hover:text-on-accent"
+                class="group/link flex min-h-11 items-center gap-5 py-6 transition-colors hover:text-accent"
                 {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
               >
                 <svg
                   aria-hidden="true"
                   focusable="false"
                   viewBox="0 0 24 24"
-                  class="size-5 fill-current"
+                  class="text-accent size-6 shrink-0 fill-current"
                 >
                   <path d={glyphs[data.icon]} />
                 </svg>
-                {data.label}
+                <span class="flex min-w-0 flex-col">
+                  <span class="text-h3 font-display font-semibold tracking-tight">
+                    {data.label}
+                  </span>
+                  <span class="text-muted truncate font-mono text-xs">{detail(data.href)}</span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  class="text-accent ml-auto text-xl transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/link:translate-x-1 group-hover/link:-translate-y-1"
+                >
+                  ↗
+                </span>
                 {external && <span class="sr-only"> (opens in a new tab)</span>}
               </a>
             </li>
@@ -63,7 +82,7 @@ const sorted = [...Astro.props.links].sort((a, b) => a.data.order - b.data.order
       </ul>
     )}
     {resume !== undefined && (
-      <div class="mt-6">
+      <div class="mt-10">
         <ButtonLink href={resume} download>
           Download resume (PDF)
         </ButtonLink>

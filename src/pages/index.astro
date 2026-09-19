@@ -7,6 +7,7 @@ import Hero from '../components/sections/Hero.astro';
 import Projects from '../components/sections/Projects.astro';
 import Skills from '../components/sections/Skills.astro';
 import WorkWithMe from '../components/sections/WorkWithMe.astro';
+import SiteHeader from '../components/ui/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { buildJsonLd } from '../lib/seo';
 
@@ -36,7 +37,24 @@ const services = await getCollection('services');
     ),
   }}
 >
-  <Hero name={profile.name} role={profile.role} tagline={profile.tagline} email={profile.email} />
+  <SiteHeader
+    slot="header"
+    name={profile.name}
+    sections={[
+      { id: 'about', label: 'About' },
+      { id: 'projects', label: 'Projects' },
+      { id: 'skills', label: 'Skills' },
+      { id: 'work-with-me', label: 'Work with me' },
+      { id: 'contact', label: 'Contact' },
+    ]}
+  />
+  <Hero
+    name={profile.name}
+    role={profile.role}
+    tagline={profile.tagline}
+    email={profile.email}
+    availability={profile.availability}
+  />
   <About bio={profile.bio} />
   <Projects projects={projects} />
   <Skills skills={skills} />

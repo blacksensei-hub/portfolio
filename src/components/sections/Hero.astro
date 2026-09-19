@@ -1,27 +1,69 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
 import ButtonLink from '../ui/ButtonLink.astro';
 import Container from '../ui/Container.astro';
+import StatusPill from '../ui/StatusPill.astro';
+import Weave from '../ui/Weave.astro';
+
+type Availability = NonNullable<CollectionEntry<'profile'>['data']['availability']>;
 
 interface Props {
   name: string;
   role: string;
   tagline: string;
   email: string;
+  availability?: Availability | undefined;
 }
 
 // The top of the page and its only <h1>, so it is not a Section (which owns an <h2>).
-const { name, role, tagline, email } = Astro.props;
+const { name, role, tagline, email, availability } = Astro.props;
 ---
 
-<section aria-labelledby="hero-heading" class="py-section">
+<section
+  id="hero"
+  aria-labelledby="hero-heading"
+  class="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden pt-8 pb-24 md:pt-(--spacing-header)"
+>
+  {/* The woven band runs behind the name, edge to edge: the site's signature. */}
+  <div class="pointer-events-none absolute inset-x-0 top-[40%] -z-10 -translate-y-1/2 opacity-45 max-md:scale-y-[0.4] md:top-1/2 md:opacity-80">
+    <Weave draw="load" height={220} />
+  </div>
+
   <Container>
-    <h1 id="hero-heading" class="text-display font-bold tracking-tight">
+    {availability && (
+      <div class="animate-rise mb-8 md:mb-10">
+        <StatusPill status={availability.status} />
+      </div>
+    )}
+    <h1
+      id="hero-heading"
+      class="text-hero animate-rise max-w-[11ch] font-bold tracking-tighter [animation-delay:100ms]"
+    >
       {name}
     </h1>
-    <p class="text-h3 text-accent mt-3 font-semibold">{role}</p>
-    <p class="text-muted mt-6 max-w-prose text-lg">{tagline}</p>
-    <div class="mt-8">
-      <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>
+    <div class="animate-rise mt-8 grid gap-6 [animation-delay:250ms] md:mt-12 md:grid-cols-12 md:items-end">
+      <div class="md:col-span-7">
+        <p class="font-display text-h3 text-accent font-semibold">{role}</p>
+        <p class="text-muted text-lede mt-3 max-w-[34ch]">{tagline}</p>
+      </div>
+      <div class="flex flex-wrap gap-3 md:col-span-5 md:justify-end">
+        <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>
+        <ButtonLink href="#projects" variant="secondary">
+          See my work
+        </ButtonLink>
+      </div>
     </div>
   </Container>
+
+  {/* Scroll cue: decorative, the content below is reachable by any means. */}
+  <div
+    aria-hidden="true"
+    class="text-muted font-mono text-label absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 uppercase md:flex"
+  >
+    Scroll
+    <span class="bg-border relative block h-12 w-px overflow-hidden">
+      <span class="bg-accent absolute inset-x-0 top-0 h-1/2 animate-scroll-cue"></span>
+    </span>
+  </div>
 </section>

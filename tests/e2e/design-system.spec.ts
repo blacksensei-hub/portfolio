@@ -100,7 +100,9 @@ test.describe('theme', () => {
   });
 });
 
-test('Inter loads from the site origin and nothing loads from another host', async ({ page }) => {
+test('the three faces load from the site origin and nothing loads from another host', async ({
+  page,
+}) => {
   // covers: AC-4
   const origin = new URL(test.info().project.use.baseURL ?? '').origin;
   const requests: string[] = [];
@@ -114,7 +116,10 @@ test('Inter loads from the site origin and nothing loads from another host', asy
   await page.evaluate(() => document.fonts.ready);
 
   const fonts = requests.filter((url) => url.includes('.woff2'));
-  expect(fonts.some((url) => url.includes('inter-latin-wght-normal'))).toBe(true);
+  // Spec 0011: Instrument Sans for body text, Bricolage Grotesque for headings, JetBrains Mono for labels.
+  for (const face of ['instrument-sans', 'bricolage-grotesque', 'jetbrains-mono']) {
+    expect(fonts.some((url) => url.includes(`${face}-latin-wght-normal`))).toBe(true);
+  }
   expect(
     requests.filter((url) => !url.startsWith(origin) && !url.startsWith('data:') && !isBeacon(url)),
   ).toEqual([]);

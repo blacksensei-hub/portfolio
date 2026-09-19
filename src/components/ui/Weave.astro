@@ -1,0 +1,61 @@
+---
+/*
+ * The signature element (spec 0011): three kente threads, gold, green, and
+ * red, woven over and under each other. Decorative, so hidden from assistive
+ * tech. `draw="scroll"` draws the threads in as the band scrolls into view;
+ * `draw="load"` draws them once on page load (the hero). Either way the final
+ * state is the fully drawn weave, so no motion and old browsers see it whole.
+ */
+interface Props {
+  draw?: 'scroll' | 'load';
+  /** Taller bands read as a woven strip, shorter ones as a divider. */
+  height?: number;
+}
+
+const { draw = 'scroll', height = 72 } = Astro.props;
+const mid = height / 2;
+const amp = height * 0.34;
+
+// Each thread is a smooth wave across a 1200 wide strip; the phase offsets make
+// the three cross each other, which reads as weaving.
+function wave(phase: number, period: number): string {
+  const points: string[] = [];
+  for (let x = 0; x <= 1200; x += 12) {
+    const y = mid + Math.sin((x / period) * 2 * Math.PI + phase) * amp;
+    points.push(`${x} ${y.toFixed(1)}`);
+  }
+  return `M ${points.join(' L ')}`;
+}
+
+const threads = [
+  { color: 'stroke-thread-gold', d: wave(0.3, 300), width: 2.5 },
+  { color: 'stroke-thread-green', d: wave(2.2, 380), width: 1.5 },
+  { color: 'stroke-thread-red', d: wave(4.1, 460), width: 1.5 },
+];
+---
+
+<svg
+  aria-hidden="true"
+  focusable="false"
+  viewBox={`0 0 1200 ${height}`}
+  preserveAspectRatio="none"
+  class:list={['block w-full overflow-visible', draw === 'scroll' && 'thread-draw']}
+  style={`height: ${height}px`}
+>
+  {threads.map(({ color, d, width }, n) => (
+    <path
+      d={d}
+      pathLength="1"
+      fill="none"
+      stroke-width={width}
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      vector-effect="non-scaling-stroke"
+      class:list={[
+        color,
+        draw === 'load' && 'animate-draw [stroke-dasharray:1]',
+        draw === 'load' && ['', '[animation-delay:200ms]', '[animation-delay:400ms]'][n],
+      ]}
+    />
+  ))}
+</svg>

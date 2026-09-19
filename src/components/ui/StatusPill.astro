@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type Status = NonNullable<CollectionEntry<'profile'>['data']['availability']>['status'];
+
+interface Props {
+  status: Status;
+  /** The availability note, shown after the label when given. */
+  note?: string | undefined;
+}
+
+// Keyed on the schema enum, so a new status fails type checking until it has a label.
+const labels: Record<Status, string> = {
+  open: 'Available',
+  limited: 'Limited availability',
+  closed: 'Booked',
+};
+
+// Full literal class names: Tailwind 4 only generates classes written out in source.
+const dots: Record<Status, string> = {
+  open: 'bg-status-open',
+  limited: 'bg-status-limited',
+  closed: 'bg-status-closed',
+};
+
+const { status, note } = Astro.props;
+---
+
+<p class="rounded-tag border-border bg-surface-raised text-on-surface inline-flex items-center gap-3 border px-4 py-2 text-sm">
+  <span aria-hidden="true" class="relative flex size-2.5 shrink-0">
+    {status === 'open' && (
+      <span
+        class:list={[
+          'absolute inset-0 animate-ping rounded-full opacity-60 [animation-duration:2.4s]',
+          dots[status],
+        ]}
+      />
+    )}
+    <span class:list={['relative size-2.5 rounded-full', dots[status]]} />
+  </span>
+  <span>
+    <strong>{labels[status]}</strong>
+    {note && <>. {note}</>}
+  </span>
+</p>

@@ -10,6 +10,7 @@
     - Express.js
     - Sequelize
     - PostgreSQL
+  image: ../assets/attendx.png
   demoUrl: https://atttend-x.vercel.app
   repoUrl: https://github.com/blacksensei-hub/AttendX.git
   order: 0
@@ -24,6 +25,7 @@
     - Node.js
     - Express.js
     - PostgreSQL
+  image: ../assets/urbanpulse.png
   demoUrl: https://urbanpulsee.vercel.app
   repoUrl: https://github.com/blacksensei-hub/UrbanPulse-frontend.git
   order: 1

@@ -52,34 +52,26 @@ test.describe('projects section', () => {
     expect(overflow).toBe(0);
   });
 
-  test('sits side by side on desktop (AC-5)', async ({ page }) => {
+  test('shows full width feature rows on desktop, image beside text, sides alternating (spec 0011)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
     const cards = page.getByRole('region', { name: 'Projects' }).getByRole('article');
     const [first, second] = [await cards.nth(0).boundingBox(), await cards.nth(1).boundingBox()];
-    expect(second?.y).toBe(first?.y);
-    expect(second?.x).toBeGreaterThan(first?.x ?? 0);
-  });
+    expect(second?.x).toBe(first?.x);
+    expect(second?.y).toBeGreaterThan((first?.y ?? 0) + (first?.height ?? 0) - 1);
 
-  test('lines up the link rows across cards on desktop', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/');
-
-    // Cards in a row share one height, and the link row is pinned to each card's bottom.
-    const section = page.getByRole('region', { name: 'Projects' });
-    const cards = await section.getByRole('article').all();
-    const links = await section.getByRole('link', { name: /^Source code/ }).all();
-    const heights = await Promise.all(cards.map(async (c) => (await c.boundingBox())?.height));
-    const bottoms = await Promise.all(
-      links.map(async (l) => {
-        const box = await l.boundingBox();
-        return (box?.y ?? 0) + (box?.height ?? 0);
-      }),
-    );
-
-    for (const height of heights) expect(height).toBeCloseTo(heights[0] ?? 0, 0);
-    for (const bottom of bottoms) expect(bottom).toBeCloseTo(bottoms[0] ?? 0, 0);
+    for (const [n, imageOnLeft] of [
+      [0, true],
+      [1, false],
+    ] as const) {
+      const card = cards.nth(n);
+      const image = await card.getByRole('img').boundingBox();
+      const title = await card.getByRole('heading', { level: 3 }).boundingBox();
+      expect(image && title && image.x < title.x).toBe(imageOnLeft);
+    }
   });
 
   test('reaches every card link with Tab (AC-7)', async ({ page }) => {

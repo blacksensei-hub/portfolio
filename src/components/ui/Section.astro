@@ -4,17 +4,41 @@ import Container from './Container.astro';
 interface Props {
   id: string;
   title: string;
+  /** Mono chapter number shown above the heading, e.g. "01". */
+  index?: string | undefined;
+  /**
+   * `stack` puts the heading above the content. `split` pins the heading in a
+   * left column beside the content from lg up, so neighbors differ in shape.
+   */
+  layout?: 'stack' | 'split';
 }
 
-const { id, title } = Astro.props;
+const { id, title, index, layout = 'stack' } = Astro.props;
 const headingId = `${id}-heading`;
+const split = layout === 'split';
 ---
 
-<section id={id} aria-labelledby={headingId} class="py-section">
+<section id={id} aria-labelledby={headingId} class="py-section relative">
   <Container>
-    <h2 id={headingId} class="text-h2 mb-6 font-semibold tracking-tight">
-      {title}
-    </h2>
-    <slot />
+    <div class:list={[split && 'lg:grid lg:grid-cols-12 lg:gap-12']}>
+      <header
+        class:list={[
+          'reveal mb-10',
+          split ? 'lg:col-span-4 lg:mb-0 lg:self-start lg:sticky lg:top-28' : 'lg:mb-14',
+        ]}
+      >
+        {index && (
+          <p class="font-mono text-label text-accent mb-4 uppercase" aria-hidden="true">
+            {index} <span class="text-muted">/ {title}</span>
+          </p>
+        )}
+        <h2 id={headingId} class="text-h2 font-semibold tracking-tight">
+          {title}
+        </h2>
+      </header>
+      <div class:list={[split && 'lg:col-span-8']}>
+        <slot />
+      </div>
+    </div>
   </Container>
 </section>

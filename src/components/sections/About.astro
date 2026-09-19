@@ -8,6 +8,6 @@ interface Props {
 const { bio } = Astro.props;
 ---
 
-<Section id="about" title="About">
-  <p class="max-w-prose">{bio}</p>
+<Section id="about" title="About" index="01" layout="split">
+  <p class="reveal text-lede max-w-[38ch] lg:pt-2">{bio}</p>
 </Section>
