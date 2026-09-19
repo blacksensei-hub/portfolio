@@ -4,10 +4,16 @@ interface Props {
 }
 
 // Never wraps the whole card in a link; links inside stay separate Tab stops.
-// The lift and gold edge on hover are pure CSS (spec 0011).
+// Hover lifts the card, gilds its edge, and a pointer spotlight follows the
+// cursor across it (specs 0011, 0012). All CSS but the spotlight's position.
 const { as: Element = 'article' }: Props = Astro.props;
 ---
 
-<Element class="group/card rounded-card border-border bg-surface-raised hover:border-accent relative overflow-hidden border p-6 transition-[border-color,translate] duration-(--duration-hover) ease-(--ease-out-soft) hover:-translate-y-1 md:p-8">
+<Element class="group/card rounded-card border-border bg-surface-raised hover:border-accent relative isolate overflow-hidden border p-6 transition-[border-color,translate,box-shadow] duration-(--duration-hover) ease-(--ease-out-soft) hover:-translate-y-1 hover:shadow-[0_24px_60px_-30px_var(--color-accent)] md:p-8">
+  <div
+    aria-hidden="true"
+    data-spotlight
+    class="spotlight pointer-events-none absolute inset-0 -z-10"
+  ></div>
   <slot />
 </Element>

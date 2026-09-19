@@ -29,13 +29,16 @@ const { title, summary, tech, demoUrl, repoUrl, image } = project;
       ]}
     >
       {image ? (
-        <Image
-          src={image}
-          alt={title}
-          widths={[480, 800, 1200]}
-          sizes="(min-width: 1024px) 44rem, 100vw"
-          class="size-full object-cover object-top transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:scale-[1.03]"
-        />
+        // Oversized and drifting with scroll (parallax), so the frame never shows an edge.
+        <div class="parallax absolute inset-x-0 -inset-y-[8%]">
+          <Image
+            src={image}
+            alt={title}
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 1024px) 44rem, 100vw"
+            class="size-full object-cover object-center transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:scale-[1.04]"
+          />
+        </div>
       ) : (
         <div class="flex size-full items-center" aria-hidden="true">
           <Weave height={120} />

@@ -8,6 +8,7 @@ import Projects from '../components/sections/Projects.astro';
 import Skills from '../components/sections/Skills.astro';
 import WorkWithMe from '../components/sections/WorkWithMe.astro';
 import SiteHeader from '../components/ui/SiteHeader.astro';
+import TechMarquee from '../components/ui/TechMarquee.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { buildJsonLd } from '../lib/seo';
 
@@ -56,6 +57,9 @@ const services = await getCollection('services');
     availability={profile.availability}
   />
   <About bio={profile.bio} />
+  <TechMarquee
+    items={skills.toSorted((a, b) => a.data.order - b.data.order).flatMap((s) => s.data.items)}
+  />
   <Projects projects={projects} />
   <Skills skills={skills} />
   <WorkWithMe services={services} availability={profile.availability} />

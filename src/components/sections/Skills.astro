@@ -29,7 +29,7 @@ const sorted = [...Astro.props.skills].sort((a, b) => a.data.order - b.data.orde
             <ul
               role="list"
               aria-labelledby={headingId}
-              class="text-muted flex flex-wrap gap-x-4 gap-y-1 text-lg md:col-span-8"
+              class="text-muted group-hover/row:text-on-surface flex flex-wrap gap-x-4 gap-y-1 text-lg transition-[color,translate] duration-(--duration-hover) ease-(--ease-out-soft) group-hover/row:translate-x-2 md:col-span-8"
             >
               {entry.data.items.map((item, i) => (
                 <li class="inline-flex items-center gap-4">

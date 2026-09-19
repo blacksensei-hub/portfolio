@@ -8,6 +8,7 @@ interface Props {
 }
 
 // A link styled as a button: every call to action here navigates or downloads.
+// Mono type, a light sheen on hover, and a gentle magnetic lean (spec 0012).
 const { href, variant = 'primary', download = false } = Astro.props;
 const external = isExternal(href);
 ---
@@ -15,9 +16,9 @@ const external = isExternal(href);
 <a
   href={href}
   download={download || undefined}
+  data-magnetic
   class:list={[
-    'group rounded-tag inline-flex min-h-11 items-center justify-center gap-2 border-2 border-accent px-6 py-2.5 font-medium transition-[background-color,color,translate]',
-    'hover:-translate-y-0.5',
+    'sheen group rounded-tag inline-flex min-h-11 items-center justify-center gap-2 border-2 border-accent px-6 py-2.5 font-mono text-sm font-medium tracking-wide uppercase transition-[background-color,color,translate]',
     variant === 'primary'
       ? 'bg-accent text-on-accent hover:bg-transparent hover:text-accent'
       : 'text-accent hover:bg-accent hover:text-on-accent',

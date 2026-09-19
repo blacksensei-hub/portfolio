@@ -94,33 +94,41 @@ const year = new Date().getFullYear();
       <div class="animate-drift absolute -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
     </div>
     <ThemeToggle />
+    {/* Reading progress along the top edge, driven by a CSS scroll timeline (spec 0012). */}
+    <div
+      aria-hidden="true"
+      class="scroll-progress bg-accent pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5"
+    ></div>
     <slot name="header" />
     <!-- Below sm, reserve room so the fixed theme toggle never sits on the first heading. -->
     <main id="main" tabindex="-1" class="max-sm:pt-16">
       <slot />
     </main>
-    <footer class="border-border border-t py-12">
+    <footer class="border-border border-t py-10">
       <Container>
-        <div class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        {/* One line, one size: the copyright on the left, the credits on the right. */}
+        <div class="text-muted flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between">
           {profile && (
-            <div>
-              <p class="font-display text-h3 font-semibold tracking-tight">{profile.name}</p>
-            </div>
-          )}
-          <div class="text-muted flex flex-col gap-2 text-sm md:items-end">
             <p>
-              © {year}. Built with Astro
-              {github && (
-                <>
-                  {' '}
-                  · <Link href={github.href}>{github.label}</Link>
-                </>
-              )}
+              © {year} {profile.name}
             </p>
-            <p>Cookie free, anonymous visit counts via Cloudflare Web Analytics.</p>
-          </div>
+          )}
+          <p>
+            Built with Astro
+            {github && (
+              <>
+                {' '}
+                · <Link href={github.href}>{github.label}</Link>
+              </>
+            )}
+          </p>
         </div>
       </Container>
     </footer>
+    <script>
+      import { initInteractions } from '../lib/interactions';
+
+      initInteractions();
+    </script>
   </body>
 </html>

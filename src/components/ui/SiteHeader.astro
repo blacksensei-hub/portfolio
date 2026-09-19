@@ -1,13 +1,16 @@
 ---
-import Container from './Container.astro';
-
 interface Props {
   name: string;
   sections: { id: string; label: string }[];
 }
 
-// Slim fixed nav for the one page site (spec 0011). Desktop only: below md the
-// page is one short column and the nav would crowd the theme toggle.
+/*
+ * Liquid glass nav (spec 0012). A floating frosted pill that starts roomy and
+ * shrinks into a compact pill over the first 240px of scroll, driven by a CSS
+ * scroll timeline: no script. The link for the section in view lights up via
+ * :target-current where supported. Desktop only: below md the page is one short
+ * column and the nav would crowd the theme toggle.
+ */
 const { name, sections } = Astro.props;
 const initials = name
   .split(/\s+/)
@@ -16,10 +19,9 @@ const initials = name
   .join('');
 ---
 
-<header class="bg-surface/75 border-border/60 fixed inset-x-0 top-0 z-40 hidden border-b backdrop-blur-md md:block">
-  <Container>
-    {/* The right padding keeps every link clear of the fixed theme toggle. */}
-    <nav aria-label="Sections" class="flex h-(--spacing-header) items-center gap-8 pr-14">
+<header class="px-gutter pointer-events-none fixed inset-x-0 top-0 z-40 hidden md:block">
+  <div class="glass glass-nav rounded-tag pointer-events-auto mx-auto mt-4 max-w-[64rem] py-2 pr-2 pl-5">
+    <nav aria-label="Sections" class="flex items-center gap-6">
       <a
         href="#hero"
         class="font-display hover:text-accent mr-auto text-xl font-bold tracking-tight transition-colors"
@@ -30,12 +32,12 @@ const initials = name
         </span>
         <span class="sr-only">, back to top</span>
       </a>
-      <ul role="list" class="flex items-center gap-7">
+      <ul role="list" class="flex items-center gap-1 [scroll-target-group:auto]">
         {sections.map(({ id, label }) => (
           <li>
             <a
               href={`#${id}`}
-              class="text-muted hover:text-on-surface font-mono text-label relative uppercase transition-colors after:bg-accent after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-0 after:transition-[width] hover:after:w-full"
+              class="rounded-tag text-muted hover:text-on-surface hover:bg-on-surface/8 [&:target-current]:bg-accent [&:target-current]:text-on-accent inline-flex min-h-11 items-center px-4 font-mono text-label uppercase transition-colors"
             >
               {label}
             </a>
@@ -43,5 +45,5 @@ const initials = name
         ))}
       </ul>
     </nav>
-  </Container>
+  </div>
 </header>

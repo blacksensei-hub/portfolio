@@ -10,7 +10,7 @@
     - Express.js
     - Sequelize
     - PostgreSQL
-  image: ../assets/attendx.png
+  image: ../assets/logo-full.png
   demoUrl: https://atttend-x.vercel.app
   repoUrl: https://github.com/blacksensei-hub/AttendX.git
   order: 0

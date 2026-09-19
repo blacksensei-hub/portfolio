@@ -9,7 +9,8 @@ import { expect, test } from '@playwright/test';
 
 const token = process.env['PUBLIC_CF_BEACON_TOKEN']?.trim();
 const BEACON_SRC = 'https://static.cloudflareinsights.com/beacon.min.js';
-const NOTICE = 'Cookie free, anonymous visit counts via Cloudflare Web Analytics.';
+// Spec 0012: the owner dropped the analytics notice; the footer now signs the page.
+const COPYRIGHT = `© ${new Date().getFullYear()} Jeffrey Nii Akwei Ankrah`;
 
 let beaconRequests = 0;
 
@@ -78,7 +79,7 @@ test('the footer notice sits after main', async ({ page }) => {
   const footer = page.locator('main ~ footer');
 
   await expect(footer).toHaveCount(1);
-  await expect(footer.getByText(NOTICE)).toBeVisible();
+  await expect(footer.getByText(COPYRIGHT, { exact: true })).toBeVisible();
 });
 
 for (const theme of ['light', 'dark'] as const) {

@@ -4,7 +4,7 @@ The look of the portfolio: its tokens and base components. Decided in [spec 0003
 
 **Source of truth:** `src/styles/global.css`. This file only documents it. If the two ever disagree, `global.css` wins, and this file should be fixed. Never write a color, font size, radius, or duration anywhere else. Use the Tailwind utility the token creates (for example `text-accent`, `bg-surface-raised`, `rounded-card`).
 
-**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces: Bricolage Grotesque for headings, Instrument Sans for body text, JetBrains Mono for small labels. The **signature** is the Weave: gold, green, and red threads that weave behind the hero name and draw themselves in. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS only and rests at its final frame under reduced motion.
+**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces (spec 0012): Space Grotesk for headings, Inter for body text (and the OG card), JetBrains Mono for labels, buttons, and technical details. The **signature** is the Weave: gold, green, and red threads along the hero's bottom edge that draw themselves in, kept clear of the name. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS only and rests at its final frame under reduced motion.
 
 ## Color tokens
 
@@ -33,9 +33,9 @@ Named by role, not by hue. Light values live in `@theme`. Dark values override t
 
 | Token | Value | Utility / use |
 |---|---|---|
-| `--font-sans` | `'Instrument Sans Variable'`, metric matched Arial fallback | body text (`@fontsource-variable/instrument-sans`) |
-| `--font-display` | `'Bricolage Grotesque Variable'` | `font-display`, every h1 to h3 via the base layer |
-| `--font-mono` | `'JetBrains Mono Variable'` | `font-mono`, labels, tags, nav |
+| `--font-sans` | `'Inter Variable'`, metric matched Arial fallback | body text (`@fontsource-variable/inter`) |
+| `--font-display` | `'Space Grotesk Variable'` | `font-display`, every h1 to h3 via the base layer |
+| `--font-mono` | `'JetBrains Mono Variable'` | `font-mono`, labels, tags, nav, buttons |
 | `--text-hero` | `clamp(3rem, 1.2rem + 7.4vw, 8.5rem)`, line height 0.92 | `text-hero`, the page `<h1>` |
 | `--text-display` | `clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem)`, line height 1 | project titles, the Contact closing line |
 | `--text-h2` | `clamp(2rem, 1.3rem + 2.8vw, 3.75rem)`, line height 1.05 | Section headings |
@@ -56,6 +56,19 @@ Named by role, not by hue. Light values live in `@theme`. Dark values override t
 Spacing inside components uses Tailwind's default 0.25rem scale.
 
 **Global rules in `global.css`:** every focusable element gets a `:focus-visible` outline (2px solid `--color-focus`, 2px offset). `main:focus` draws no outline. Under `prefers-reduced-motion: reduce`, all transitions and animations are removed, and every animation is written so its resting state is the final frame. `.reveal` rises content into place as it scrolls into view and `.thread-draw` draws a Weave in (CSS scroll driven animations, transform only, never opacity, so axe always sees real contrast). The last Section has no forced height: the footer closes the page, and an anchor jump to Contact lands as high as the page allows.
+
+## Motion and interaction (spec 0012)
+
+CSS first. Scroll driven animations reference their timeline through `--timeline-view` / `--timeline-page`, never a literal: the minifier folds a literal `animation-timeline` into the `animation` shorthand, which Chromium rejects, silently dropping the effect.
+
+- `.glass` is liquid glass: a translucent surface tint, `blur(18px) saturate(180%)`, a bright inner rim, a soft shadow. Used by the nav and the theme toggle.
+- `.glass-nav` shrinks the nav pill from 64rem to 46rem over the first 240px of scroll. Nav links light up for the section in view through `:target-current` where supported.
+- `.scroll-progress` is the gold reading bar on the top edge (hidden where scroll timelines are unsupported).
+- `MaskText` splits a heading into words that slide up out of clipped lines: on load in the hero, on scroll in every Section heading.
+- `.parallax` drifts project images inside their frame; `.sheen` sweeps light across buttons; `TechMarquee` is a slow, hover-pausing ribbon of the stack (aria-hidden, Skills lists the same items).
+- `src/lib/interactions.ts` is the only script: a pointer spotlight on `[data-spotlight]` (hero, cards) and a magnetic lean on `[data-magnetic]` buttons. Fine pointers only, off under reduced motion.
+
+Under reduced motion every animation and transition stops at its final frame.
 
 ## Components
 

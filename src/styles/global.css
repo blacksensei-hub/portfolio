@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@fontsource-variable/bricolage-grotesque/wght.css";
-@import "@fontsource-variable/instrument-sans/wght.css";
+@import "@fontsource-variable/space-grotesk/wght.css";
+@import "@fontsource-variable/inter/wght.css";
 @import "@fontsource-variable/jetbrains-mono/wght.css";
 
 /*
@@ -33,10 +33,8 @@
   --color-thread-green: oklch(56% 0.12 155);
   --color-thread-red: oklch(56% 0.17 28);
 
-  --font-sans:
-    "Instrument Sans Variable", "Instrument Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    "Bricolage Grotesque Variable", "Instrument Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
 
   --text-hero: clamp(3rem, 1.2rem + 7.4vw, 8.5rem);
@@ -72,6 +70,9 @@
   --animate-rise: rise 1s var(--ease-out-soft) both;
   --animate-scroll-cue: scroll-cue 2.4s var(--ease-out-soft) infinite;
   --animate-drift: drift var(--duration-drift) ease-in-out infinite;
+  --animate-mask-up: mask-up 1.1s var(--ease-out-soft) both;
+  --animate-marquee: marquee var(--duration-marquee) linear infinite;
+  --duration-marquee: 40s;
 }
 
 /* Dark: a deep indigo night, never pure black, with gold as the rare light. */
@@ -140,6 +141,44 @@
   }
 }
 
+@keyframes marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+
+@keyframes mask-up {
+  from {
+    translate: 0 110%;
+  }
+}
+
+@keyframes progress {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* The nav settles from a roomy bar into a compact floating pill as the page scrolls. */
+@keyframes nav-shrink {
+  to {
+    max-width: 46rem;
+    padding-block: 0.25rem;
+  }
+}
+
+@keyframes parallax {
+  from {
+    translate: 0 -6%;
+  }
+  to {
+    translate: 0 6%;
+  }
+}
+
 @keyframes drift {
   50% {
     translate: -6% 4%;
@@ -158,13 +197,13 @@
   }
 }
 
-/* Metric matched stand in, so the swap to Instrument Sans barely shifts the layout. */
+/* Metric matched stand in, so the swap to Inter barely shifts the layout. */
 @font-face {
-  font-family: "Instrument Fallback";
+  font-family: "Inter Fallback";
   src: local("Arial");
-  size-adjust: 97%;
-  ascent-override: 96%;
-  descent-override: 25%;
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22.5%;
   line-gap-override: 0%;
 }
 
@@ -213,6 +252,22 @@
 
 @layer components {
   /*
+   * Timelines go through custom properties on purpose: the CSS minifier folds a
+   * literal animation-timeline into the animation shorthand, which Chromium
+   * rejects, silently dropping every scroll driven animation (spec 0012).
+   */
+  :root {
+    --timeline-view: view();
+    --timeline-page: scroll(root);
+  }
+
+  /* Only browsers that can drive it from scroll show the progress bar. */
+  .scroll-progress {
+    display: none;
+    transform-origin: left;
+  }
+
+  /*
    * Scroll reveal (spec 0011): content rises into place as it enters the
    * viewport. Transform only, never opacity, so text is always readable and
    * axe always sees its real contrast. Browsers without scroll driven
@@ -221,18 +276,103 @@
   @supports (animation-timeline: view()) {
     .reveal {
       animation: var(--animate-rise);
-      animation-timeline: view();
+      animation-timeline: var(--timeline-view);
       animation-range: entry 0% entry 60%;
+    }
+
+    /* Words slide up out of a clipped line as a heading enters the viewport. */
+    .mask-reveal .word > span {
+      animation: mask-up linear both;
+      animation-timeline: var(--timeline-view);
+      animation-range: entry 20% entry 90%;
+    }
+
+    .scroll-progress {
+      display: block;
+      animation: progress linear both;
+      animation-timeline: var(--timeline-page);
+    }
+
+    .glass-nav {
+      animation: nav-shrink linear both;
+      animation-timeline: var(--timeline-page);
+      animation-range: 0 240px;
+    }
+
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: var(--timeline-view);
     }
 
     .thread-draw path {
       animation: draw linear both;
-      animation-timeline: view();
+      animation-timeline: var(--timeline-view);
       animation-range: entry 10% cover 45%;
     }
   }
 
   .thread-draw path {
     stroke-dasharray: 1;
+  }
+
+  /* Each word of a masked heading clips its own line, so the slide reads as a reveal. */
+  .word {
+    display: inline-block;
+    overflow: clip;
+    overflow-clip-margin: 0.12em;
+    vertical-align: top;
+  }
+
+  .word > span {
+    display: inline-block;
+  }
+
+  /*
+   * Liquid glass (spec 0012): a translucent tint of the surface, a strong blur
+   * with extra saturation, a bright inner rim, and a soft drop shadow.
+   */
+  .glass {
+    background: color-mix(in oklch, var(--color-surface) 55%, transparent);
+    backdrop-filter: blur(18px) saturate(180%);
+    border: 1px solid color-mix(in oklch, var(--color-on-surface) 12%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, var(--color-on-surface) 14%, transparent),
+      inset 0 -1px 0 color-mix(in oklch, var(--color-on-surface) 4%, transparent),
+      0 10px 40px -12px color-mix(in oklch, var(--color-surface) 70%, black);
+  }
+
+  /* Pointer spotlight: interactions.ts sets --mx/--my; without it the glow simply never shows. */
+  .spotlight {
+    background-image: radial-gradient(
+      24rem circle at var(--mx, -100rem) var(--my, -100rem),
+      color-mix(in oklch, var(--color-accent) 12%, transparent),
+      transparent 70%
+    );
+  }
+
+  /* Button sheen: a soft light band sweeps across on hover. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      color-mix(in oklch, white 35%, transparent) 50%,
+      transparent 70%
+    );
+    translate: -120% 0;
+    transition: translate 700ms var(--ease-out-soft);
+  }
+
+  .sheen:hover::after {
+    translate: 120% 0;
   }
 }

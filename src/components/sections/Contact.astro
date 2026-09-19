@@ -51,7 +51,7 @@ function detail(href: string): string {
             <li class="reveal border-border border-b">
               <a
                 href={data.href}
-                class="group/link flex min-h-11 items-center gap-5 py-6 transition-colors hover:text-accent"
+                class="group/link from-accent/10 flex min-h-11 items-center gap-5 bg-gradient-to-r to-transparent bg-[length:0%_100%] bg-no-repeat px-2 py-6 transition-[color,background-size] duration-(--duration-hover) ease-(--ease-out-soft) hover:bg-[length:100%_100%] hover:text-accent"
                 {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
               >
                 <svg

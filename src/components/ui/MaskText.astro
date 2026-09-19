@@ -1,0 +1,32 @@
+---
+/*
+ * Splits text into words that each slide up out of their own clipped line
+ * (spec 0012). `load` plays once on page load, staggered; `scroll` plays as the
+ * parent with `.mask-reveal` enters the viewport. The real words stay in the
+ * DOM with real spaces, so the accessible name is unchanged, and the resting
+ * state is the plain text, so reduced motion and old browsers see it as is.
+ */
+interface Props {
+  text: string;
+  mode?: 'load' | 'scroll';
+  /** Start delay in ms for `load`. */
+  delay?: number;
+}
+
+const { text, mode = 'scroll', delay = 0 } = Astro.props;
+const words = text.split(/\s+/).filter(Boolean);
+---
+
+{words.map((word, n) => (
+  <>
+    <span class="word">
+      <span
+        class:list={[mode === 'load' && 'animate-mask-up']}
+        style={mode === 'load' ? `animation-delay: ${delay + n * 90}ms` : undefined}
+      >
+        {word}
+      </span>
+    </span>
+    {n < words.length - 1 && ' '}
+  </>
+))}

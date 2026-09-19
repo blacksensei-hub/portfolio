@@ -1,5 +1,6 @@
 ---
 import Container from './Container.astro';
+import MaskText from './MaskText.astro';
 
 interface Props {
   id: string;
@@ -23,7 +24,7 @@ const split = layout === 'split';
     <div class:list={[split && 'lg:grid lg:grid-cols-12 lg:gap-12']}>
       <header
         class:list={[
-          'reveal mb-10',
+          'mask-reveal mb-10',
           split ? 'lg:col-span-4 lg:mb-0 lg:self-start lg:sticky lg:top-28' : 'lg:mb-14',
         ]}
       >
@@ -33,7 +34,7 @@ const split = layout === 'split';
           </p>
         )}
         <h2 id={headingId} class="text-h2 font-semibold tracking-tight">
-          {title}
+          <MaskText text={title} />
         </h2>
       </header>
       <div class:list={[split && 'lg:col-span-8']}>

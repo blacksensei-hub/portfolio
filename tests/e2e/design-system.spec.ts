@@ -116,8 +116,8 @@ test('the three faces load from the site origin and nothing loads from another h
   await page.evaluate(() => document.fonts.ready);
 
   const fonts = requests.filter((url) => url.includes('.woff2'));
-  // Spec 0011: Instrument Sans for body text, Bricolage Grotesque for headings, JetBrains Mono for labels.
-  for (const face of ['instrument-sans', 'bricolage-grotesque', 'jetbrains-mono']) {
+  // Spec 0012: Inter for body text, Space Grotesk for headings, JetBrains Mono for labels and buttons.
+  for (const face of ['inter', 'space-grotesk', 'jetbrains-mono']) {
     expect(fonts.some((url) => url.includes(`${face}-latin-wght-normal`))).toBe(true);
   }
   expect(
