@@ -346,7 +346,9 @@ describe('serviceSchema (spec 0009, AC-2)', () => {
   });
 
   it('rejects a 281 character blurb', () => {
-    expect(serviceSchema.safeParse({ ...validService, blurb: 'x'.repeat(281) }).success).toBe(false);
+    expect(serviceSchema.safeParse({ ...validService, blurb: 'x'.repeat(281) }).success).toBe(
+      false,
+    );
   });
 
   it('rejects an empty title or blurb', () => {

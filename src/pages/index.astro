@@ -6,6 +6,7 @@ import Contact from '../components/sections/Contact.astro';
 import Hero from '../components/sections/Hero.astro';
 import Projects from '../components/sections/Projects.astro';
 import Skills from '../components/sections/Skills.astro';
+import WorkWithMe from '../components/sections/WorkWithMe.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { buildJsonLd } from '../lib/seo';
 
@@ -18,6 +19,7 @@ if (!profile) throw new Error('profile.yaml is missing');
 const projects = await getCollection('projects');
 const skills = await getCollection('skills');
 const links = await getCollection('links');
+const services = await getCollection('services');
 ---
 
 <BaseLayout
@@ -38,5 +40,6 @@ const links = await getCollection('links');
   <About bio={profile.bio} />
   <Projects projects={projects} />
   <Skills skills={skills} />
+  <WorkWithMe services={services} availability={profile.availability} />
   <Contact links={links} resume={profile.resume} />
 </BaseLayout>
