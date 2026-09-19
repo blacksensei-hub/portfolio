@@ -20,8 +20,8 @@ const links = read('links.yaml').toSorted((a, b) => a.order - b.order);
 const EDUCATION = [
   {
     title: 'BSc Computer Science',
-    org: 'University — update in scripts/build-resume.mjs',
-    period: 'Expected 20XX',
+    org: 'Ghana Communication Technology University',
+    period: 'Expected 2026',
     notes: 'Coursework across algorithms, databases, software engineering, and networks.',
   },
 ];
