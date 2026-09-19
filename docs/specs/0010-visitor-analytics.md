@@ -1,7 +1,7 @@
 # 0010. Cookie free visitor analytics with Cloudflare Web Analytics
 
 **Date**: 2026-09-19
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
