@@ -15,63 +15,123 @@ interface Props {
   tagline: string;
   email: string;
   availability?: Availability | undefined;
+  /** Counts for the stat row, from the content collections. */
+  stats: { value: number; label: string }[];
+  /** A few headline technologies for the code card. */
+  stack: string[];
 }
 
 // The top of the page and its only <h1>, so it is not a Section (which owns an <h2>).
-const { name, role, tagline, email, availability } = Astro.props;
+const { name, role, tagline, email, availability, stats, stack } = Astro.props;
+const short = name
+  .split(/\s+/)
+  .filter((_, n, all) => n === 0 || n === all.length - 1)
+  .join(' ');
+
+// The code card: a decorative restatement of the profile, typed in line by line.
+type Token = { t: string; c?: string };
+const lines: Token[][] = [
+  [{ t: 'const ', c: 'text-thread-red' }, { t: 'developer' }, { t: ' = {', c: 'text-muted' }],
+  [
+    { t: '  name: ', c: 'text-muted' },
+    { t: `"${short}"`, c: 'text-thread-green' },
+    { t: ',', c: 'text-muted' },
+  ],
+  [
+    { t: '  role: ', c: 'text-muted' },
+    { t: `"${role}"`, c: 'text-thread-green' },
+    { t: ',', c: 'text-muted' },
+  ],
+  [
+    { t: '  stack: [', c: 'text-muted' },
+    { t: stack.map((s) => `"${s}"`).join(', '), c: 'text-thread-green' },
+    { t: '],', c: 'text-muted' },
+  ],
+  [
+    { t: '  basedIn: ', c: 'text-muted' },
+    { t: '"Ghana"', c: 'text-thread-green' },
+    { t: ',', c: 'text-muted' },
+  ],
+  [
+    { t: '  available: ', c: 'text-muted' },
+    { t: String(availability?.status === 'open'), c: 'text-accent' },
+    { t: ',', c: 'text-muted' },
+  ],
+  [{ t: '};', c: 'text-muted' }],
+];
 ---
 
 <section
   id="hero"
   aria-labelledby="hero-heading"
-  class="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden pt-8 pb-24 md:pt-(--spacing-header)"
+  class="relative isolate overflow-hidden pt-10 pb-8 md:pt-(--spacing-header)"
 >
-  {/* Pointer spotlight across the whole hero (interactions.ts); decorative. */}
+  {/* Moving aurora over a faint grid floor: the MotionSites style backdrop. */}
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <div class="grid-floor absolute inset-0"></div>
+    <div class="animate-aurora bg-thread-gold/25 absolute top-[5%] left-[10%] size-[28rem] rounded-full blur-[110px]"></div>
+    <div class="animate-aurora bg-thread-green/20 absolute top-[25%] right-[5%] size-[24rem] rounded-full blur-[110px] [animation-delay:-6s]"></div>
+    <div class="animate-aurora bg-thread-red/15 absolute bottom-0 left-[40%] size-[20rem] rounded-full blur-[110px] [animation-delay:-12s]"></div>
+  </div>
   <div
     aria-hidden="true"
     data-spotlight
     class="spotlight pointer-events-none absolute inset-0 -z-10"
   ></div>
 
-  {/*
-    The woven band runs along the bottom edge, clear of the name: the site's
-    signature, and the seam between the hero and the page.
-  */}
-  <div class="pointer-events-none absolute inset-x-0 bottom-6 -z-10 opacity-70 md:bottom-10">
-    <Weave draw="load" height={64} />
-  </div>
-
   <Container>
-    {availability && (
-      <div class="animate-rise mb-8 md:mb-10">
-        <StatusPill status={availability.status} />
-      </div>
-    )}
-    <h1 id="hero-heading" class="text-hero max-w-[11ch] font-bold tracking-tighter">
-      <MaskText text={name} mode="load" delay={150} />
-    </h1>
-    <div class="animate-rise mt-8 grid gap-6 [animation-delay:550ms] md:mt-12 md:grid-cols-12 md:items-end">
+    <div class="grid items-center gap-12 pt-6 md:grid-cols-12 md:pt-10">
       <div class="md:col-span-7">
-        <p class="font-display text-h3 text-accent font-semibold">{role}</p>
-        <p class="text-muted text-lede mt-3 max-w-[34ch]">{tagline}</p>
+        {availability && (
+          <div class="animate-rise mb-6">
+            <StatusPill status={availability.status} />
+          </div>
+        )}
+        <p class="animate-rise border-accent/40 bg-accent/10 text-accent rounded-tag mb-4 inline-block border px-3 py-1 font-mono text-label uppercase">
+          <span class="shimmer-text">{role}</span>
+        </p>
+        <h1 id="hero-heading" class="text-hero font-bold tracking-tight">
+          <MaskText text={name} mode="load" delay={150} />
+        </h1>
+        <p class="animate-rise text-muted text-lede mt-5 max-w-[46ch] [animation-delay:450ms]">
+          {tagline}
+        </p>
+        <div class="animate-rise mt-7 flex flex-wrap gap-3 [animation-delay:550ms]">
+          <ButtonLink href="#projects">View my work</ButtonLink>
+          <ButtonLink href={`mailto:${email}`} variant="secondary">
+            Email me
+          </ButtonLink>
+        </div>
+
+        <dl class="animate-rise mt-10 flex flex-wrap gap-x-10 gap-y-4 [animation-delay:650ms]">
+          {stats.map(({ value, label }) => (
+            <div class="flex flex-col-reverse">
+              <dt class="text-muted font-mono text-label uppercase">{label}</dt>
+              <dd class="font-display text-2xl font-bold">
+                <span aria-hidden="true" class="count-up" style={`--to: ${value}`} />
+                <span class="sr-only">{value}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
-      <div class="flex flex-wrap gap-3 md:col-span-5 md:justify-end">
-        <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>
-        <ButtonLink href="#projects" variant="secondary">
-          See my work
-        </ButtonLink>
+
+      {/* Decorative code card: the profile restated as code, typed in line by line. */}
+      <div aria-hidden="true" class="animate-rise md:col-span-5 [animation-delay:300ms]">
+        <div class="glass glow-border glow-border-on rounded-card shadow-2xl transition-transform duration-(--duration-hover) md:rotate-[1.5deg] md:hover:rotate-0">
+          <div class="border-border/60 flex items-center gap-2 border-b px-4 py-3">
+            <span class="bg-thread-red size-2.5 rounded-full"></span>
+            <span class="bg-thread-gold size-2.5 rounded-full"></span>
+            <span class="bg-thread-green size-2.5 rounded-full"></span>
+            <span class="text-muted ml-3 font-mono text-xs">developer.ts</span>
+          </div>
+          <pre class="overflow-x-auto p-5 font-mono text-[0.8125rem] leading-7 whitespace-pre-wrap"><code>{lines.map((line, n) => (<span class="type-line block" style={`--line: ${n}`}>{line.map(({ t, c }) => <span class={c}>{t}</span>)}</span>))}<span class="caret text-accent" /></code></pre>
+        </div>
       </div>
     </div>
   </Container>
 
-  {/* Scroll cue: decorative, the content below is reachable by any means. */}
-  <div
-    aria-hidden="true"
-    class="text-muted font-mono text-label absolute bottom-24 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 uppercase md:flex"
-  >
-    Scroll
-    <span class="bg-border relative block h-12 w-px overflow-hidden">
-      <span class="bg-accent absolute inset-x-0 top-0 h-1/2 animate-scroll-cue"></span>
-    </span>
+  <div class="mt-14 opacity-70">
+    <Weave draw="load" height={48} />
   </div>
 </section>

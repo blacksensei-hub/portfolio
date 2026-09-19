@@ -1,43 +1,56 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
+import { glyphs } from './glyphs';
+import ThemeToggle from './ThemeToggle.astro';
+
 interface Props {
   name: string;
   sections: { id: string; label: string }[];
+  links: CollectionEntry<'links'>['data'][];
 }
 
 /*
- * Liquid glass nav (spec 0012). A floating frosted pill that starts roomy and
- * shrinks into a compact pill over the first 240px of scroll, driven by a CSS
- * scroll timeline: no script. The link for the section in view lights up via
- * :target-current where supported. Desktop only: below md the page is one short
- * column and the nav would crowd the theme toggle.
+ * Liquid glass nav (specs 0012, 0013). A floating frosted pill that shrinks over
+ * the first 240px of scroll (CSS scroll timeline). Left: monogram and name.
+ * Centre: a segmented group of section links, the one in view lit through
+ * :target-current. Right: quick social icons and the theme toggle. The toggle
+ * is first in the DOM (the first Tab stop after the skip link, spec 0008) and
+ * placed last visually with `order-last`.
  */
-const { name, sections } = Astro.props;
-const initials = name
-  .split(/\s+/)
-  .filter((_, n, all) => n === 0 || n === all.length - 1)
-  .map((word) => word.charAt(0))
-  .join('');
+const { name, sections, links } = Astro.props;
+const parts = name.split(/\s+/);
+const initials = `${parts[0]?.charAt(0) ?? ''}${parts.at(-1)?.charAt(0) ?? ''}`;
+const short = `${parts[0] ?? ''} ${parts.at(-1) ?? ''}`;
+const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
 ---
 
-<header class="px-gutter pointer-events-none fixed inset-x-0 top-0 z-40 hidden md:block">
-  <div class="glass glass-nav rounded-tag pointer-events-auto mx-auto mt-4 max-w-[64rem] py-2 pr-2 pl-5">
-    <nav aria-label="Sections" class="flex items-center gap-6">
-      <a
-        href="#hero"
-        class="font-display hover:text-accent mr-auto text-xl font-bold tracking-tight transition-colors"
+<header class="px-gutter pointer-events-none fixed inset-x-0 top-0 z-40">
+  <div class="glass glass-nav rounded-tag pointer-events-auto mx-auto mt-3 flex max-w-[62rem] items-center gap-2 py-1.5 pr-1.5 pl-2 md:mt-4">
+    <ThemeToggle inline />
+    <a
+      href="#hero"
+      class="group/logo hover:bg-on-surface/8 rounded-tag mr-auto flex min-h-11 items-center gap-2.5 pr-3 pl-1.5 transition-colors"
+    >
+      <span
+        aria-hidden="true"
+        class="bg-accent text-on-accent font-display grid size-8 place-items-center rounded-lg text-sm font-bold transition-transform duration-(--duration-hover) group-hover/logo:rotate-[-8deg]"
       >
         {initials}
-        <span class="text-accent" aria-hidden="true">
-          .
-        </span>
-        <span class="sr-only">, back to top</span>
-      </a>
-      <ul role="list" class="flex items-center gap-1 [scroll-target-group:auto]">
+      </span>
+      <span class="font-display hidden text-sm font-semibold sm:inline">{short}</span>
+      <span class="sr-only">, back to top</span>
+    </a>
+    <nav aria-label="Sections" class="hidden md:block">
+      <ul
+        role="list"
+        class="bg-on-surface/5 border-border/60 rounded-tag flex items-center gap-0.5 border p-1 [scroll-target-group:auto]"
+      >
         {sections.map(({ id, label }) => (
           <li>
             <a
               href={`#${id}`}
-              class="rounded-tag text-muted hover:text-on-surface hover:bg-on-surface/8 [&:target-current]:bg-accent [&:target-current]:text-on-accent inline-flex min-h-11 items-center px-4 font-mono text-label uppercase transition-colors"
+              class="rounded-tag text-muted hover:text-on-surface hover:bg-on-surface/8 [&:target-current]:bg-accent [&:target-current]:text-on-accent inline-flex min-h-9 items-center px-3.5 text-sm font-medium transition-colors"
             >
               {label}
             </a>
@@ -45,5 +58,27 @@ const initials = name
         ))}
       </ul>
     </nav>
+    <ul role="list" class="ml-auto hidden items-center sm:flex" aria-label="Elsewhere">
+      {quick.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            aria-label={link.label}
+            class="text-muted hover:text-accent hover:bg-on-surface/8 grid size-10 place-items-center rounded-full transition-colors"
+            {...(/^https?:/.test(link.href) && { target: '_blank', rel: 'noopener noreferrer' })}
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              viewBox="0 0 24 24"
+              class="size-[1.05rem] fill-current"
+            >
+              <path d={glyphs[link.icon]} />
+            </svg>
+          </a>
+        </li>
+      ))}
+      <li aria-hidden="true" class="bg-border mx-1.5 h-5 w-px"></li>
+    </ul>
   </div>
 </header>

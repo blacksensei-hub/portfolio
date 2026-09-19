@@ -38,6 +38,22 @@ const { title, summary, tech, demoUrl, repoUrl, image } = project;
             sizes="(min-width: 1024px) 44rem, 100vw"
             class="size-full object-cover object-center transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:scale-[1.04]"
           />
+          {demoUrl && (
+            // A hover shortcut to the live site. The labelled "Live demo" link below is the
+            // accessible one, so this stays out of the tab order and the tree.
+            <a
+              href={demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              tabindex="-1"
+              aria-hidden="true"
+              class="bg-surface/60 absolute inset-0 grid place-items-center opacity-0 backdrop-blur-sm transition-opacity duration-(--duration-hover) group-hover/card:opacity-100"
+            >
+              <span class="glass rounded-tag text-on-surface px-4 py-2 font-mono text-xs uppercase">
+                Visit live site ↗
+              </span>
+            </a>
+          )}
         </div>
       ) : (
         <div class="flex size-full items-center" aria-hidden="true">
@@ -45,12 +61,17 @@ const { title, summary, tech, demoUrl, repoUrl, image } = project;
         </div>
       )}
     </div>
-    <div class="flex h-full flex-col gap-5 lg:col-span-5">
-      <p class="font-mono text-label text-accent uppercase" aria-hidden="true">
-        {String(number).padStart(2, '0')}
+    <div class="flex h-full flex-col gap-4 lg:col-span-5">
+      <p class="flex items-center gap-3 font-mono text-label uppercase" aria-hidden="true">
+        <span class="text-accent">{String(number).padStart(2, '0')}</span>
+        {number === 1 && (
+          <span class="rounded-tag border-accent/40 bg-accent/10 text-accent border px-2.5 py-0.5">
+            ★ Featured
+          </span>
+        )}
       </p>
       <h3 class="text-display font-bold tracking-tight">{title}</h3>
-      <p class="text-muted text-lg">{summary}</p>
+      <p class="text-muted">{summary}</p>
       <ul class="flex flex-wrap gap-2" aria-label="Tech used">
         {tech.map((item) => (
           <li>

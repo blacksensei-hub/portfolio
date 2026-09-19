@@ -5,41 +5,40 @@ import MaskText from './MaskText.astro';
 interface Props {
   id: string;
   title: string;
-  /** Mono chapter number shown above the heading, e.g. "01". */
+  /** Mono chapter number shown in the badge beside the heading, e.g. "02". */
   index?: string | undefined;
-  /**
-   * `stack` puts the heading above the content. `split` pins the heading in a
-   * left column beside the content from lg up, so neighbors differ in shape.
-   */
-  layout?: 'stack' | 'split';
+  /** A short mono note at the far end of the heading row. */
+  hint?: string | undefined;
 }
 
-const { id, title, index, layout = 'stack' } = Astro.props;
+// Compact heading row (spec 0013): number badge, heading, optional hint, and a
+// hairline rule beneath that draws itself in from the left.
+const { id, title, index, hint } = Astro.props;
 const headingId = `${id}-heading`;
-const split = layout === 'split';
 ---
 
 <section id={id} aria-labelledby={headingId} class="py-section relative">
   <Container>
-    <div class:list={[split && 'lg:grid lg:grid-cols-12 lg:gap-12']}>
-      <header
-        class:list={[
-          'mask-reveal mb-10',
-          split ? 'lg:col-span-4 lg:mb-0 lg:self-start lg:sticky lg:top-28' : 'lg:mb-14',
-        ]}
-      >
-        {index && (
-          <p class="font-mono text-label text-accent mb-4 uppercase" aria-hidden="true">
-            {index} <span class="text-muted">/ {title}</span>
-          </p>
-        )}
-        <h2 id={headingId} class="text-h2 font-semibold tracking-tight">
-          <MaskText text={title} />
-        </h2>
-      </header>
-      <div class:list={[split && 'lg:col-span-8']}>
-        <slot />
-      </div>
-    </div>
+    <header class="mask-reveal relative mb-8 flex items-center gap-3 pb-4">
+      {index && (
+        <span
+          aria-hidden="true"
+          class="rounded-card border-border bg-surface-raised text-accent grid size-9 shrink-0 place-items-center border font-mono text-xs"
+        >
+          {index}
+        </span>
+      )}
+      <h2 id={headingId} class="text-h2 font-semibold tracking-tight">
+        <MaskText text={title} />
+      </h2>
+      {hint && (
+        <p class="text-muted ml-auto hidden font-mono text-label uppercase sm:block">{hint}</p>
+      )}
+      <span
+        aria-hidden="true"
+        class="rule-draw from-accent via-border to-border absolute inset-x-0 bottom-0 h-px bg-gradient-to-r"
+      ></span>
+    </header>
+    <slot />
   </Container>
 </section>

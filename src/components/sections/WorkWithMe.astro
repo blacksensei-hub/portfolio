@@ -18,31 +18,30 @@ const sorted = [...Astro.props.services].sort((a, b) => a.data.order - b.data.or
 
 {/* An empty services.yaml is valid content, so the section simply disappears. */}
 {sorted.length > 0 && (
-  <Section id="work-with-me" title="Work with me" index="04">
+  <Section id="work-with-me" title="Work with me" index="04" hint="How I can help">
     {availability && (
-      <div class="reveal mb-12">
+      <div class="reveal mb-8">
         <StatusPill status={availability.status} note={availability.note} />
       </div>
     )}
-    {/* Numbered, open columns under a gold rule: two by two, so four services never leave a hole. */}
-    <ol role="list" class="grid gap-x-12 gap-y-12 md:grid-cols-2">
+    {/* Glass cards, two by two so four services never leave a hole; a glow ring spins round on hover. */}
+    <ol role="list" class="grid gap-4 md:grid-cols-2">
       {sorted.map((entry, n) => (
         <li class="reveal grid">
-          <article class="group/svc border-border relative border-t pt-6">
-            <span
+          <article class="group/svc glass glow-border rounded-card relative p-6 transition-transform duration-(--duration-hover) ease-(--ease-out-soft) hover:-translate-y-1">
+            <p
+              class="rounded-card border-border bg-surface-raised text-accent group-hover/svc:bg-accent group-hover/svc:text-on-accent mb-4 grid size-9 place-items-center border font-mono text-xs transition-colors"
               aria-hidden="true"
-              class="bg-accent absolute -top-px left-0 h-0.5 w-12 transition-[width] duration-(--duration-hover) ease-(--ease-out-soft) group-hover/svc:w-full"
-            />
-            <p class="font-mono text-label text-accent mb-3 uppercase" aria-hidden="true">
+            >
               {String(n + 1).padStart(2, '0')}
             </p>
             <h3 class="text-h3 font-semibold tracking-tight">{entry.data.title}</h3>
-            <p class="text-muted mt-3 max-w-[48ch]">{entry.data.blurb}</p>
+            <p class="text-muted mt-2 text-sm leading-relaxed">{entry.data.blurb}</p>
           </article>
         </li>
       ))}
     </ol>
-    <div class="reveal mt-14">
+    <div class="reveal mt-10 flex justify-center">
       <ButtonLink href="#contact">Get in touch</ButtonLink>
     </div>
   </Section>

@@ -27,7 +27,72 @@ export function localPoint(box: Box, x: number, y: number): { mx: number; my: nu
   return { mx: x - box.left, my: y - box.top };
 }
 
+/** The time in Ghana (GMT, no daylight saving) as HH:MM, 24 hour. */
+export function ghanaTime(date: Date): string {
+  const hh = String(date.getUTCHours()).padStart(2, '0');
+  const mm = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+/**
+ * The typewriter's next state: type toward `word`, pause when complete, then
+ * delete back to empty and move on. Returns the text to show and the delay in ms
+ * before the next step.
+ */
+export function typewriterStep(
+  shown: string,
+  word: string,
+  deleting: boolean,
+): { text: string; deleting: boolean; delay: number; advance: boolean } {
+  if (!deleting && shown === word)
+    return { text: shown, deleting: true, delay: 1800, advance: false };
+  if (deleting && shown === '') return { text: '', deleting: false, delay: 300, advance: true };
+  const text = deleting ? shown.slice(0, -1) : word.slice(0, shown.length + 1);
+  return { text, deleting, delay: deleting ? 45 : 90, advance: false };
+}
+
+function startClocks(root: Document): void {
+  const clocks = root.querySelectorAll<HTMLElement>('[data-local-clock]');
+  if (clocks.length === 0) return;
+  const tick = () => {
+    const now = new Date();
+    for (const clock of clocks) {
+      clock.textContent = ghanaTime(now);
+      clock.setAttribute('datetime', now.toISOString());
+    }
+  };
+  tick();
+  setInterval(tick, 15_000);
+}
+
+function startTypewriters(root: Document): void {
+  for (const el of root.querySelectorAll<HTMLElement>('[data-typewriter]')) {
+    let words: string[];
+    try {
+      words = JSON.parse(el.dataset['typewriter'] ?? '[]');
+    } catch {
+      continue;
+    }
+    if (words.length === 0) continue;
+    let index = 0;
+    let shown = el.textContent ?? '';
+    let deleting = true;
+    const step = () => {
+      const next = typewriterStep(shown, words[index] ?? '', deleting);
+      if (next.advance) index = (index + 1) % words.length;
+      shown = next.text;
+      deleting = next.deleting;
+      el.textContent = shown;
+      setTimeout(step, next.delay);
+    };
+    setTimeout(step, 2000);
+  }
+}
+
 export function initInteractions(root: Document = document): void {
+  startClocks(root);
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startTypewriters(root);
+
   const fine = window.matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)');
   if (!fine.matches) return;
 

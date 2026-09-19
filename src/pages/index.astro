@@ -22,6 +22,10 @@ const projects = await getCollection('projects');
 const skills = await getCollection('skills');
 const links = await getCollection('links');
 const services = await getCollection('services');
+
+const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
+const technologies = skills.toSorted(byOrder).flatMap((group) => group.data.items);
+const socials = links.toSorted(byOrder).map((link) => link.data);
 ---
 
 <BaseLayout
@@ -41,11 +45,12 @@ const services = await getCollection('services');
   <SiteHeader
     slot="header"
     name={profile.name}
+    links={socials}
     sections={[
       { id: 'about', label: 'About' },
       { id: 'projects', label: 'Projects' },
       { id: 'skills', label: 'Skills' },
-      { id: 'work-with-me', label: 'Work with me' },
+      { id: 'work-with-me', label: 'Services' },
       { id: 'contact', label: 'Contact' },
     ]}
   />
@@ -55,11 +60,15 @@ const services = await getCollection('services');
     tagline={profile.tagline}
     email={profile.email}
     availability={profile.availability}
+    stack={['React', 'React Native', 'Node.js', 'PostgreSQL']}
+    stats={[
+      { value: projects.length, label: 'Projects shipped' },
+      { value: technologies.length, label: 'Technologies' },
+      { value: services.length, label: 'Services' },
+    ]}
   />
-  <About bio={profile.bio} />
-  <TechMarquee
-    items={skills.toSorted((a, b) => a.data.order - b.data.order).flatMap((s) => s.data.items)}
-  />
+  <About bio={profile.bio} email={profile.email} availability={profile.availability} />
+  <TechMarquee items={technologies} />
   <Projects projects={projects} />
   <Skills skills={skills} />
   <WorkWithMe services={services} availability={profile.availability} />

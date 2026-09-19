@@ -1,13 +1,51 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
+import Link from '../ui/Link.astro';
 import Section from '../ui/Section.astro';
+
+type Availability = NonNullable<CollectionEntry<'profile'>['data']['availability']>;
 
 interface Props {
   bio: string;
+  email: string;
+  availability?: Availability | undefined;
 }
 
-const { bio } = Astro.props;
+const { bio, email, availability } = Astro.props;
+
+// The quick facts card: the scannable version of the bio.
+const status: Record<Availability['status'], string> = {
+  open: 'Taking new work',
+  limited: 'Limited slots',
+  closed: 'Fully booked',
+};
 ---
 
-<Section id="about" title="About" index="01" layout="split">
-  <p class="reveal text-lede max-w-[38ch] lg:pt-2">{bio}</p>
+<Section id="about" title="About" index="01" hint="Who I am">
+  <div class="grid gap-10 md:grid-cols-12">
+    <p class="reveal text-lede md:col-span-7">{bio}</p>
+    <dl class="reveal glass glow-border rounded-card divide-border/70 self-start divide-y text-sm md:col-span-5">
+      <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+        <dt class="text-muted font-mono text-label uppercase">Based in</dt>
+        <dd class="font-medium">Ghana, GMT</dd>
+      </div>
+      <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+        <dt class="text-muted font-mono text-label uppercase">Focus</dt>
+        <dd class="font-medium">Web, mobile, APIs</dd>
+      </div>
+      {availability && (
+        <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+          <dt class="text-muted font-mono text-label uppercase">Status</dt>
+          <dd class="font-medium">{status[availability.status]}</dd>
+        </div>
+      )}
+      <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+        <dt class="text-muted font-mono text-label uppercase">Email</dt>
+        <dd class="min-w-0 truncate">
+          <Link href={`mailto:${email}`}>{email}</Link>
+        </dd>
+      </div>
+    </dl>
+  </div>
 </Section>

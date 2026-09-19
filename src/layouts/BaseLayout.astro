@@ -2,7 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 
 import Container from '../components/ui/Container.astro';
-import Link from '../components/ui/Link.astro';
+import { glyphs } from '../components/ui/glyphs';
 import SkipLink from '../components/ui/SkipLink.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
 import { beaconAttr } from '../lib/analytics';
@@ -36,8 +36,28 @@ const beacon = beaconAttr(import.meta.env.PUBLIC_CF_BEACON_TOKEN);
 
 // The footer signs the page with the profile and the GitHub link from links.yaml.
 const profile = (await getEntry('profile', 'profile'))?.data;
-const github = (await getCollection('links')).find((link) => link.data.icon === 'github')?.data;
-const year = new Date().getFullYear();
+const links = (await getCollection('links'))
+  .toSorted((a, b) => a.data.order - b.data.order)
+  .map((link) => link.data);
+const now = new Date();
+const year = now.getFullYear();
+const updated = now.toLocaleDateString('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+const footerNav = [
+  { href: '/#about', label: 'About' },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/#skills', label: 'Skills' },
+  { href: '/#work-with-me', label: 'Services' },
+  { href: '/#contact', label: 'Contact' },
+];
+const statusLabel = {
+  open: 'Available for work',
+  limited: 'Limited availability',
+  closed: 'Currently booked',
+};
 ---
 
 <html lang="en">
@@ -93,7 +113,8 @@ const year = new Date().getFullYear();
       <div class="animate-drift absolute -top-1/3 -right-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-gold)_16%,transparent),transparent)]"></div>
       <div class="animate-drift absolute -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
     </div>
-    <ThemeToggle />
+    {/* A page with a site header carries the toggle inside it instead. */}
+    {!Astro.slots.has('header') && <ThemeToggle />}
     {/* Reading progress along the top edge, driven by a CSS scroll timeline (spec 0012). */}
     <div
       aria-hidden="true"
@@ -104,24 +125,103 @@ const year = new Date().getFullYear();
     <main id="main" tabindex="-1" class="max-sm:pt-16">
       <slot />
     </main>
-    <footer class="border-border border-t py-10">
+    <footer class="border-border relative mt-8 border-t">
       <Container>
-        {/* One line, one size: the copyright on the left, the credits on the right. */}
-        <div class="text-muted flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between">
+        <div class="grid gap-10 py-12 sm:grid-cols-2 md:grid-cols-12">
+          {profile && (
+            <div class="md:col-span-5">
+              <a href="/#hero" class="group/logo inline-flex items-center gap-2.5">
+                <span
+                  aria-hidden="true"
+                  class="bg-accent text-on-accent font-display grid size-8 place-items-center rounded-lg text-sm font-bold transition-transform group-hover/logo:rotate-[-8deg]"
+                >
+                  {profile.name
+                    .split(/\s+/)
+                    .filter((_, n, all) => n === 0 || n === all.length - 1)
+                    .map((w) => w.charAt(0))
+                    .join('')}
+                </span>
+                <span class="font-display font-semibold">{profile.name}</span>
+              </a>
+              <p class="text-muted mt-3 max-w-[38ch] text-sm">
+                {profile.role}. Web, mobile, and backend work, from first idea to launch.
+              </p>
+              {profile.availability && (
+                <p class="mt-5 inline-flex items-center gap-2 text-sm">
+                  <span aria-hidden="true" class="bg-status-open relative size-2 rounded-full">
+                    <span class="bg-status-open absolute inset-0 animate-ping rounded-full opacity-60"></span>
+                  </span>
+                  {statusLabel[profile.availability.status]}
+                </p>
+              )}
+            </div>
+          )}
+          <nav aria-label="Footer" class="md:col-span-2">
+            <p class="text-muted mb-3 font-mono text-label uppercase">Explore</p>
+            <ul role="list" class="grid gap-2 text-sm">
+              {footerNav.map(({ href, label }) => (
+                <li>
+                  <a href={href} class="hover:text-accent transition-colors">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div class="md:col-span-3">
+            <p class="text-muted mb-3 font-mono text-label uppercase">Connect</p>
+            <ul role="list" class="grid gap-2 text-sm">
+              {links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="hover:text-accent inline-flex items-center gap-2 transition-colors"
+                    {...(/^https?:/.test(link.href) && {
+                      target: '_blank',
+                      rel: 'noopener noreferrer',
+                    })}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                      class="text-accent size-4 fill-current"
+                    >
+                      <path d={glyphs[link.icon]} />
+                    </svg>
+                    {link.label}
+                    {/^https?:/.test(link.href) && (
+                      <span class="sr-only"> (opens in a new tab)</span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="md:col-span-2">
+            <p class="text-muted mb-3 font-mono text-label uppercase">Local time</p>
+            <p class="font-display text-2xl font-semibold tabular-nums">
+              <time data-local-clock>GMT</time>
+            </p>
+            <p class="text-muted mt-1 text-sm">Ghana, GMT+0</p>
+          </div>
+        </div>
+        <div class="border-border text-muted flex flex-col gap-3 border-t py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
           {profile && (
             <p>
               © {year} {profile.name}
             </p>
           )}
-          <p>
-            Built with Astro
-            {github && (
-              <>
-                {' '}
-                · <Link href={github.href}>{github.label}</Link>
-              </>
-            )}
-          </p>
+          <p class="font-mono text-xs">Last updated {updated}</p>
+          <a
+            href="#main"
+            class="hover:text-accent group/top inline-flex items-center gap-2 transition-colors"
+          >
+            Back to top
+            <span aria-hidden="true" class="transition-transform group-hover/top:-translate-y-0.5">
+              ↑
+            </span>
+          </a>
         </div>
       </Container>
     </footer>

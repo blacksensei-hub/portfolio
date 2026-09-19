@@ -3,6 +3,13 @@
 // its script corrects the label and reveals it, so without JavaScript it never
 // shows. Icons are Lucide (ISC licence): monitor, sun, moon.
 import { themeLabel } from '../../lib/theme';
+
+interface Props {
+  /** Sits inside the site header instead of floating in the corner (spec 0013). */
+  inline?: boolean;
+}
+
+const { inline = false } = Astro.props;
 ---
 
 <button
@@ -10,7 +17,10 @@ import { themeLabel } from '../../lib/theme';
   hidden
   data-theme-toggle
   aria-label={themeLabel('system')}
-  class="glass fixed top-4 right-4 z-50 flex size-11 items-center justify-center rounded-full text-on-surface transition-colors hover:text-accent md:top-[1.375rem] md:right-6"
+  class:list={[
+    'flex size-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:text-accent',
+    inline ? 'hover:bg-on-surface/8 order-last' : 'glass fixed top-4 right-4 z-50',
+  ]}
 >
   <svg
     data-icon="system"
