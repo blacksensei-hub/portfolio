@@ -23,7 +23,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 10 | Deploy to free hosting | Release 1 | done |
 | 11 | Dark/light theme | Release 2 | done |
 | 12 | Work with me section | Release 2 | done |
-| 13 | Visitor analytics | Release 3 | planned |
+| 13 | Visitor analytics | Release 3 | in-progress |
 
 ## Foundations
 
@@ -158,10 +158,18 @@ spec [0009](../specs/0009-work-with-me-section.md) · code in `src/content.confi
 
 ## Release 3: learn who visits
 
-### 13. Visitor analytics · needs a decision
+### 13. Visitor analytics · in-progress
 Privacy friendly visit counts and referrers, so you see which links bring people in.
 **Done when:** page views and referrers show up in a dashboard, and no cookie banner is needed (or consent is handled if one is).
-- [ ] Design it (spec): `/architect visitor analytics`
+spec [0010](../specs/0010-visitor-analytics.md)
+code `src/lib/analytics.ts`, `src/layouts/BaseLayout.astro`, `tests/e2e/analytics.spec.ts`
+- [x] Design it (spec): `/architect visitor analytics`
+- [ ] Build it: `/develop visitor analytics`
+  - [x] Cloudflare Web Analytics site and token, `beaconAttr` gate with unit tests (AC-1, AC-2)
+  - [x] Beacon in `BaseLayout` head, `env.d.ts` typing, token in `deploy.yml` and `.env.example` (AC-1, AC-2, AC-5)
+  - [x] Site footer with the analytics notice (AC-3, AC-4)
+  - [ ] E2E for the tag vs env, blocked requests, cookies, footer and axe, then a live check (AC-1 to AC-5) (e2e done; live check owed after merge)
+- [ ] Verify it: `/check verify visitor analytics`
 
 ## Deferred
 Out of scope for now, kept so the plan stays honest.
