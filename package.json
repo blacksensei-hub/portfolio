@@ -14,6 +14,7 @@
     "format": "biome check --write . && prettier --write \"**/*.astro\"",
     "test": "vitest",
     "test:e2e": "playwright test",
+    "resume": "node scripts/build-resume.mjs",
     "astro": "astro"
   },
   "dependencies": {

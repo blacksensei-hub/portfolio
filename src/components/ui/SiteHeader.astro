@@ -41,6 +41,73 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
       <span class="font-display hidden text-sm font-semibold sm:inline">{short}</span>
       <span class="sr-only">, back to top</span>
     </a>
+    {/* Phone menu: a plain disclosure, so the sections are reachable with no script. */}
+    <details class="group/menu relative md:hidden" data-menu>
+      <summary
+        class="hover:bg-on-surface/8 grid size-11 cursor-pointer list-none place-items-center rounded-full transition-colors [&::-webkit-details-marker]:hidden"
+        aria-label="Sections menu"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          class="size-5"
+        >
+          <path
+            d="M4 7h16"
+            class="origin-center transition-transform group-open/menu:translate-y-[5px] group-open/menu:rotate-45"
+          />
+          <path d="M4 12h16" class="transition-opacity group-open/menu:opacity-0" />
+          <path
+            d="M4 17h16"
+            class="origin-center transition-transform group-open/menu:-translate-y-[5px] group-open/menu:-rotate-45"
+          />
+        </svg>
+      </summary>
+      <nav
+        aria-label="Menu"
+        class="rounded-card border-border bg-surface absolute top-full right-0 mt-2 w-56 border p-2 shadow-2xl"
+      >
+        <ul role="list" class="grid gap-1">
+          {sections.map(({ id, label }) => (
+            <li>
+              <a
+                href={`#${id}`}
+                class="rounded-tag hover:bg-on-surface/8 hover:text-accent flex min-h-11 items-center px-4 text-sm font-medium transition-colors"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+          {links.map((link, n) => (
+            <li class:list={[n === 0 && 'border-border mt-1 border-t pt-1']}>
+              <a
+                href={link.href}
+                class="rounded-tag hover:bg-on-surface/8 hover:text-accent text-muted flex min-h-11 items-center gap-3 px-4 text-sm transition-colors"
+                {...(/^https?:/.test(link.href) && {
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                })}
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                  class="text-accent size-4 fill-current"
+                >
+                  <path d={glyphs[link.icon]} />
+                </svg>
+                {link.label}
+                {/^https?:/.test(link.href) && <span class="sr-only"> (opens in a new tab)</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
     <nav aria-label="Sections" class="hidden md:block">
       <ul
         role="list"

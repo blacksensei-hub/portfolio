@@ -16,26 +16,35 @@ import { parseOklch, toHex } from '../styles/contrast';
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-const BAR = 12;
 const PAD = 80;
 
 const fontFile = (weight: 400 | 500 | 700) =>
   readFile(`node_modules/@fontsource/inter/files/inter-latin-${weight}-normal.woff`);
 
-/** Light theme tokens from the `@theme` block, as hex, since satori cannot read `oklch()`. */
-async function lightColors() {
+/**
+ * Dark theme tokens from the forced dark block, as hex, since satori cannot read
+ * `oklch()`. The card ships in the dark palette: it is the site's signature look,
+ * and link previews sit on other people's dark chrome more often than not.
+ */
+async function cardColors() {
   const css = await readFile('src/styles/global.css', 'utf8');
-  const theme = /@theme\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+  const block = /:root\[data-theme="dark"\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
   const token = (name: string) => {
-    const value = new RegExp(`--color-${name}:s*([^;]+);`).exec(theme)?.[1];
-    if (value === undefined) throw new Error(`og.png: --color-${name} is missing from @theme`);
+    const value = new RegExp(`--color-${name}:s*([^;]+);`).exec(block)?.[1];
+    if (value === undefined)
+      throw new Error(`og.png: --color-${name} is missing from the dark theme`);
     return toHex(parseOklch(value));
   };
   return {
     surface: token('surface'),
+    surfaceRaised: token('surface-raised'),
     onSurface: token('on-surface'),
+    onAccent: token('on-accent'),
     accent: token('accent'),
     muted: token('muted'),
+    gold: token('thread-gold'),
+    green: token('thread-green'),
+    red: token('thread-red'),
   };
 }
 
@@ -52,7 +61,7 @@ export const GET: APIRoute = async () => {
     fontFile(400),
     fontFile(500),
     fontFile(700),
-    lightColors(),
+    cardColors(),
   ]);
 
   const boldFace = opentype.parse(
@@ -72,43 +81,95 @@ export const GET: APIRoute = async () => {
     return (units / boldFace.unitsPerEm) * size;
   });
 
-  const card = el(
-    { display: 'flex', width: WIDTH, height: HEIGHT, backgroundColor: colors.surface },
+  const badge = el(
+    {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 72,
+      height: 72,
+      borderRadius: 20,
+      backgroundColor: colors.accent,
+      color: colors.onAccent,
+      fontSize: 34,
+      fontWeight: 700,
+    },
+    profile.name
+      .split(/\s+/)
+      .filter((_, n, all) => n === 0 || n === all.length - 1)
+      .map((word) => word.charAt(0))
+      .join(''),
+  );
+
+  const chip = el(
+    {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      padding: '10px 22px',
+      borderRadius: 999,
+      backgroundColor: colors.surfaceRaised,
+      color: colors.onSurface,
+      fontSize: 24,
+      fontWeight: 500,
+    },
     [
-      el({ width: BAR, height: HEIGHT, backgroundColor: colors.accent }),
+      el({ width: 14, height: 14, borderRadius: 999, backgroundColor: colors.green }),
+      'Available for work',
+    ],
+  );
+
+  // The weave, flattened for a still card: three thread coloured bars.
+  const threads = el({ display: 'flex', width: WIDTH, height: 14 }, [
+    el({ width: 460, height: 14, backgroundColor: colors.gold }),
+    el({ width: 300, height: 14, backgroundColor: colors.green }),
+    el({ width: 440, height: 14, backgroundColor: colors.red }),
+  ]);
+
+  const card = el(
+    {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      width: WIDTH,
+      height: HEIGHT,
+      backgroundColor: colors.surface,
+      fontFamily: 'Inter',
+    },
+    [
       el(
         {
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
+          gap: 26,
           width: TEXT_WIDTH,
-          height: HEIGHT,
-          padding: `${PAD}px 0 ${PAD}px ${PAD}px`,
+          padding: `${PAD}px 0 0 ${PAD}px`,
           boxSizing: 'content-box',
-          fontFamily: 'Inter',
         },
         [
+          el({ display: 'flex', alignItems: 'center', gap: 28 }, [badge, chip]),
           el(
             { fontSize: nameSize, fontWeight: 700, lineHeight: 1.1, color: colors.onSurface },
             profile.name,
           ),
           el(
-            { fontSize: 40, fontWeight: 500, lineHeight: 1.2, color: colors.accent },
+            { fontSize: 38, fontWeight: 500, lineHeight: 1.2, color: colors.accent },
             profile.role,
           ),
           el(
             {
               display: 'block',
-              fontSize: 32,
+              fontSize: 30,
               fontWeight: 400,
               lineHeight: 1.4,
               color: colors.muted,
-              lineClamp: 3,
+              lineClamp: 2,
             },
             profile.tagline,
           ),
         ],
       ),
+      threads,
     ],
   );
 

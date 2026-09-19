@@ -1,10 +1,10 @@
 # Design system
 
-The look of the portfolio: its tokens and base components. Decided in [spec 0003](docs/specs/0003-design-system/index.md), restyled by [spec 0011](docs/specs/0011-visual-redesign.md). See every token and component live at `/styleguide/` (noindexed, not in the sitemap).
+The look of the portfolio: its tokens and base components. Decided in [spec 0003](docs/specs/0003-design-system/index.md), restyled by [spec 0011](docs/specs/0011-visual-redesign.md), then [0012](docs/specs/0012-motion-and-refinements.md), [0013](docs/specs/0013-compact-scale-and-reference-features.md), and [0014](docs/specs/0014-launch-polish.md). See every token and component live at `/styleguide/` (noindexed, not in the sitemap).
 
 **Source of truth:** `src/styles/global.css`. This file only documents it. If the two ever disagree, `global.css` wins, and this file should be fixed. Never write a color, font size, radius, or duration anywhere else. Use the Tailwind utility the token creates (for example `text-accent`, `bg-surface-raised`, `rounded-card`).
 
-**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces (spec 0012): Space Grotesk for headings, Inter for body text (and the OG card), JetBrains Mono for labels, buttons, and technical details. The **signature** is the Weave: gold, green, and red threads along the hero's bottom edge that draw themselves in, kept clear of the name. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS only and rests at its final frame under reduced motion.
+**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces (spec 0012): Space Grotesk for headings, Inter for body text (and the OG card), JetBrains Mono for labels, buttons, and technical details. The **signature** is the Weave: gold, green, and red threads along the hero's bottom edge that draw themselves in, kept clear of the name. The scale is deliberately compact (spec 0013): hero 40 to 60px, section headings 22 to 26px, body 16px, a 62rem column. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS only and rests at its final frame under reduced motion.
 
 ## Color tokens
 
@@ -66,9 +66,16 @@ CSS first. Scroll driven animations reference their timeline through `--timeline
 - `.scroll-progress` is the gold reading bar on the top edge (hidden where scroll timelines are unsupported).
 - `MaskText` splits a heading into words that slide up out of clipped lines: on load in the hero, on scroll in every Section heading.
 - `.parallax` drifts project images inside their frame; `.sheen` sweeps light across buttons; `TechMarquee` is a slow, hover-pausing ribbon of the stack (aria-hidden, Skills lists the same items).
-- `src/lib/interactions.ts` is the only script: a pointer spotlight on `[data-spotlight]` (hero, cards) and a magnetic lean on `[data-magnetic]` buttons. Fine pointers only, off under reduced motion.
+- `src/lib/interactions.ts` is the only script: a pointer spotlight on `[data-spotlight]` (hero, cards), a magnetic lean on `[data-magnetic]` buttons, the live Ghana clock in the footer, the Contact typewriter, and closing the phone menu on choice. Pointer effects need a fine pointer and are off under reduced motion.
+- MotionSites style effects (spec 0013), all CSS: `.glow-border` (a conic ring spun by `@property --angle`), `.shimmer-text`, `.grid-floor`, aurora blobs (`--animate-aurora`), `.count-up` (`@property --num`), `.type-line`, `.caret`.
 
 Under reduced motion every animation and transition stops at its final frame.
+
+## Brand assets
+
+- `public/favicon.svg` is the gold JA badge; `favicon.ico` (32px) and `apple-touch-icon.png` (180px) are generated from it, and `theme-color` follows the theme.
+- `src/pages/og.png.ts` draws the 1200 by 630 link card at build in the **dark** palette: JA badge, availability chip, name, role, tagline, and a three thread bar. Colors are read from the `:root[data-theme="dark"]` block, so changing a token changes the card.
+- `public/resume.pdf` is generated by `pnpm resume` (`scripts/build-resume.mjs`) from the same YAML the site renders. The education block inside that script is the one thing it does not read from content.
 
 ## Components
 
@@ -124,7 +131,13 @@ Props: `status` (the profile availability enum), `note?: string`. A pill with a 
 Props: `draw?: 'scroll' | 'load'` (default `scroll`), `height?: number`. The signature: three thread colored waves woven across the full width, `aria-hidden`. `load` draws once on page load (hero); `scroll` draws as it enters the viewport. Also the placeholder for a project without an image.
 
 ### SiteHeader
-Props: `name`, `sections: { id, label }[]`. Slim fixed nav with the initials mark and mono anchor links, `md` and up only. Rendered by `index.astro` into BaseLayout's `header` slot, so `/styleguide/` has none.
+Props: `name`, `sections: { id, label }[]`, `links`. The glass nav pill: monogram and name, segmented section tabs from `md` up (the section in view lit by `:target-current`), a `<details>` menu below `md`, quick social icons, and ThemeToggle. The toggle is first in the DOM and last visually (`order-last`), so it stays the first Tab stop after the skip link. Rendered by `index.astro` into BaseLayout's `header` slot; a page without that slot gets the floating toggle instead.
+
+### MaskText
+Props: `text`, `mode?: 'load' | 'scroll'`, `delay?`. Splits text into words that slide up out of clipped lines. Real words and spaces, so the accessible name never changes.
+
+### TechMarquee
+Props: `items: string[]`. The hover pausing ribbon of the stack, `aria-hidden` because Skills lists the same items.
 
 ### SkipLink
 No props. "Skip to content", pointing at `#main` and visually hidden until focused. `BaseLayout` renders it first in `<body>`, then wraps the page in `<main id="main" tabindex="-1">`. Pages must not render their own `<main>`.

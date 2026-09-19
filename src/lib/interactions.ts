@@ -89,8 +89,17 @@ function startTypewriters(root: Document): void {
   }
 }
 
+function closeMenusOnChoice(root: Document): void {
+  for (const menu of root.querySelectorAll<HTMLDetailsElement>('details[data-menu]')) {
+    menu.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) menu.open = false;
+    });
+  }
+}
+
 export function initInteractions(root: Document = document): void {
   startClocks(root);
+  closeMenusOnChoice(root);
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startTypewriters(root);
 
   const fine = window.matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)');
