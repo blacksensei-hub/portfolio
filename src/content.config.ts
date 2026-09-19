@@ -8,7 +8,7 @@ import { load as yamlLoad } from 'js-yaml';
 import { z } from 'zod';
 
 /*
- * The four content collections every section reads from, per spec 0002.
+ * The five content collections every section reads from, per specs 0002 and 0009.
  *
  * Each is one YAML file under `src/content/`, validated by a strict Zod schema.
  * The parsers and schemas are exported so `content.config.test.ts` can exercise
@@ -232,6 +232,13 @@ const unknownKey = z.unknown().pipe(
   }),
 );
 
+export const availabilitySchema = z
+  .object({
+    status: z.enum(['open', 'limited', 'closed']),
+    note: nonEmpty.max(160),
+  })
+  .catchall(unknownKey);
+
 export const profileSchema = z
   .object({
     name: nonEmpty,
@@ -245,6 +252,8 @@ export const profileSchema = z
       .string()
       .regex(/^\//, 'must be a root relative path into `public/`, for example `/resume.pdf`')
       .optional(),
+    // Absent means no badge; the Work with me section still renders (spec 0009).
+    availability: availabilitySchema.optional(),
   })
   .catchall(unknownKey);
 
@@ -288,6 +297,14 @@ export const linkSchema = z
   })
   .catchall(unknownKey);
 
+export const serviceSchema = z
+  .object({
+    title: nonEmpty,
+    blurb: nonEmpty.max(280),
+    order: z.number().int().min(0),
+  })
+  .catchall(unknownKey);
+
 const profile = defineCollection({
   loader: file('src/content/profile.yaml', { parser: singleProfile }),
   schema: reportProfileDefect(profileSchema),
@@ -308,4 +325,9 @@ const links = defineCollection({
   schema: reportDefects(linkSchema, 'links', 'label'),
 });
 
-export const collections = { profile, projects, skills, links };
+const services = defineCollection({
+  loader: file('src/content/services.yaml', { parser: keyedList('services', 'title') }),
+  schema: reportDefects(serviceSchema, 'services', 'title'),
+});
+
+export const collections = { profile, projects, skills, links, services };

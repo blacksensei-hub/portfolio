@@ -8,6 +8,7 @@ import {
   projectSchema,
   reportDefects,
   reportProfileDefect,
+  serviceSchema,
   singleProfile,
   skillGroupSchema,
 } from './content.config';
@@ -299,6 +300,85 @@ describe('profileSchema', () => {
     const { bio: _bio, ...withoutBio } = validProfile;
 
     expect(profileSchema.safeParse(withoutBio).success).toBe(false);
+  });
+
+  describe('availability (spec 0009, AC-2)', () => {
+    const withAvailability = (availability: unknown) =>
+      profileSchema.safeParse({ ...validProfile, availability });
+
+    it.each(['open', 'limited', 'closed'])('accepts status %s', (status) => {
+      expect(withAvailability({ status, note: 'Taking work.' }).success).toBe(true);
+    });
+
+    it('rejects a status outside the enum', () => {
+      expect(withAvailability({ status: 'busy', note: 'Taking work.' }).success).toBe(false);
+    });
+
+    it('rejects an empty note', () => {
+      expect(withAvailability({ status: 'open', note: '' }).success).toBe(false);
+    });
+
+    it('rejects a note longer than 160 characters', () => {
+      expect(withAvailability({ status: 'open', note: 'x'.repeat(161) }).success).toBe(false);
+    });
+
+    it('rejects a missing note', () => {
+      expect(withAvailability({ status: 'open' }).success).toBe(false);
+    });
+
+    it('rejects an unknown key, pinned to that key', () => {
+      const result = withAvailability({ status: 'open', note: 'Taking work.', until: 'May' });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.path).toEqual(['availability', 'until']);
+    });
+  });
+});
+
+describe('serviceSchema (spec 0009, AC-2)', () => {
+  const validService = { title: 'Web apps', blurb: 'I build web apps.', order: 0 };
+  const schema = reportDefects(serviceSchema, 'services', 'title');
+  const parse = keyedList('services', 'title');
+
+  it('accepts a valid entry, including a 280 character blurb', () => {
+    expect(serviceSchema.safeParse(validService).success).toBe(true);
+    expect(serviceSchema.safeParse({ ...validService, blurb: 'x'.repeat(280) }).success).toBe(true);
+  });
+
+  it('rejects a 281 character blurb', () => {
+    expect(serviceSchema.safeParse({ ...validService, blurb: 'x'.repeat(281) }).success).toBe(false);
+  });
+
+  it('rejects an empty title or blurb', () => {
+    expect(serviceSchema.safeParse({ ...validService, title: '' }).success).toBe(false);
+    expect(serviceSchema.safeParse({ ...validService, blurb: '' }).success).toBe(false);
+  });
+
+  it('rejects an unknown key', () => {
+    const result = serviceSchema.safeParse({ ...validService, price: 100 });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['price']);
+  });
+
+  it('reports a duplicate title', () => {
+    const parsed = parse(
+      '- title: Web apps\n  blurb: a\n  order: 0\n- title: Web apps\n  blurb: b\n  order: 1\n',
+    );
+    const result = schema.safeParse(parsed['Web apps']);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['title']);
+  });
+
+  it('reports a duplicate order', () => {
+    const parsed = parse(
+      '- title: Web apps\n  blurb: a\n  order: 0\n- title: Mobile\n  blurb: b\n  order: 0\n',
+    );
+    const result = schema.safeParse(parsed['Mobile']);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['order']);
   });
 });
 

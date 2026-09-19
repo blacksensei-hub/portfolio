@@ -1,13 +1,13 @@
 # Content
 
-The site's text lives here, in four YAML files validated by the strict Zod
+The site's text lives here, in five YAML files validated by the strict Zod
 schemas in [`../content.config.ts`](../content.config.ts). Adding or editing a
 project, skill or link is a change to one file, with no code touched. A bad
 entry fails `pnpm build` rather than shipping.
 
 Decided in [spec 0002](../../docs/specs/0002-content-model/index.md).
 
-## The four collections
+## The five collections
 
 | File | Collection | Entry key | Shape |
 |---|---|---|---|
@@ -15,8 +15,9 @@ Decided in [spec 0002](../../docs/specs/0002-content-model/index.md).
 | `projects.yaml` | `projects` | `slug` | a list |
 | `skills.yaml` | `skills` | `group` | a list |
 | `links.yaml` | `links` | `label` | a list |
+| `services.yaml` | `services` | `title` | a list (spec 0009) |
 
-The four are independent. There are no cross collection references, so there is
+The five are independent. There are no cross collection references, so there is
 nothing to join at render time.
 
 ## Reading content
@@ -24,8 +25,8 @@ nothing to join at render time.
 - Read through `getCollection` and `getEntry` only. Never import a YAML file
   directly, and never read one off disk. The schema types are the contract.
 - `profile` holds exactly one entry: `getEntry('profile', 'profile')`.
-- **Sort ascending on `order`** before rendering `projects`, `skills` or
-  `links`. The loader does not sort for you, and `order` is unique within each
+- **Sort ascending on `order`** before rendering `projects`, `skills`,
+  `links` or `services`. The loader does not sort for you, and `order` is unique within each
   collection, so no tie break is needed.
 - Under `strictest`, `getEntry` returns `T | undefined`. Handle the absent case;
   do not assert non-null.
@@ -49,6 +50,11 @@ nothing to join at render time.
   `href`. To add a resume, drop the PDF at `public/resume.pdf` and add one
   `resume: /resume.pdf` line. It is not an `astro:assets` asset: that pipeline
   handles images, and a PDF has nothing to optimise.
+- `profile.availability` is optional: `{ status: open | limited | closed, note }`
+  (note 1 to 160 chars). Absent means the Work with me section shows no badge
+  but still renders its services. The status label and color live in the
+  section, not the data (spec 0009).
+- A service `blurb` is 1 to 280 characters.
 
 ## Project images
 
@@ -72,7 +78,7 @@ nothing to join at render time.
   adding a field is two steps: the schema first, then the data.
 - **`order` must be unique within a collection**, and is checked when the file
   is parsed. Inserting between two entries means renumbering, not one edit.
-- **Entry keys must be unique**: `slug`, `group`, `label`. A duplicate fails the
+- **Entry keys must be unique**: `slug`, `group`, `label`, `title`. A duplicate fails the
   build with a message naming the collection and the value.
 - A project needs **at least one of `demoUrl` or `repoUrl`**, so its card always
   has somewhere to link.

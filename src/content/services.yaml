@@ -1,0 +1,12 @@
+- title: Web Application Development
+  blurb: Full-stack web apps built with React, Node.js, and PostgreSQL. From concept to deployment, with a focus on clean code, fast load times, and a UI that feels right.
+  order: 0
+- title: Mobile App Development
+  blurb: Cross-platform iOS and Android apps with React Native and Expo. One codebase, native feel, and a smooth path from prototype to app store.
+  order: 1
+- title: API & Backend Development
+  blurb: "REST APIs, database design, and backend services with Node.js and PostgreSQL. Built for correctness first: typed inputs, safe migrations, and tests that catch mistakes before your users do."
+  order: 2
+- title: Technical Consulting
+  blurb: Code reviews, architecture feedback, and pair-programming sessions for teams or solo developers. Practical, specific advice you can act on.
+  order: 3
