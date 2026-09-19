@@ -1,6 +1,8 @@
 ---
+import Container from '../components/ui/Container.astro';
 import SkipLink from '../components/ui/SkipLink.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
+import { beaconAttr } from '../lib/analytics';
 import { THEME_HEAD_SCRIPT } from '../lib/theme';
 import '../styles/global.css';
 
@@ -26,6 +28,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const image = social && new URL(social.image, Astro.site).href;
 // Escaping `<` keeps content from ever closing the script tag early.
 const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
+// Production only: deploy.yml sets the token just for pushes to main (spec 0010).
+const beacon = beaconAttr(import.meta.env.PUBLIC_CF_BEACON_TOKEN);
 ---
 
 <html lang="en">
@@ -61,6 +65,14 @@ const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
         <script is:inline type="application/ld+json" set:html={jsonLd}></script>
       </>
     )}
+    {beacon && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={beacon}
+      ></script>
+    )}
     <slot name="head" />
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">
@@ -70,5 +82,12 @@ const jsonLd = social && JSON.stringify(social.jsonLd).replace(/</g, '\\u003c');
     <main id="main" tabindex="-1" class="max-sm:pt-16">
       <slot />
     </main>
+    <footer class="border-border border-t py-8">
+      <Container>
+        <p class="text-muted text-sm">
+          Cookie free, anonymous visit counts via Cloudflare Web Analytics.
+        </p>
+      </Container>
+    </footer>
   </body>
 </html>

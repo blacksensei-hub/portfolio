@@ -20,6 +20,9 @@ permissions:
 
 env:
   SITE_URL: https://jeffrey-ankrah.pages.dev
+  # Cloudflare Web Analytics token (spec 0010). Public by design, so a literal,
+  # and set only for pushes to main so previews and PRs never count visits.
+  PUBLIC_CF_BEACON_TOKEN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'f0ad6e5f4dd04ca1a67c36afebb79cdc' || '' }}
   CI: true
 
 jobs:
