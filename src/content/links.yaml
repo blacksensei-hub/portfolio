@@ -3,17 +3,22 @@
   icon: github
   order: 0
 
+- label: LinkedIn
+  href: https://www.linkedin.com/in/jeffrey-ankrah-915746338
+  icon: linkedin
+  order: 1
+
 - label: Email
   href: mailto:jeffreyankrah2004@gmail.com
   icon: email
-  order: 1
+  order: 2
 
 - label: WhatsApp
   href: 'https://wa.me/233530297282?text=Hello%20Jeffrey,%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20get%20in%20touch.'
   icon: whatsapp
-  order: 2
+  order: 3
 
 - label: Phone
   href: tel:+233530297282
   icon: phone
-  order: 3
+  order: 4
