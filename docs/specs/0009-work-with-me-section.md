@@ -1,7 +1,7 @@
 # 0009. Work with me section from a services collection
 
 **Date**: 2026-09-19
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -161,5 +161,5 @@ Skateboard: the data lands first so the section has something real to show, then
 
 ## Follow-up
 
-- [ ] Mark spec 0002 as extended by 0009 (new `services` collection and `profile.availability`) when this ships.
+- [x] Mark spec 0002 as extended by 0009 (new `services` collection and `profile.availability`) when this ships.
 - [ ] If a site nav is added later, link it to `#work-with-me`.

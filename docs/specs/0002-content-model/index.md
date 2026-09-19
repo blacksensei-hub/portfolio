@@ -2,6 +2,7 @@
 
 **Date**: 2026-09-17
 **Status**: Accepted
+**Extended by**: [0009](../0009-work-with-me-section.md) (adds the `services` collection and `profile.availability`)
 
 ## Summary
 

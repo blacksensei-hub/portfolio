@@ -22,7 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 9 | SEO & social cards | Release 1 | done |
 | 10 | Deploy to free hosting | Release 1 | done |
 | 11 | Dark/light theme | Release 2 | done |
-| 12 | Work with me section | Release 2 | in-progress |
+| 12 | Work with me section | Release 2 | done |
 | 13 | Visitor analytics | Release 3 | planned |
 
 ## Foundations
@@ -144,7 +144,7 @@ spec [0008](../specs/0008-dark-light-theme.md) · code in `src/lib/theme.ts`, `s
   - [x] E2E for cycle, persistence, no flash, blocked storage, and axe per forced theme; `design.md` entry (AC-1 to AC-8)
 - [x] Verify it: `/check verify dark/light theme`
 
-### 12. Work with me section · in-progress
+### 12. Work with me section · done
 A short services and availability block, so freelance clients know what to hire you for.
 **Done when:** services and a call to action render from the content files and link to your contact options.
 spec [0009](../specs/0009-work-with-me-section.md) · code in `src/content.config.ts`, `src/content/services.yaml`, `src/components/sections/WorkWithMe.astro`, `src/styles/global.css`, `tests/e2e/work-with-me.spec.ts`
@@ -154,7 +154,7 @@ spec [0009](../specs/0009-work-with-me-section.md) · code in `src/content.confi
   - [x] Three status tokens and their contrast pairs (AC-7)
   - [x] `WorkWithMe` component wired between Skills and Contact, with container tests (AC-1, AC-3 to AC-6, AC-8)
   - [x] E2E for content, placement, layout, and axe per theme; `design.md` badge entry (AC-1, AC-3, AC-4, AC-6 to AC-8)
-- [ ] Verify it: `/check verify work with me section`
+- [x] Verify it: `/check verify work with me section`
 
 ## Release 3: learn who visits
 
