@@ -20,7 +20,7 @@ Every claim is checked against the project's code, commits, or live site before 
 
 ## Screens
 
-Captured from the public live sites on 2026-09-24, desktop at 1440 px and phone at 390 px, stored as WebP under `src/assets/case-studies/`. UrbanPulse's cookie banner was hidden before capture, not accepted. Private screens (dashboards, admin, the mobile app signed in) are a follow-up once supplied.
+Captured from the public live sites on 2026-09-24, desktop at 1440 px and phone at 390 px, stored as WebP under `src/assets/case-studies/`. UrbanPulse's cookie banner was hidden before capture, not accepted. Signed-in screens were added on 2026-09-24 from local copies of each app running against throwaway databases (`attendx_demo`, and `urbanpulse_demo`, a copy of the local dev database) seeded with made-up people and orders, emails on the reserved `.test` domain. The live databases were never touched: AttendX's `.env` points at the hosted Neon database, so the runs overrode `DATABASE_URL` in the process environment only. Payments, email, and SMS were disabled for the runs. The owner signed in to each role in a separate browser; the capture never handled credentials. The gallery notes that signed-in screens use demo data.
 
 ## Verification
 

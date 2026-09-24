@@ -214,9 +214,13 @@ const phone = gallery.filter((shot) => shot.device === 'phone');
 
     <section aria-labelledby="gallery-heading" class="pb-section">
       <Container>
-        <h2 id="gallery-heading" class="text-h2 mb-8 font-semibold tracking-tight">
+        <h2 id="gallery-heading" class="text-h2 font-semibold tracking-tight">
           Screens
         </h2>
+        <p class="text-muted mt-2 mb-8 text-sm">
+          Signed-in screens were captured from a local copy filled with made-up demo data, so no
+          real student or customer appears here.
+        </p>
         {desktop.length > 0 && (
           <ul role="list" class="grid gap-8 md:grid-cols-2">
             {desktop.map((shot, n) => {

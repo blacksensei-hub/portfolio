@@ -17,25 +17,40 @@ metrics:
   - value: '14'
     label: API areas behind the store
 gallery:
-  - image: ../../assets/case-studies/urbanpulse/new-in-rotation.webp
-    alt: UrbanPulse homepage section titled New in rotation, with a yellow Ghana jersey and baggy jeans.
-    caption: New in rotation, straight from the catalogue.
+  - image: ../../assets/case-studies/urbanpulse/app-admin-today.webp
+    alt: 'Admin Today view with today''s revenue, orders ready to ship with Mark shipped buttons, and returns awaiting review.'
+    caption: 'The admin Today view: what needs doing first, orders to ship and returns to review.'
     device: desktop
-  - image: ../../assets/case-studies/urbanpulse/the-cloth.webp
-    alt: Section titled Before it is a garment, with close-up photos of folded fabric and knit.
-    caption: The homepage sells the fabric before the product.
+  - image: ../../assets/case-studies/urbanpulse/app-admin-dashboard.webp
+    alt: Admin dashboard showing revenue, orders, customers, and products for the last 30 days with a daily revenue chart.
+    caption: Revenue, orders, and stock over the last 30 days.
+    device: desktop
+  - image: ../../assets/case-studies/urbanpulse/app-admin-orders.webp
+    alt: Admin orders table with status filters from pending to refunded, order totals in cedis, payment method, and receipt links.
+    caption: Every order, filterable by status, with receipts one click away.
+    device: desktop
+  - image: ../../assets/case-studies/urbanpulse/app-admin-return.webp
+    alt: 'Admin return request RMA-2026-00019 with a timeline, the returned jersey, the customer''s note, and Approve and Reject buttons.'
+    caption: 'A return request: the item, the customer''s reason, and a decision to make.'
+    device: desktop
+  - image: ../../assets/case-studies/urbanpulse/app-admin-loyalty.webp
+    alt: Admin loyalty page with points issued and outstanding, a tier distribution chart, and the top members.
+    caption: The loyalty programme, from points issued to the top members.
+    device: desktop
+  - image: ../../assets/case-studies/urbanpulse/app-cart.webp
+    alt: Shopping bag with a jersey and baggy jeans, quantities, and an order summary in cedis.
+    device: desktop
+  - image: ../../assets/case-studies/urbanpulse/app-checkout.webp
+    alt: Checkout step one with contact details, a saved East Legon address, and the order summary.
+    caption: Checkout in three steps, with saved addresses and cedi totals throughout.
     device: desktop
   - image: ../../assets/case-studies/urbanpulse/product-page.webp
     alt: Product page for a yellow Ghana jersey priced at GH₵ 120.00, with colour, size, and an add to cart button.
     caption: Product page, priced in cedis, with size, stock, and delivery promises up front.
     device: desktop
-  - image: ../../assets/case-studies/urbanpulse/shop-filters.webp
-    alt: Shop page titled Everything in rotation, with category, price, and size filters beside the products.
-    caption: The shop, filterable by category, price, size, colour, and stock.
-    device: desktop
-  - image: ../../assets/case-studies/urbanpulse/lookbook.webp
-    alt: Lookbook page with three editorial story cards.
-    caption: The lookbook, for campaign stories and field guides.
+  - image: ../../assets/case-studies/urbanpulse/the-cloth.webp
+    alt: Section titled Before it is a garment, with close-up photos of folded fabric and knit.
+    caption: The homepage sells the fabric before the product.
     device: desktop
   - image: ../../assets/case-studies/urbanpulse/phone-hero.webp
     alt: UrbanPulse homepage on a phone, headline Built for the street. Made to last.
@@ -43,11 +58,11 @@ gallery:
   - image: ../../assets/case-studies/urbanpulse/phone-weight-demo.webp
     alt: The Feel the difference fabric weight demo on a phone, showing 180 GSM and a press and hold button.
     device: phone
-  - image: ../../assets/case-studies/urbanpulse/phone-shop.webp
-    alt: The shop on a phone, with a filters button and two products.
+  - image: ../../assets/case-studies/urbanpulse/app-phone-checkout.webp
+    alt: Checkout on a phone, with contact details and a saved address.
     device: phone
-  - image: ../../assets/case-studies/urbanpulse/phone-new-in.webp
-    alt: The New in rotation section on a phone.
+  - image: ../../assets/case-studies/urbanpulse/app-phone-rewards.webp
+    alt: Customer rewards page on a phone, showing gold tier and points.
     device: phone
 ---
 
