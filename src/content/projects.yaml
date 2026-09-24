@@ -13,7 +13,7 @@
     - Sequelize
     - PostgreSQL
     - Socket.IO
-  image: ../assets/attendx.png
+  image: ../assets/attendx.webp
   demoUrl: https://atttend-x.vercel.app
   repoUrl: https://github.com/blacksensei-hub/AttendX.git
   order: 0
