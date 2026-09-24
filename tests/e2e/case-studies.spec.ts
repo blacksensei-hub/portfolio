@@ -112,6 +112,62 @@ for (const study of studies) {
       });
     }
 
+    test('opens any screenshot full screen, steps through, and closes back to it', async ({
+      page,
+    }) => {
+      // Spec 0017.
+      await page.goto(path);
+      const shots = page.locator('a[data-lightbox]');
+      await expect(shots).toHaveCount(study.gallery.length);
+
+      const first = shots.first();
+      await first.scrollIntoViewIfNeeded();
+      await first.click();
+
+      const viewer = page.getByRole('dialog', { name: `${project.title} screenshots` });
+      await expect(viewer).toBeVisible();
+      const counter = viewer.locator('[data-lightbox-counter]');
+      await expect(counter).toHaveText(`1 / ${study.gallery.length}`);
+      await expect(viewer.getByRole('img', { name: study.gallery[0]?.alt ?? '' })).toBeVisible();
+
+      await page.keyboard.press('ArrowRight');
+      await expect(counter).toHaveText(`2 / ${study.gallery.length}`);
+      await page.keyboard.press('ArrowLeft');
+      await page.keyboard.press('ArrowLeft');
+      await expect(counter).toHaveText(`${study.gallery.length} / ${study.gallery.length}`);
+
+      await viewer.getByRole('button', { name: 'Next screenshot' }).click();
+      await expect(counter).toHaveText(`1 / ${study.gallery.length}`);
+
+      await page.keyboard.press('Escape');
+      await expect(viewer).toBeHidden();
+      await expect(first).toBeFocused();
+    });
+
+    test('the open viewer has no accessibility violations', async ({ page }) => {
+      await page.goto(path);
+      await page.locator('a[data-lightbox]').first().click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+
+      const results = await new AxeBuilder({ page })
+        .include('dialog')
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    });
+
+    test('without JavaScript each screenshot links to its full-size image', async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false });
+      const page = await context.newPage();
+      await page.goto(path);
+
+      const href = await page.locator('a[data-lightbox]').first().getAttribute('href');
+      expect(href).toMatch(/\.webp$/);
+      const response = await page.request.get(href ?? '');
+      expect(response.headers()['content-type']).toContain('image/');
+      await context.close();
+    });
+
     test('is linked from its project card on the home page', async ({ page }) => {
       await page.goto('/');
 
