@@ -14,12 +14,14 @@
     - React Native
     - Expo
     - Bootstrap
+    - Tailwind CSS
   order: 1
 
 - group: Backend
   items:
     - Node.js
     - Express.js
+    - Socket.IO
   order: 2
 
 - group: Databases
@@ -27,6 +29,7 @@
     - PostgreSQL
     - MySQL
     - MongoDB
+    - Sequelize
   order: 3
 
 - group: Tools
@@ -34,4 +37,5 @@
     - Git
     - GitHub
     - VS Code
+    - Vite
   order: 4
