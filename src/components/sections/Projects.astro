@@ -6,9 +6,14 @@ import ProjectCard from './ProjectCard.astro';
 
 interface Props {
   projects: CollectionEntry<'projects'>[];
+  /** Case studies, matched to their project by the reference (spec 0016). */
+  caseStudies?: CollectionEntry<'caseStudies'>[];
 }
 
 const sorted = [...Astro.props.projects].sort((a, b) => a.data.order - b.data.order);
+const studyFor = new Map(
+  (Astro.props.caseStudies ?? []).map((study) => [study.data.project.id, `/projects/${study.id}/`]),
+);
 ---
 
 {/* An empty projects.yaml is valid content, so the section simply disappears. */}
@@ -18,7 +23,12 @@ const sorted = [...Astro.props.projects].sort((a, b) => a.data.order - b.data.or
     <ul role="list" class="grid gap-8 md:gap-12">
       {sorted.map((entry, n) => (
         <li class="reveal grid">
-          <ProjectCard project={entry.data} number={n + 1} flip={n % 2 === 1} />
+          <ProjectCard
+            project={entry.data}
+            number={n + 1}
+            flip={n % 2 === 1}
+            caseStudyHref={studyFor.get(entry.id)}
+          />
         </li>
       ))}
     </ul>

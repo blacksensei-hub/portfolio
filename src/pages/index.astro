@@ -22,6 +22,7 @@ const projects = await getCollection('projects');
 const skills = await getCollection('skills');
 const links = await getCollection('links');
 const services = await getCollection('services');
+const caseStudies = await getCollection('caseStudies');
 
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
 const technologies = skills.toSorted(byOrder).flatMap((group) => group.data.items);
@@ -69,7 +70,7 @@ const socials = links.toSorted(byOrder).map((link) => link.data);
   />
   <About bio={profile.bio} email={profile.email} availability={profile.availability} />
   <TechMarquee items={technologies} />
-  <Projects projects={projects} />
+  <Projects projects={projects} caseStudies={caseStudies} />
   <Skills skills={skills} />
   <WorkWithMe services={services} availability={profile.availability} />
   <Contact links={links} resume={profile.resume} />

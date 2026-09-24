@@ -139,6 +139,9 @@ Props: `text`, `mode?: 'load' | 'scroll'`, `delay?`. Splits text into words that
 ### TechMarquee
 Props: `items: string[]`. The hover pausing ribbon of the stack, `aria-hidden` because Skills lists the same items.
 
+### Case study page
+`src/pages/projects/[slug].astro`, one per file in `src/content/case-studies/` (spec 0016). Reuses SiteHeader with `base="/"`. The write-up is styled by `.case-prose` in `global.css` (lede size, ruled `h2`s, accent list markers) rather than a typography plugin. Desktop shots sit in a browser frame, phone shots in a rounded device frame; the first desktop shot, and the last when the rest would leave a gap, run full width. ProjectCard shows a "Read case study" button when its project has one.
+
 ### SkipLink
 No props. "Skip to content", pointing at `#main` and visually hidden until focused. `BaseLayout` renders it first in `<body>`, then wraps the page in `<main id="main" tabindex="-1">`. Pages must not render their own `<main>`.
 

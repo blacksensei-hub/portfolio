@@ -1,14 +1,15 @@
 import type { ImageFunction } from 'astro:content';
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 
-import { file } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 import { load as yamlLoad } from 'js-yaml';
 // Zod comes straight from the package: Astro 7 deprecates re-exporting `z` from
 // `astro:content`, and this is the same zod 4 that Astro validates with.
 import { z } from 'zod';
 
 /*
- * The five content collections every section reads from, per specs 0002 and 0009.
+ * The five content collections every section reads from, per specs 0002 and 0009,
+ * plus the case studies behind `/projects/[slug]` (spec 0016).
  *
  * Each is one YAML file under `src/content/`, validated by a strict Zod schema.
  * The parsers and schemas are exported so `content.config.test.ts` can exercise
@@ -305,6 +306,41 @@ export const serviceSchema = z
   })
   .catchall(unknownKey);
 
+/*
+ * A case study is one Markdown file per project in `src/content/case-studies/`:
+ * this frontmatter, then the write-up as the body. The file name is the page
+ * slug. `projectRef` is `reference('projects')` in the build, so a case study
+ * naming a project that does not exist fails the build; tests pass a stub.
+ */
+export const caseStudySchema = <R extends z.ZodTypeAny>(image: ImageFunction, projectRef: R) =>
+  z
+    .object({
+      project: projectRef,
+      headline: nonEmpty.max(120),
+      role: nonEmpty.max(80),
+      period: nonEmpty.max(40),
+      platforms: z.array(nonEmpty).min(1),
+      // At most four, so the facts row stays one line on desktop.
+      metrics: z
+        .array(z.object({ value: nonEmpty.max(12), label: nonEmpty.max(60) }).catchall(unknownKey))
+        .max(4)
+        .optional(),
+      gallery: z
+        .array(
+          z
+            .object({
+              // Relative to the Markdown file, like project images are to projects.yaml.
+              image: image(),
+              alt: nonEmpty,
+              caption: nonEmpty.max(140).optional(),
+              device: z.enum(['desktop', 'phone']),
+            })
+            .catchall(unknownKey),
+        )
+        .min(1),
+    })
+    .catchall(unknownKey);
+
 const profile = defineCollection({
   loader: file('src/content/profile.yaml', { parser: singleProfile }),
   schema: reportProfileDefect(profileSchema),
@@ -330,4 +366,9 @@ const services = defineCollection({
   schema: reportDefects(serviceSchema, 'services', 'title'),
 });
 
-export const collections = { profile, projects, skills, links, services };
+const caseStudies = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/case-studies' }),
+  schema: ({ image }) => caseStudySchema(image, reference('projects')),
+});
+
+export const collections = { profile, projects, skills, links, services, caseStudies };
