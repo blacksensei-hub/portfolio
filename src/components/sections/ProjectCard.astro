@@ -13,9 +13,11 @@ interface Props {
   number?: number;
   /** Puts the image on the right from lg up, so rows alternate. */
   flip?: boolean;
+  /** The project's case study page, when it has one (spec 0016). */
+  caseStudyHref?: string | undefined;
 }
 
-const { project, number = 1, flip = false } = Astro.props;
+const { project, number = 1, flip = false, caseStudyHref } = Astro.props;
 const { title, summary, tech, demoUrl, repoUrl, image } = project;
 ---
 
@@ -79,7 +81,18 @@ const { title, summary, tech, demoUrl, repoUrl, image } = project;
           </li>
         ))}
       </ul>
-      <p class="mt-auto flex flex-wrap gap-6 pt-2 font-medium">
+      {caseStudyHref && (
+        <a
+          href={caseStudyHref}
+          class="group/cs border-accent/40 hover:border-accent hover:bg-accent hover:text-on-accent text-accent rounded-tag mt-auto inline-flex min-h-11 items-center gap-2 self-start border px-4 font-mono text-xs font-medium uppercase transition-colors"
+        >
+          Read case study<span class="sr-only">, {title}</span>
+          <span aria-hidden="true" class="transition-transform group-hover/cs:translate-x-1">
+            →
+          </span>
+        </a>
+      )}
+      <p class:list={['flex flex-wrap gap-6 pt-2 font-medium', !caseStudyHref && 'mt-auto']}>
         {demoUrl && (
           <Link href={demoUrl}>
             Live demo<span class="sr-only">, {title}</span>

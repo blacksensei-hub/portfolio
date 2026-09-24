@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import {
+  caseStudySchema,
   keyedList,
   linkSchema,
   profileSchema,
@@ -504,5 +505,65 @@ describe('linkSchema', () => {
 
   it('rejects an unknown key', () => {
     expect(linkSchema.safeParse({ ...validLink, title: 'GitHub' }).success).toBe(false);
+  });
+});
+
+describe('caseStudySchema (spec 0016)', () => {
+  // In the build `project` is `reference('projects')`, which checks the slug
+  // exists; a plain string stands in, since these cases are about the rest.
+  const studies = caseStudySchema(imageStub, z.string());
+
+  const shot = { image: 'shot.webp', alt: 'The home page', device: 'desktop' };
+  const validStudy = {
+    project: 'attendx',
+    headline: 'A class register that fills itself.',
+    role: 'Solo. Design, web, mobile, and API.',
+    period: 'May to Sep 2026',
+    platforms: ['Web app'],
+    metrics: [{ value: '5s', label: 'How long each QR code lives' }],
+    gallery: [shot],
+  };
+
+  it('accepts a valid entry', () => {
+    expect(studies.safeParse(validStudy).success).toBe(true);
+  });
+
+  it('accepts an entry with no metrics', () => {
+    const { metrics: _metrics, ...entry } = validStudy;
+    expect(studies.safeParse(entry).success).toBe(true);
+  });
+
+  it('rejects an empty gallery, so every case study shows its work', () => {
+    expect(studies.safeParse({ ...validStudy, gallery: [] }).success).toBe(false);
+  });
+
+  it('rejects a gallery image without alt text', () => {
+    const { alt: _alt, ...noAlt } = shot;
+    expect(studies.safeParse({ ...validStudy, gallery: [noAlt] }).success).toBe(false);
+  });
+
+  it('rejects a device other than desktop or phone', () => {
+    const result = studies.safeParse({ ...validStudy, gallery: [{ ...shot, device: 'tablet' }] });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects more than four metrics, so the figures row stays one line', () => {
+    const metric = { value: '1', label: 'A figure' };
+    const result = studies.safeParse({ ...validStudy, metrics: Array(5).fill(metric) });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects an entry with no platforms', () => {
+    expect(studies.safeParse({ ...validStudy, platforms: [] }).success).toBe(false);
+  });
+
+  it('names an unknown key in the error path, at the top level and in a gallery shot', () => {
+    const top = studies.safeParse({ ...validStudy, subtitle: 'Nope' });
+    const nested = studies.safeParse({ ...validStudy, gallery: [{ ...shot, width: 1600 }] });
+
+    expect(top.success).toBe(false);
+    expect(top.error?.issues[0]?.path).toEqual(['subtitle']);
+    expect(nested.success).toBe(false);
+    expect(nested.error?.issues[0]?.path).toEqual(['gallery', 0, 'width']);
   });
 });

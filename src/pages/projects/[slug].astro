@@ -1,0 +1,318 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+
+import ButtonLink from '../../components/ui/ButtonLink.astro';
+import Container from '../../components/ui/Container.astro';
+import MaskText from '../../components/ui/MaskText.astro';
+import SiteHeader from '../../components/ui/SiteHeader.astro';
+import Tag from '../../components/ui/Tag.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+/*
+ * One page per case study (spec 0016). The write-up is the Markdown body; the
+ * facts, metrics, and gallery come from its frontmatter; the title, summary,
+ * stack, links, and cover come from the project it references, so the card on
+ * the home page and this page can never disagree.
+ */
+export async function getStaticPaths() {
+  const studies = await getCollection('caseStudies');
+  return studies.map((study) => ({ params: { slug: study.id }, props: { study } }));
+}
+
+const { study } = Astro.props;
+const project = (await getEntry(study.data.project))?.data;
+// The schema's reference already fails the build on a bad slug; this narrows the type.
+if (!project) throw new Error(`Case study ${study.id} names a missing project`);
+
+const profile = (await getEntry('profile', 'profile'))?.data;
+if (!profile) throw new Error('profile.yaml is missing');
+
+const links = (await getCollection('links'))
+  .toSorted((a, b) => a.data.order - b.data.order)
+  .map((link) => link.data);
+
+// The next case study, by project order, wrapping round to the first.
+const studies = await getCollection('caseStudies');
+const withOrder = await Promise.all(
+  studies.map(async (s) => ({ s, p: (await getEntry(s.data.project))?.data })),
+);
+const ordered = withOrder
+  .filter((x): x is { s: typeof study; p: NonNullable<typeof x.p> } => x.p !== undefined)
+  .toSorted((a, b) => a.p.order - b.p.order);
+const at = ordered.findIndex((x) => x.s.id === study.id);
+const next = ordered.length > 1 ? ordered[(at + 1) % ordered.length] : undefined;
+
+const { Content } = await render(study);
+const { headline, role, period, platforms, metrics = [], gallery } = study.data;
+const desktop = gallery.filter((shot) => shot.device === 'desktop');
+const phone = gallery.filter((shot) => shot.device === 'phone');
+---
+
+<BaseLayout
+  title={`${project.title} case study · ${profile.name}`}
+  description={headline}
+  social={{
+    image: '/og.png',
+    imageAlt: `${profile.name}, ${profile.role}`,
+    siteName: profile.name,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: `${project.title} case study`,
+      headline,
+      about: project.summary,
+      author: { '@type': 'Person', name: profile.name },
+      url: new URL(`/projects/${study.id}/`, Astro.site).href,
+    },
+  }}
+>
+  <SiteHeader
+    slot="header"
+    base="/"
+    name={profile.name}
+    links={links}
+    sections={[
+      { id: 'about', label: 'About' },
+      { id: 'projects', label: 'Projects' },
+      { id: 'skills', label: 'Skills' },
+      { id: 'work-with-me', label: 'Services' },
+      { id: 'contact', label: 'Contact' },
+    ]}
+  />
+
+  <article aria-labelledby="case-heading">
+    {/* Hero: back link, title, the one line pitch, the facts, and the cover. */}
+    <header class="relative isolate overflow-hidden pt-10 pb-12 md:pt-(--spacing-header)">
+      <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+        <div class="grid-floor absolute inset-0"></div>
+        <div class="animate-aurora aurora-blob text-thread-gold/20 absolute -top-40 left-[5%] size-[36rem] rounded-full"></div>
+      </div>
+      <Container>
+        <div class="pt-6 md:pt-10">
+          <a
+            href="/#projects"
+            class="text-muted hover:text-accent group/back flex min-h-11 w-fit items-center gap-2 font-mono text-label uppercase transition-colors"
+          >
+            <span aria-hidden="true" class="transition-transform group-hover/back:-translate-x-1">
+              ←
+            </span>
+            All projects
+          </a>
+          <p class="animate-rise border-accent/40 bg-accent/10 text-accent rounded-tag mt-6 mb-4 inline-block border px-3 py-1 font-mono text-label uppercase">
+            Case study
+          </p>
+          <h1 id="case-heading" class="text-hero font-bold tracking-tight">
+            <MaskText text={project.title} mode="load" delay={100} />
+          </h1>
+          <p class="animate-rise text-lede mt-5 max-w-[40ch] [animation-delay:350ms]">{headline}</p>
+
+          <dl class="animate-rise border-border mt-10 grid gap-x-8 gap-y-6 border-y py-6 text-sm [animation-delay:450ms] sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <dt class="text-muted mb-1 font-mono text-label uppercase">Role</dt>
+              <dd>{role}</dd>
+            </div>
+            <div>
+              <dt class="text-muted mb-1 font-mono text-label uppercase">Timeline</dt>
+              <dd>{period}</dd>
+            </div>
+            <div>
+              <dt class="text-muted mb-1 font-mono text-label uppercase">Platforms</dt>
+              <dd>{platforms.join(', ')}</dd>
+            </div>
+            <div>
+              <dt class="text-muted mb-1 font-mono text-label uppercase">Links</dt>
+              <dd class="flex flex-wrap gap-x-4 gap-y-1">
+                {project.demoUrl && (
+                  <a
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent underline underline-offset-2 hover:underline-offset-4"
+                  >
+                    Live demo<span class="sr-only"> (opens in a new tab)</span>
+                  </a>
+                )}
+                {project.repoUrl && (
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent underline underline-offset-2 hover:underline-offset-4"
+                  >
+                    Source code<span class="sr-only"> (opens in a new tab)</span>
+                  </a>
+                )}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        {project.image && (
+          <figure class="animate-rise mt-10 [animation-delay:550ms]">
+            <div class="rounded-card border-border bg-surface-raised overflow-hidden border shadow-2xl">
+              <div
+                aria-hidden="true"
+                class="border-border/60 flex items-center gap-2 border-b px-4 py-2.5"
+              >
+                <span class="bg-thread-red size-2.5 rounded-full"></span>
+                <span class="bg-thread-gold size-2.5 rounded-full"></span>
+                <span class="bg-thread-green size-2.5 rounded-full"></span>
+              </div>
+              <Image
+                src={project.image}
+                alt={`${project.title} home page`}
+                widths={[640, 1024, 1600]}
+                sizes="(min-width: 1024px) 62rem, 100vw"
+                loading="eager"
+                fetchpriority="high"
+                class="aspect-video w-full object-cover object-left"
+              />
+            </div>
+          </figure>
+        )}
+      </Container>
+    </header>
+
+    {metrics.length > 0 && (
+      <section aria-label="Key figures" class="pb-4">
+        <Container>
+          <dl class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {metrics.map(({ value, label }) => (
+              <div class="reveal glass rounded-card flex flex-col-reverse gap-1 p-5">
+                <dt class="text-muted text-sm">{label}</dt>
+                <dd class="font-display text-accent text-3xl font-bold">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </Container>
+      </section>
+    )}
+
+    {/* The write up, with the stack alongside it on wide screens. */}
+    <section aria-label="The write-up" class="py-section">
+      <Container>
+        <div class="grid gap-12 lg:grid-cols-12">
+          <div class="case-prose lg:col-span-8">
+            <Content />
+          </div>
+          <aside aria-label="Stack" class="lg:col-span-4">
+            <div class="glass rounded-card p-6 lg:sticky lg:top-28">
+              <p class="text-muted mb-4 font-mono text-label uppercase">Built with</p>
+              <ul role="list" class="flex flex-wrap gap-2">
+                {project.tech.map((item) => (
+                  <li>
+                    <Tag>{item}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </Container>
+    </section>
+
+    <section aria-labelledby="gallery-heading" class="pb-section">
+      <Container>
+        <h2 id="gallery-heading" class="text-h2 mb-8 font-semibold tracking-tight">
+          Screens
+        </h2>
+        {desktop.length > 0 && (
+          <ul role="list" class="grid gap-8 md:grid-cols-2">
+            {desktop.map((shot, n) => {
+              // The first shot leads full width; so does the last when the rest would leave a hole.
+              const wide = n === 0 || (n === desktop.length - 1 && desktop.length % 2 === 0);
+              return (
+                <li class:list={['reveal', wide && 'md:col-span-2']}>
+                  <figure>
+                    <div class="rounded-card border-border bg-surface-raised overflow-hidden border">
+                      <div
+                        aria-hidden="true"
+                        class="border-border/60 flex items-center gap-1.5 border-b px-3 py-2"
+                      >
+                        <span class="bg-border size-2 rounded-full"></span>
+                        <span class="bg-border size-2 rounded-full"></span>
+                        <span class="bg-border size-2 rounded-full"></span>
+                      </div>
+                      <Image
+                        src={shot.image}
+                        alt={shot.alt}
+                        widths={[480, 800, 1200, 1600]}
+                        sizes={
+                          wide
+                            ? '(min-width: 1024px) 62rem, 100vw'
+                            : '(min-width: 768px) 31rem, 100vw'
+                        }
+                        class="w-full"
+                      />
+                    </div>
+                    {shot.caption && (
+                      <figcaption class="text-muted mt-3 text-sm">{shot.caption}</figcaption>
+                    )}
+                  </figure>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {phone.length > 0 && (
+          <ul role="list" class="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
+            {phone.map((shot) => (
+              <li class="reveal">
+                <figure>
+                  <div class="border-on-surface/15 bg-surface-raised overflow-hidden rounded-[1.75rem] border-[6px] shadow-xl">
+                    <Image
+                      src={shot.image}
+                      alt={shot.alt}
+                      widths={[300, 600]}
+                      sizes="(min-width: 768px) 14rem, 45vw"
+                      class="w-full"
+                    />
+                  </div>
+                  {shot.caption && (
+                    <figcaption class="text-muted mt-3 text-sm">{shot.caption}</figcaption>
+                  )}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Container>
+    </section>
+
+    {/* Where to go next: the other case study, and a way to get in touch. */}
+    <section aria-label="Next" class="border-border border-t py-16">
+      <Container>
+        <div class="grid gap-6 md:grid-cols-2">
+          {next && (
+            <a
+              href={`/projects/${next.s.id}/`}
+              class="group/next glass glow-border rounded-card block p-6 transition-transform hover:-translate-y-1"
+            >
+              <p class="text-muted font-mono text-label uppercase">Next case study</p>
+              <p class="font-display text-display mt-2 font-bold tracking-tight">{next.p.title}</p>
+              <p class="text-muted mt-2">{next.s.data.headline}</p>
+              <p
+                aria-hidden="true"
+                class="text-accent mt-4 transition-transform group-hover/next:translate-x-1"
+              >
+                Read it →
+              </p>
+            </a>
+          )}
+          <div class="glass rounded-card flex flex-col justify-between gap-6 p-6">
+            <div>
+              <p class="text-muted font-mono text-label uppercase">Have something similar?</p>
+              <p class="font-display mt-2 text-2xl font-semibold tracking-tight">
+                Let's talk about what you're building.
+              </p>
+            </div>
+            <div>
+              <ButtonLink href="/#contact">Get in touch</ButtonLink>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+  </article>
+</BaseLayout>
