@@ -16,7 +16,7 @@ const { items } = Astro.props;
   aria-hidden="true"
   class="group/marquee border-border overflow-hidden border-y py-6 [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]"
 >
-  <div class="animate-marquee flex w-max group-hover/marquee:[animation-play-state:paused]">
+  <div class="animate-marquee flex w-max will-change-transform group-hover/marquee:[animation-play-state:paused]">
     {[0, 1].map(() => (
       <ul class="flex shrink-0 items-center">
         {items.map((item) => (

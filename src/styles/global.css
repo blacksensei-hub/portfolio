@@ -480,13 +480,19 @@
     mask-composite: exclude;
     opacity: 0;
     transition: opacity var(--duration-hover) var(--ease-out-soft);
+    /* Spinning repaints the ring every frame, so it only spins under the pointer (spec 0015). */
     animation: var(--animate-spin-angle);
+    animation-play-state: paused;
     pointer-events: none;
   }
 
   .glow-border:hover::before,
   .glow-border-on::before {
     opacity: 1;
+  }
+
+  .glow-border:hover::before {
+    animation-play-state: running;
   }
 
   /* A light band slides through gradient filled text, forever and slowly. */
@@ -501,7 +507,18 @@
       0 0 / 200% 100%;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    /* Two sweeps, then rest: a forever shimmer repaints the text every frame (spec 0015). */
     animation: var(--animate-shimmer);
+    animation-iteration-count: 2;
+  }
+
+  /*
+   * Aurora blob: a soft radial gradient in `currentColor`, moved on the GPU.
+   * Replaces a blur() filter, which the browser redrew every frame (spec 0015).
+   */
+  .aurora-blob {
+    background: radial-gradient(closest-side, currentColor, transparent);
+    will-change: transform;
   }
 
   /* A faint grid that fades out from the center: the hero's floor. */

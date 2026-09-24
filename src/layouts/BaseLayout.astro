@@ -8,6 +8,11 @@ import ThemeToggle from '../components/ui/ThemeToggle.astro';
 import { beaconAttr } from '../lib/analytics';
 import { THEME_HEAD_SCRIPT } from '../lib/theme';
 import '../styles/global.css';
+// The two faces on the first screen, preloaded so text paints without waiting
+// for the stylesheet to discover them (spec 0015). Same files the CSS uses, so
+// Vite emits one hashed asset for both.
+import bodyFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import displayFont from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -65,6 +70,8 @@ const statusLabel = {
     <meta charset="utf-8" />
     <script is:inline set:html={THEME_HEAD_SCRIPT}></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -113,8 +120,8 @@ const statusLabel = {
       colored glows drifting over 90 seconds. Decorative, and still under reduced motion.
     */}
     <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div class="animate-drift absolute -top-1/3 -right-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-gold)_16%,transparent),transparent)]"></div>
-      <div class="animate-drift absolute -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
+      <div class="animate-drift absolute will-change-transform -top-1/3 -right-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-gold)_16%,transparent),transparent)]"></div>
+      <div class="animate-drift absolute will-change-transform -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
     </div>
     {/* A page with a site header carries the toggle inside it instead. */}
     {!Astro.slots.has('header') && <ThemeToggle />}
