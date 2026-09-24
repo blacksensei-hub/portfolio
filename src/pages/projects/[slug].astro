@@ -1,6 +1,6 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 
 import ButtonLink from '../../components/ui/ButtonLink.astro';
 import Container from '../../components/ui/Container.astro';
@@ -45,8 +45,17 @@ const next = ordered.length > 1 ? ordered[(at + 1) % ordered.length] : undefined
 
 const { Content } = await render(study);
 const { headline, role, period, platforms, metrics = [], gallery } = study.data;
-const desktop = gallery.filter((shot) => shot.device === 'desktop');
-const phone = gallery.filter((shot) => shot.device === 'phone');
+// Every shot also gets a full-size URL: the link a click opens, and the image
+// the full-screen viewer shows (spec 0017). The viewer steps through desktop
+// shots, then phone shots, the order they appear on the page.
+const withFull = await Promise.all(
+  gallery.map(async (shot) => ({
+    ...shot,
+    full: (await getImage({ src: shot.image, format: 'webp' })).src,
+  })),
+);
+const desktop = withFull.filter((shot) => shot.device === 'desktop');
+const phone = withFull.filter((shot) => shot.device === 'phone');
 ---
 
 <BaseLayout
@@ -229,27 +238,42 @@ const phone = gallery.filter((shot) => shot.device === 'phone');
               return (
                 <li class:list={['reveal', wide && 'md:col-span-2']}>
                   <figure>
-                    <div class="rounded-card border-border bg-surface-raised overflow-hidden border">
-                      <div
-                        aria-hidden="true"
-                        class="border-border/60 flex items-center gap-1.5 border-b px-3 py-2"
-                      >
-                        <span class="bg-border size-2 rounded-full"></span>
-                        <span class="bg-border size-2 rounded-full"></span>
-                        <span class="bg-border size-2 rounded-full"></span>
+                    <a
+                      href={shot.full}
+                      data-lightbox
+                      data-alt={shot.alt}
+                      data-caption={shot.caption ?? ''}
+                      class="group/shot rounded-card relative block cursor-zoom-in"
+                    >
+                      <div class="rounded-card border-border bg-surface-raised overflow-hidden border transition-[border-color] group-hover/shot:border-accent">
+                        <div
+                          aria-hidden="true"
+                          class="border-border/60 flex items-center gap-1.5 border-b px-3 py-2"
+                        >
+                          <span class="bg-border size-2 rounded-full"></span>
+                          <span class="bg-border size-2 rounded-full"></span>
+                          <span class="bg-border size-2 rounded-full"></span>
+                        </div>
+                        <Image
+                          src={shot.image}
+                          alt={shot.alt}
+                          widths={[480, 800, 1200, 1600]}
+                          sizes={
+                            wide
+                              ? '(min-width: 1024px) 62rem, 100vw'
+                              : '(min-width: 768px) 31rem, 100vw'
+                          }
+                          class="w-full transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/shot:scale-[1.015]"
+                        />
                       </div>
-                      <Image
-                        src={shot.image}
-                        alt={shot.alt}
-                        widths={[480, 800, 1200, 1600]}
-                        sizes={
-                          wide
-                            ? '(min-width: 1024px) 62rem, 100vw'
-                            : '(min-width: 768px) 31rem, 100vw'
-                        }
-                        class="w-full"
-                      />
-                    </div>
+                      <span
+                        aria-hidden="true"
+                        class="glass rounded-tag absolute top-10 right-3 px-3 py-1 font-mono text-xs uppercase opacity-0 transition-opacity group-hover/shot:opacity-100 group-focus-visible/shot:opacity-100"
+                      >
+                        ⤢ View
+                      </span>
+                      <span class="sr-only">, open full size</span>
+                    </a>
                     {shot.caption && (
                       <figcaption class="text-muted mt-3 text-sm">{shot.caption}</figcaption>
                     )}
@@ -264,15 +288,30 @@ const phone = gallery.filter((shot) => shot.device === 'phone');
             {phone.map((shot) => (
               <li class="reveal">
                 <figure>
-                  <div class="border-on-surface/15 bg-surface-raised overflow-hidden rounded-[1.75rem] border-[6px] shadow-xl">
-                    <Image
-                      src={shot.image}
-                      alt={shot.alt}
-                      widths={[300, 600]}
-                      sizes="(min-width: 768px) 14rem, 45vw"
-                      class="w-full"
-                    />
-                  </div>
+                  <a
+                    href={shot.full}
+                    data-lightbox
+                    data-alt={shot.alt}
+                    data-caption={shot.caption ?? ''}
+                    class="group/shot relative block cursor-zoom-in rounded-[1.75rem]"
+                  >
+                    <div class="border-on-surface/15 bg-surface-raised group-hover/shot:border-accent overflow-hidden rounded-[1.75rem] border-[6px] shadow-xl transition-[border-color]">
+                      <Image
+                        src={shot.image}
+                        alt={shot.alt}
+                        widths={[300, 600]}
+                        sizes="(min-width: 768px) 14rem, 45vw"
+                        class="w-full"
+                      />
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      class="glass rounded-tag absolute top-3 right-3 px-2.5 py-1 font-mono text-xs uppercase opacity-0 transition-opacity group-hover/shot:opacity-100 group-focus-visible/shot:opacity-100"
+                    >
+                      ⤢
+                    </span>
+                    <span class="sr-only">, open full size</span>
+                  </a>
                   {shot.caption && (
                     <figcaption class="text-muted mt-3 text-sm">{shot.caption}</figcaption>
                   )}
@@ -319,4 +358,64 @@ const phone = gallery.filter((shot) => shot.device === 'phone');
       </Container>
     </section>
   </article>
+
+  {/*
+    Full-screen viewer (spec 0017). Hidden until a screenshot is clicked; the
+    links above work as plain links to the full-size image without it.
+  */}
+  <dialog
+    data-lightbox-dialog
+    aria-label={`${project.title} screenshots`}
+    class="text-on-surface backdrop:bg-surface/95 m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 backdrop:backdrop-blur-sm"
+  >
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
+        <p data-lightbox-counter aria-live="polite" class="text-muted font-mono text-sm"></p>
+        <button
+          type="button"
+          data-lightbox-close
+          aria-label="Close"
+          class="glass grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent"
+        >
+          ×
+        </button>
+      </div>
+      <div
+        data-lightbox-stage
+        class="relative flex min-h-0 flex-1 items-center justify-center px-2 md:px-20"
+      >
+        <button
+          type="button"
+          data-lightbox-prev
+          aria-label="Previous screenshot"
+          class="glass absolute left-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent md:left-6"
+        >
+          ←
+        </button>
+        <img
+          data-lightbox-image
+          alt=""
+          class="rounded-card max-h-full max-w-full object-contain shadow-2xl"
+        />
+        <button
+          type="button"
+          data-lightbox-next
+          aria-label="Next screenshot"
+          class="glass absolute right-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent md:right-6"
+        >
+          →
+        </button>
+      </div>
+      <p
+        data-lightbox-caption
+        class="text-muted mx-auto max-w-2xl px-4 py-4 text-center text-sm"
+      ></p>
+    </div>
+  </dialog>
 </BaseLayout>
+
+<script>
+  import { initLightbox } from '../../lib/lightbox';
+
+  initLightbox();
+</script>
