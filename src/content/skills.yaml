@@ -15,6 +15,7 @@
     - Expo
     - Bootstrap
     - Tailwind CSS
+    - Framer Motion
   order: 1
 
 - group: Backend
