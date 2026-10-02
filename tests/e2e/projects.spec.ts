@@ -68,7 +68,8 @@ test.describe('projects section', () => {
       [1, false],
     ] as const) {
       const card = cards.nth(n);
-      const image = await card.getByRole('img').boundingBox();
+      // The first image is the desktop screen (spec 0020), or the project image.
+      const image = await card.getByRole('img').first().boundingBox();
       const title = await card.getByRole('heading', { level: 3 }).boundingBox();
       expect(image && title && image.x < title.x).toBe(imageOnLeft);
     }
