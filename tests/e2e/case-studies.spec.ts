@@ -148,6 +148,8 @@ for (const study of studies) {
       await page.goto(path);
       await page.locator('a[data-lightbox]').first().click();
       await expect(page.getByRole('dialog')).toBeVisible();
+      // Spec 0018: the backdrop fades in on a spring; judge the settled viewer.
+      await expect(page.locator('[data-lightbox-scrim]')).toHaveCSS('opacity', '1');
 
       const results = await new AxeBuilder({ page })
         .include('dialog')

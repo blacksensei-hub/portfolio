@@ -35,7 +35,7 @@ const sorted = [...Astro.props.services].sort((a, b) => a.data.order - b.data.or
             >
               {String(n + 1).padStart(2, '0')}
             </p>
-            <h3 class="text-h3 font-semibold tracking-tight">{entry.data.title}</h3>
+            <h3 class="text-h3 font-semibold">{entry.data.title}</h3>
             <p class="text-muted mt-2 text-sm leading-relaxed">{entry.data.blurb}</p>
           </article>
         </li>

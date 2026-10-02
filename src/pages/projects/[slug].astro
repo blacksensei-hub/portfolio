@@ -111,7 +111,7 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
           <p class="animate-rise border-accent/40 bg-accent/10 text-accent rounded-tag mt-6 mb-4 inline-block border px-3 py-1 font-mono text-label uppercase">
             Case study
           </p>
-          <h1 id="case-heading" class="text-hero font-bold tracking-tight">
+          <h1 id="case-heading" class="text-hero font-bold">
             <MaskText text={project.title} mode="load" delay={100} />
           </h1>
           <p class="animate-rise text-lede mt-5 max-w-[40ch] [animation-delay:350ms]">{headline}</p>
@@ -223,7 +223,7 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
 
     <section aria-labelledby="gallery-heading" class="pb-section">
       <Container>
-        <h2 id="gallery-heading" class="text-h2 font-semibold tracking-tight">
+        <h2 id="gallery-heading" class="text-h2 font-semibold">
           Screens
         </h2>
         <p class="text-muted mt-2 mb-8 text-sm">
@@ -242,8 +242,10 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
                       href={shot.full}
                       data-lightbox
                       data-alt={shot.alt}
+                      data-width={shot.image.width}
+                      data-height={shot.image.height}
                       data-caption={shot.caption ?? ''}
-                      class="group/shot rounded-card relative block cursor-zoom-in"
+                      class="group/shot rounded-card relative block cursor-zoom-in transition-[scale] duration-100 ease-out motion-safe:active:scale-[0.985]"
                     >
                       <div class="rounded-card border-border bg-surface-raised overflow-hidden border transition-[border-color] group-hover/shot:border-accent">
                         <div
@@ -292,8 +294,10 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
                     href={shot.full}
                     data-lightbox
                     data-alt={shot.alt}
+                    data-width={shot.image.width}
+                    data-height={shot.image.height}
                     data-caption={shot.caption ?? ''}
-                    class="group/shot relative block cursor-zoom-in rounded-[1.75rem]"
+                    class="group/shot relative block cursor-zoom-in rounded-[1.75rem] transition-[scale] duration-100 ease-out motion-safe:active:scale-[0.97]"
                   >
                     <div class="border-on-surface/15 bg-surface-raised group-hover/shot:border-accent overflow-hidden rounded-[1.75rem] border-[6px] shadow-xl transition-[border-color]">
                       <Image
@@ -333,7 +337,7 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
               class="group/next glass glow-border rounded-card block p-6 transition-transform hover:-translate-y-1"
             >
               <p class="text-muted font-mono text-label uppercase">Next case study</p>
-              <p class="font-display text-display mt-2 font-bold tracking-tight">{next.p.title}</p>
+              <p class="font-display text-display mt-2 font-bold">{next.p.title}</p>
               <p class="text-muted mt-2">{next.s.data.headline}</p>
               <p
                 aria-hidden="true"
@@ -366,50 +370,59 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
   <dialog
     data-lightbox-dialog
     aria-label={`${project.title} screenshots`}
-    class="text-on-surface backdrop:bg-surface/95 m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 backdrop:backdrop-blur-sm"
+    class="text-on-surface m-0 h-dvh max-h-none w-screen max-w-none overflow-hidden bg-transparent p-0 backdrop:bg-transparent"
   >
-    <div class="flex h-full flex-col">
-      <div class="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
+    {/* The dimmed backdrop, a real element so a drag can thin it (spec 0018). */}
+    <div
+      data-lightbox-scrim
+      aria-hidden="true"
+      class="bg-surface/95 absolute inset-0 backdrop-blur-sm"
+    ></div>
+    <div class="relative flex h-full flex-col">
+      <div data-lightbox-chrome class="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
         <p data-lightbox-counter aria-live="polite" class="text-muted font-mono text-sm"></p>
         <button
           type="button"
           data-lightbox-close
           aria-label="Close"
-          class="glass grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent"
+          class="glass grid size-11 place-items-center rounded-full text-xl transition-[color,scale] duration-100 hover:text-accent motion-safe:active:scale-90"
         >
           ×
         </button>
       </div>
       <div
         data-lightbox-stage
-        class="relative flex min-h-0 flex-1 items-center justify-center px-2 md:px-20"
+        class="relative flex min-h-0 flex-1 touch-pinch-zoom items-center justify-center px-2 select-none md:px-20"
       >
         <button
           type="button"
           data-lightbox-prev
           aria-label="Previous screenshot"
-          class="glass absolute left-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent md:left-6"
+          class="glass absolute left-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-[color,scale] duration-100 hover:text-accent motion-safe:active:scale-90 md:left-6"
         >
           ←
         </button>
         <img
           data-lightbox-image
           alt=""
-          class="rounded-card max-h-full max-w-full object-contain shadow-2xl"
+          draggable="false"
+          class="rounded-card shadow-2xl will-change-transform"
         />
         <button
           type="button"
           data-lightbox-next
           aria-label="Next screenshot"
-          class="glass absolute right-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-colors hover:text-accent md:right-6"
+          class="glass absolute right-2 z-10 grid size-11 place-items-center rounded-full text-xl transition-[color,scale] duration-100 hover:text-accent motion-safe:active:scale-90 md:right-6"
         >
           →
         </button>
       </div>
-      <p
-        data-lightbox-caption
-        class="text-muted mx-auto max-w-2xl px-4 py-4 text-center text-sm"
-      ></p>
+      <div data-lightbox-chrome>
+        <p
+          data-lightbox-caption
+          class="text-muted mx-auto max-w-2xl px-4 py-4 text-center text-sm"
+        ></p>
+      </div>
     </div>
   </dialog>
 </BaseLayout>

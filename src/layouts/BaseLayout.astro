@@ -130,6 +130,8 @@ const statusLabel = {
       aria-hidden="true"
       class="scroll-progress bg-accent pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5"
     ></div>
+    {/* Content softens as it slides under the floating nav (spec 0018). */}
+    {Astro.slots.has('header') && <div aria-hidden="true" class="scroll-edge"></div>}
     <slot name="header" />
     <!-- Below sm, reserve room so the fixed theme toggle never sits on the first heading. -->
     <main id="main" tabindex="-1" class="max-sm:pt-16">

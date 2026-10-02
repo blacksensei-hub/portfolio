@@ -37,14 +37,29 @@
   --font-display: "Space Grotesk Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
 
+  /*
+   * Tracking is size specific (spec 0018, after Apple's UI typography): large
+   * type tightens, body text sits at 0, small text opens up a touch. Leading
+   * already runs the other way, tight on big type and loose on body.
+   */
   --text-hero: clamp(2.5rem, 1.9rem + 2.6vw, 3.75rem);
   --text-hero--line-height: 1.02;
+  --text-hero--letter-spacing: -0.03em;
   --text-display: clamp(1.625rem, 1.35rem + 1.1vw, 2.125rem);
   --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.022em;
   --text-h2: clamp(1.375rem, 1.25rem + 0.5vw, 1.625rem);
   --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.015em;
   --text-h3: 1.125rem;
   --text-h3--line-height: 1.35;
+  --text-h3--letter-spacing: -0.01em;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-sm--letter-spacing: 0.005em;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-xs--letter-spacing: 0.01em;
   --text-lede: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --text-lede--line-height: 1.65;
   --text-label: 0.6875rem;
@@ -254,15 +269,46 @@
   }
 }
 
+@keyframes edge-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * Reduced motion is gentler motion, not none (spec 0018): animations rest at
+ * their final frame, and transitions keep only what doesn't move, so a hover
+ * or a press still answers with a colour or opacity change.
+ */
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --still-properties:
+      color, background-color, border-color, outline-color, text-decoration-color, fill, stroke,
+      opacity, box-shadow;
+  }
+
   *,
   *::before,
   *::after {
-    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every utility (AC-8). */
-    transition: none !important;
     /* biome-ignore lint/complexity/noImportantStyles: every animation rests at its final frame (spec 0011). */
     animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: no utility may bring movement back (spec 0018). */
+    transition-property: var(--still-properties) !important;
   }
+}
+
+/* The theme switch cross-fades (spec 0018). A fade isn't vestibular, so it stays under reduced motion. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: ease;
+}
+
+/* While the phone menu animates shut, its icon is already a hamburger again (spec 0018). */
+details[data-menu][data-closing] > summary path {
+  translate: 0 0;
+  rotate: 0deg;
+  opacity: 1;
 }
 
 /* Metric matched stand in, so the swap to Inter barely shifts the layout. */
@@ -347,7 +393,7 @@
     font-size: var(--text-h2);
     line-height: var(--text-h2--line-height);
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--text-h2--letter-spacing);
     margin-top: 2.4em;
     padding-top: 1.1em;
     border-top: 1px solid var(--color-border);
@@ -478,6 +524,61 @@
       inset 0 1px 0 color-mix(in oklch, var(--color-on-surface) 14%, transparent),
       inset 0 -1px 0 color-mix(in oklch, var(--color-on-surface) 4%, transparent),
       0 10px 40px -12px color-mix(in oklch, var(--color-surface) 70%, black);
+  }
+
+  /* Asked for less transparency or more contrast: the glass goes solid (spec 0018). */
+  @media (prefers-reduced-transparency: reduce) {
+    .glass {
+      background: var(--color-surface);
+      backdrop-filter: none;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    .glass {
+      background: var(--color-surface);
+      backdrop-filter: none;
+      border-color: color-mix(in oklch, var(--color-on-surface) 60%, transparent);
+    }
+  }
+
+  /*
+   * Scroll edge effect (spec 0018): where content slides under the floating
+   * nav it softens into a light blur and a tint of the page, instead of
+   * meeting a hard line. Fades in over the first 64px of scroll.
+   */
+  .scroll-edge {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 30;
+    height: 5.5rem;
+    pointer-events: none;
+    background: linear-gradient(
+      color-mix(in oklch, var(--color-surface) 60%, transparent),
+      transparent
+    );
+    backdrop-filter: blur(6px);
+    mask-image: linear-gradient(black 40%, transparent);
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .scroll-edge {
+      animation: edge-in linear both;
+      animation-timeline: var(--timeline-page);
+      animation-range: 0 64px;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .scroll-edge {
+      backdrop-filter: none;
+      background: linear-gradient(var(--color-surface) 45%, transparent);
+    }
+
+    [data-lightbox-scrim] {
+      background: var(--color-surface);
+      backdrop-filter: none;
+    }
   }
 
   /* Pointer spotlight: interactions.ts sets --mx/--my; without it the glow simply never shows. */

@@ -4,7 +4,7 @@ The look of the portfolio: its tokens and base components. Decided in [spec 0003
 
 **Source of truth:** `src/styles/global.css`. This file only documents it. If the two ever disagree, `global.css` wins, and this file should be fixed. Never write a color, font size, radius, or duration anywhere else. Use the Tailwind utility the token creates (for example `text-accent`, `bg-surface-raised`, `rounded-card`).
 
-**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces (spec 0012): Space Grotesk for headings, Inter for body text (and the OG card), JetBrains Mono for labels, buttons, and technical details. The **signature** is the Weave: gold, green, and red threads along the hero's bottom edge that draw themselves in, kept clear of the name. The scale is deliberately compact (spec 0013): hero 40 to 60px, section headings 22 to 26px, body 16px, a 62rem column. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS only and rests at its final frame under reduced motion.
+**Direction: Woven threads** (spec 0011). Built on kente weaving: one developer weaving frontend, backend, and mobile into one thing. A deep indigo night canvas (a pale indigo-tinted canvas in light), warm off-white ink, and kente gold as the rare accent: calls to action, focus rings, chapter numbers, one or two emphasis moments. Three faces (spec 0012): Space Grotesk for headings, Inter for body text (and the OG card), JetBrains Mono for labels, buttons, and technical details. The **signature** is the Weave: gold, green, and red threads along the hero's bottom edge that draw themselves in, kept clear of the name. The scale is deliberately compact (spec 0013): hero 40 to 60px, section headings 22 to 26px, body 16px, a 62rem column. One fixed background layer (two soft thread-colored glows drifting over 90s) makes the page feel like one place. No two neighboring sections share a layout: About and Skills pin the heading in a left column, Projects are alternating feature rows, Work with me is a numbered 2 by 2, Contact is a closing line over ruled link rows. Motion is CSS first; anything a person touches moves on springs (spec 0018). Under reduced motion it rests at its final frame and keeps only colour and opacity fades.
 
 ## Color tokens
 
@@ -55,7 +55,7 @@ Named by role, not by hue. Light values live in `@theme`. Dark values override t
 
 Spacing inside components uses Tailwind's default 0.25rem scale.
 
-**Global rules in `global.css`:** every focusable element gets a `:focus-visible` outline (2px solid `--color-focus`, 2px offset). `main:focus` draws no outline. Under `prefers-reduced-motion: reduce`, all transitions and animations are removed, and every animation is written so its resting state is the final frame. `.reveal` rises content into place as it scrolls into view and `.thread-draw` draws a Weave in (CSS scroll driven animations, transform only, never opacity, so axe always sees real contrast). The last Section has no forced height: the footer closes the page, and an anchor jump to Contact lands as high as the page allows.
+**Global rules in `global.css`:** every focusable element gets a `:focus-visible` outline (2px solid `--color-focus`, 2px offset). `main:focus` draws no outline. Under `prefers-reduced-motion: reduce`, animations are removed and transitions are limited to colour, opacity, and shadow (spec 0018), and every animation is written so its resting state is the final frame. `.reveal` rises content into place as it scrolls into view and `.thread-draw` draws a Weave in (CSS scroll driven animations, transform only, never opacity, so axe always sees real contrast). The last Section has no forced height: the footer closes the page, and an anchor jump to Contact lands as high as the page allows.
 
 ## Motion and interaction (spec 0012)
 
@@ -66,10 +66,21 @@ CSS first. Scroll driven animations reference their timeline through `--timeline
 - `.scroll-progress` is the gold reading bar on the top edge (hidden where scroll timelines are unsupported).
 - `MaskText` splits a heading into words that slide up out of clipped lines: on load in the hero, on scroll in every Section heading.
 - `.parallax` drifts project images inside their frame; `.sheen` sweeps light across buttons; `TechMarquee` is a slow, hover-pausing ribbon of the stack (aria-hidden, Skills lists the same items).
-- `src/lib/interactions.ts` is the only script: a pointer spotlight on `[data-spotlight]` (hero, cards), a magnetic lean on `[data-magnetic]` buttons, the live Ghana clock in the footer, the Contact typewriter, and closing the phone menu on choice. Pointer effects need a fine pointer and are off under reduced motion.
+- `src/lib/interactions.ts` starts the page scripts: a pointer spotlight on `[data-spotlight]` (hero, cards), a spring-driven magnetic lean on `[data-magnetic]` buttons, the live Ghana clock in the footer, the Contact typewriter, and the phone menu (`menu.ts`). Pointer effects need a fine pointer and are off under reduced motion.
 - MotionSites style effects (spec 0013), all CSS: `.glow-border` (a conic ring spun by `@property --angle`), `.shimmer-text`, `.grid-floor`, aurora blobs (`--animate-aurora`), `.count-up` (`@property --num`), `.type-line`, `.caret`.
 
-Under reduced motion every animation and transition stops at its final frame.
+### Fluid motion (spec 0018)
+
+After Apple's *Designing Fluid Interfaces*. `src/lib/spring.ts` is a small spring in Apple's terms, a damping ratio and a response in seconds. It always continues from the current value and velocity, so motion can be interrupted. Damping 1 (no overshoot) is the default; a touch of bounce comes only after a fling. The same file has a velocity tracker, momentum projection (`x + (v / 1000) * 0.998 / 0.002`) and rubber-banding.
+
+- **Screenshot viewer:** grows out of the pressed thumbnail and goes back into the one on screen. Drags follow the finger 1:1 after about 10px of hysteresis, and a release is judged by where the throw would land: sideways it pages, up or down it closes. A shot can be grabbed mid-close.
+- **Phone menu:** grows out of its button (transform origin at the button) as a scale, fade and blur together, and closes the same way. It also closes on Esc, a tap outside, a choice, or an upward throw.
+- **Press states:** buttons, nav links, and shots answer on pointer down with `motion-safe:active:scale-*`.
+- **Materials:** `.glass` turns solid under `prefers-reduced-transparency` and `prefers-contrast: more`. `.scroll-edge` softens content where it slides under the nav.
+- **Type:** tracking is size specific. Hero -0.03em, display -0.022em, h2 -0.015em, h3 -0.01em, sm and xs slightly positive.
+- **Theme switch:** a 280ms View Transition cross-fade.
+
+Under reduced motion, keyframe animations stop at their final frame. Transitions keep only colour, opacity and shadow, and script-driven motion becomes short cross-fades.
 
 ## Brand assets
 
