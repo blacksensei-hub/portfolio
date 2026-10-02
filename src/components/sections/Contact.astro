@@ -53,8 +53,9 @@ function detail(href: string): string {
         <ul role="list" class="mx-auto mt-8 grid max-w-2xl gap-3 text-left sm:grid-cols-2">
           {sorted.map(({ data }) => {
             const external = isExternal(data.href);
+            const email = data.href.startsWith('mailto:') ? detail(data.href) : undefined;
             return (
-              <li>
+              <li class="relative">
                 <a
                   href={data.href}
                   class="group/link rounded-card border-border bg-surface/40 hover:border-accent flex min-h-11 items-center gap-4 border px-4 py-3 transition-[border-color,background-color,translate] duration-(--duration-hover) ease-(--ease-out-soft) hover:-translate-y-0.5"
@@ -74,17 +75,55 @@ function detail(href: string): string {
                   </span>
                   <span
                     aria-hidden="true"
-                    class="text-accent ml-auto transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                    class:list={[
+                      'text-accent ml-auto transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5',
+                      email && 'mr-12',
+                    ]}
                   >
                     ↗
                   </span>
                   {external && <span class="sr-only"> (opens in a new tab)</span>}
                 </a>
+                {email && (
+                  // Copy the address, confirmed on the spot (spec 0021). Hidden
+                  // until the script finds a clipboard to write to.
+                  <button
+                    type="button"
+                    hidden
+                    data-copy={email}
+                    aria-label="Copy email address"
+                    class="group/copy text-muted hover:text-accent hover:bg-accent/10 data-copied:text-status-open absolute top-1/2 right-2.5 grid size-11 -translate-y-1/2 place-items-center rounded-full transition-[color,background-color,scale] duration-100 motion-safe:active:scale-90"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="rounded-tag border-border bg-surface text-on-surface pointer-events-none absolute -top-9 border px-2.5 py-1 font-mono text-xs whitespace-nowrap opacity-0 shadow-lg transition-opacity group-data-copied/copy:opacity-100"
+                    >
+                      Copied
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="size-[1.15rem]"
+                    >
+                      <g class="group-data-copied/copy:hidden">
+                        <rect width="13" height="13" x="9" y="9" rx="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </g>
+                      <path class="hidden group-data-copied/copy:inline" d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                  </button>
+                )}
               </li>
             );
           })}
         </ul>
       )}
+      <p data-copy-status aria-live="polite" class="sr-only"></p>
       {resume !== undefined && (
         <div class="mt-8">
           <ButtonLink href={resume} download>

@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+
+import { previewTransitionName } from '../../lib/preview';
+
+/*
+ * A project's real screens (specs 0020, 0021): a browser window with the
+ * desktop shot, and a phone resting on its bottom right corner. Used on the
+ * home page card and the case study header; both name the same view
+ * transition, so following "Read case study" carries the screens across.
+ */
+type Shot = { image: ImageMetadata; alt: string };
+
+interface Props {
+  desktop: Shot;
+  phone?: Shot | undefined;
+  /** The project slug: names the shared view transition. */
+  slug: string;
+  /** `card` on the home page, `hero` on the case study header (bigger, loaded first). */
+  size?: 'card' | 'hero';
+  /** A hover shortcut to the live site, over the window (the card's). */
+  liveHref?: string | undefined;
+  /**
+   * Empty alt text: on the case study header the same screens follow in the
+   * gallery with their full descriptions, so reading them twice adds nothing.
+   */
+  decorative?: boolean;
+}
+
+const { desktop, phone, slug, size = 'card', liveHref, decorative = false } = Astro.props;
+const hero = size === 'hero';
+---
+
+<div class="relative pr-[5%] pb-[9%]">
+  <div
+    data-preview-part
+    style={`view-transition-name: ${previewTransitionName(slug, 'window')}`}
+    class="rounded-card border-border bg-surface relative overflow-hidden border shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)] transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:-translate-y-1"
+  >
+    <div aria-hidden="true" class="border-border/60 flex items-center gap-1.5 border-b px-3 py-2">
+      <span class="bg-border size-2 rounded-full"></span>
+      <span class="bg-border size-2 rounded-full"></span>
+      <span class="bg-border size-2 rounded-full"></span>
+    </div>
+    <Image
+      src={desktop.image}
+      alt={decorative ? '' : desktop.alt}
+      widths={hero ? [640, 1024, 1600] : [480, 800, 1200]}
+      sizes={hero ? '(min-width: 1024px) 58rem, 100vw' : '(min-width: 1024px) 34rem, 100vw'}
+      loading={hero ? 'eager' : 'lazy'}
+      fetchpriority={hero ? 'high' : 'auto'}
+      class="w-full"
+    />
+    {liveHref && (
+      // A hover shortcut; the labelled "Live demo" link is the accessible one.
+      // The chip is solid: glass on a translucent layer loses legibility (spec 0021).
+      <a
+        href={liveHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        tabindex="-1"
+        aria-hidden="true"
+        class="bg-surface/60 absolute inset-0 grid place-items-center opacity-0 backdrop-blur-sm transition-opacity duration-(--duration-hover) group-hover/card:opacity-100"
+      >
+        <span class="rounded-tag border-border bg-surface text-on-surface border px-4 py-2 font-mono text-xs uppercase shadow-lg">
+          Visit live site ↗
+        </span>
+      </a>
+    )}
+  </div>
+  {phone && (
+    <div
+      data-preview-part
+      style={`view-transition-name: ${previewTransitionName(slug, 'phone')}`}
+      class:list={[
+        'absolute right-0 bottom-0 w-[22%] overflow-hidden rounded-[1.6rem] border-[#0b0b0f] bg-[#0b0b0f] shadow-[0_24px_48px_-16px_rgb(0_0_0/0.55)] transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:-translate-y-2',
+        hero ? 'border-[6px] md:rounded-[2.2rem] md:border-8' : 'border-[5px] md:border-[6px]',
+      ]}
+    >
+      <Image
+        src={phone.image}
+        alt={decorative ? '' : phone.alt}
+        widths={hero ? [200, 400] : [160, 320]}
+        sizes={hero ? '(min-width: 1024px) 13rem, 22vw' : '(min-width: 1024px) 7.5rem, 22vw'}
+        loading={hero ? 'eager' : 'lazy'}
+        class:list={['w-full', hero ? 'rounded-[1.25rem] md:rounded-[1.7rem]' : 'rounded-[1.2rem]']}
+      />
+    </div>
+  )}
+</div>

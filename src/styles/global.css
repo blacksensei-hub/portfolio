@@ -304,6 +304,55 @@
   animation-timing-function: ease;
 }
 
+/*
+ * Page to page (spec 0021): navigations cross-fade, and a project's screens
+ * (its card on the home page, the header of its case study) carry across on a
+ * critically damped spring, sampled from spring.ts (damping 1, response 0.42)
+ * into a linear() curve. Under reduced motion the screens don't travel; the
+ * page still fades.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 600ms;
+  animation-timing-function: linear(
+    0,
+    0.066,
+    0.19,
+    0.329,
+    0.459,
+    0.573,
+    0.667,
+    0.744,
+    0.804,
+    0.851,
+    0.887,
+    0.915,
+    0.936,
+    0.952,
+    0.964,
+    0.973,
+    0.98,
+    0.985,
+    0.989,
+    0.992,
+    0.994,
+    0.995,
+    0.997,
+    0.998,
+    1
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-preview-part] {
+    /* biome-ignore lint/complexity/noImportantStyles: beats the inline name the component sets. */
+    view-transition-name: none !important;
+  }
+}
+
 /* While the phone menu animates shut, its icon is already a hamburger again (spec 0018). */
 details[data-menu][data-closing] > summary path {
   translate: 0 0;
