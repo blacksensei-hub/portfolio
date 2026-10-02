@@ -89,6 +89,23 @@ describe('ProjectCard image (AC-4)', () => {
     expect(images[0]).toContain('sizes=');
   });
 
+  it('shows the case study screens instead of the image when given a preview (spec 0020)', async () => {
+    const html = await container.renderToString(ProjectCard, {
+      props: {
+        project: asData({ ...base, image: projectImage }),
+        preview: {
+          desktop: { image: projectImage, alt: 'The desktop screen' },
+          phone: { image: projectImage, alt: 'The phone screen' },
+        },
+      },
+    });
+    const images = html.match(/<img\b[^>]*>/g) ?? [];
+    expect(images).toHaveLength(2);
+    expect(images[0]).toContain('alt="The desktop screen"');
+    expect(images[1]).toContain('alt="The phone screen"');
+    expect(html).not.toContain('alt="Fixture Project"');
+  });
+
   it('renders no image element when unset', async () => {
     const html = await container.renderToString(ProjectCard, { props: { project: asData(base) } });
 

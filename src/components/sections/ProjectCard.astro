@@ -7,6 +7,9 @@ import Link from '../ui/Link.astro';
 import Tag from '../ui/Tag.astro';
 import Weave from '../ui/Weave.astro';
 
+/** A case study screenshot: the gallery's image and alt text. */
+type Shot = { image: ImageMetadata; alt: string };
+
 interface Props {
   project: CollectionEntry<'projects'>['data'];
   /** 1 based position, shown as the mono "01". */
@@ -15,34 +18,43 @@ interface Props {
   flip?: boolean;
   /** The project's case study page, when it has one (spec 0016). */
   caseStudyHref?: string | undefined;
+  /**
+   * Real screens from the case study (spec 0020): a desktop shot in a browser
+   * window, with a phone shot resting on its corner. Replaces the project image.
+   */
+  preview?: { desktop: Shot; phone?: Shot | undefined } | undefined;
 }
 
-const { project, number = 1, flip = false, caseStudyHref } = Astro.props;
+const { project, number = 1, flip = false, caseStudyHref, preview } = Astro.props;
 const { title, summary, tech, demoUrl, repoUrl, image } = project;
 ---
 
 <Card>
   {/* Card takes no class, so the row layout lives inside it. */}
   <div class="grid h-full gap-8 lg:grid-cols-12 lg:items-center lg:gap-12">
-    <div
-      class:list={[
-        'rounded-card border-border bg-surface relative aspect-video overflow-hidden border lg:col-span-7',
-        flip && 'lg:order-last',
-      ]}
-    >
-      {image ? (
-        // Oversized and drifting with scroll (parallax), so the frame never shows an edge.
-        <div class="parallax absolute inset-x-0 -inset-y-[8%]">
+    {preview ? (
+      // A browser window with the desktop screen and a phone resting on its
+      // corner; on hover they lift by different amounts, so they read as layers.
+      <div class:list={['relative pr-[5%] pb-[9%] lg:col-span-7', flip && 'lg:order-last']}>
+        <div class="rounded-card border-border bg-surface relative overflow-hidden border shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)] transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:-translate-y-1">
+          <div
+            aria-hidden="true"
+            class="border-border/60 flex items-center gap-1.5 border-b px-3 py-2"
+          >
+            <span class="bg-border size-2 rounded-full"></span>
+            <span class="bg-border size-2 rounded-full"></span>
+            <span class="bg-border size-2 rounded-full"></span>
+          </div>
           <Image
-            src={image}
-            alt={title}
+            src={preview.desktop.image}
+            alt={preview.desktop.alt}
             widths={[480, 800, 1200]}
-            sizes="(min-width: 1024px) 44rem, 100vw"
-            class="size-full object-cover object-left transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:scale-[1.04]"
+            sizes="(min-width: 1024px) 34rem, 100vw"
+            class="w-full"
           />
           {demoUrl && (
-            // A hover shortcut to the live site. The labelled "Live demo" link below is the
-            // accessible one, so this stays out of the tab order and the tree.
+            // The same hover shortcut as the plain image below; the labelled
+            // "Live demo" link is the accessible one.
             <a
               href={demoUrl}
               target="_blank"
@@ -57,12 +69,59 @@ const { title, summary, tech, demoUrl, repoUrl, image } = project;
             </a>
           )}
         </div>
-      ) : (
-        <div class="flex size-full items-center" aria-hidden="true">
-          <Weave height={120} />
-        </div>
-      )}
-    </div>
+        {preview.phone && (
+          <div class="absolute right-0 bottom-0 w-[22%] overflow-hidden rounded-[1.6rem] border-[5px] border-[#0b0b0f] bg-[#0b0b0f] shadow-[0_24px_48px_-16px_rgb(0_0_0/0.55)] transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:-translate-y-2 md:border-[6px]">
+            <Image
+              src={preview.phone.image}
+              alt={preview.phone.alt}
+              widths={[160, 320]}
+              sizes="(min-width: 1024px) 7.5rem, 22vw"
+              class="w-full rounded-[1.2rem]"
+            />
+          </div>
+        )}
+      </div>
+    ) : (
+      <div
+        class:list={[
+          'rounded-card border-border bg-surface relative aspect-video overflow-hidden border lg:col-span-7',
+          flip && 'lg:order-last',
+        ]}
+      >
+        {image ? (
+          // Oversized and drifting with scroll (parallax), so the frame never shows an edge.
+          <div class="parallax absolute inset-x-0 -inset-y-[8%]">
+            <Image
+              src={image}
+              alt={title}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 1024px) 44rem, 100vw"
+              class="size-full object-cover object-left transition-transform duration-(--duration-hover) ease-(--ease-out-soft) group-hover/card:scale-[1.04]"
+            />
+            {demoUrl && (
+              // A hover shortcut to the live site. The labelled "Live demo" link below is the
+              // accessible one, so this stays out of the tab order and the tree.
+              <a
+                href={demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                tabindex="-1"
+                aria-hidden="true"
+                class="bg-surface/60 absolute inset-0 grid place-items-center opacity-0 backdrop-blur-sm transition-opacity duration-(--duration-hover) group-hover/card:opacity-100"
+              >
+                <span class="glass rounded-tag text-on-surface px-4 py-2 font-mono text-xs uppercase">
+                  Visit live site ↗
+                </span>
+              </a>
+            )}
+          </div>
+        ) : (
+          <div class="flex size-full items-center" aria-hidden="true">
+            <Weave height={120} />
+          </div>
+        )}
+      </div>
+    )}
     <div class="flex h-full flex-col gap-4 lg:col-span-5">
       <p class="flex items-center gap-3 font-mono text-label uppercase" aria-hidden="true">
         <span class="text-accent">{String(number).padStart(2, '0')}</span>
