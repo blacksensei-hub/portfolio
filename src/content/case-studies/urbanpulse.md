@@ -53,6 +53,7 @@ gallery:
     alt: Admin visitors panel with 3,092 visits and 9,726 page views over 30 days, a daily chart with a spike after a restock, visit sources led by Instagram, the most viewed pages, and devices.
     caption: Visit counts the store keeps itself, with no IP addresses and no tracking cookies.
     device: desktop
+    card: true
   - image: ../../assets/case-studies/urbanpulse/app-admin-product.webp
     alt: Admin product form for the jersey, with stock for each size, a note that 9 people are waiting for the sold-out XXL, and a size chart editor.
     caption: The product form shows how many people are waiting for each size.
@@ -70,6 +71,7 @@ gallery:
   - image: ../../assets/case-studies/urbanpulse/phone-size-guide.webp
     alt: The size guide on a phone, as a sheet over the product page with the baggy jeans measurements.
     device: phone
+    card: true
   - image: ../../assets/case-studies/urbanpulse/phone-notify-me.webp
     alt: The restock sheet on a phone for the baggy jeans in sold-out size 36.
     device: phone

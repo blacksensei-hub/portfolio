@@ -334,6 +334,9 @@ export const caseStudySchema = <R extends z.ZodTypeAny>(image: ImageFunction, pr
               alt: nonEmpty,
               caption: nonEmpty.max(140).optional(),
               device: z.enum(['desktop', 'phone']),
+              // Picks this shot for the project card's preview (spec 0020); without
+              // one, the card uses the first shot of each device.
+              card: z.boolean().optional(),
             })
             .catchall(unknownKey),
         )

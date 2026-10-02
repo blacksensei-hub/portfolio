@@ -14,11 +14,16 @@ const sorted = [...Astro.props.projects].sort((a, b) => a.data.order - b.data.or
 const studyFor = new Map(
   (Astro.props.caseStudies ?? []).map((study) => [study.data.project.id, `/projects/${study.id}/`]),
 );
-// The card's preview is the case study's first desktop and first phone screen (spec 0020).
+// The card's preview (spec 0020): the case study's shots marked `card: true`,
+// else its first desktop and first phone screen.
 const previewFor = new Map(
   (Astro.props.caseStudies ?? []).flatMap((study) => {
-    const desktop = study.data.gallery.find((shot) => shot.device === 'desktop');
-    const phone = study.data.gallery.find((shot) => shot.device === 'phone');
+    const pick = (device: 'desktop' | 'phone') => {
+      const shots = study.data.gallery.filter((shot) => shot.device === device);
+      return shots.find((shot) => shot.card) ?? shots[0];
+    };
+    const desktop = pick('desktop');
+    const phone = pick('phone');
     return desktop ? [[study.data.project.id, { desktop, phone }] as const] : [];
   }),
 );
