@@ -1,0 +1,536 @@
+/*
+ * Keynote, a redesign concept (spec 0019): Apple product page language on the
+ * owner's identity. Scoped to `.kn` so it can sit beside the real site without
+ * touching it. The accent comes from the site's own tokens (global.css), so
+ * the gold, and its light and dark values, stay the brand's.
+ */
+
+.kn {
+  --kn-page: #fff;
+  --kn-tile: #f5f5f7;
+  --kn-ink: #1d1d1f;
+  --kn-muted: #6e6e73;
+  --kn-hair: #d2d2d7;
+  --kn-material: color-mix(in srgb, #fbfbfd 72%, transparent);
+  --kn-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.35), 0 18px 36px -18px rgb(0 0 0 / 0.25);
+  --kn-radius: 28px;
+  --kn-gutter: 16px;
+  --kn-width: 980px;
+  --kn-wide: 1180px;
+
+  background: var(--kn-page);
+  color: var(--kn-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.47;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .kn {
+    --kn-page: #000;
+    --kn-tile: #161617;
+    --kn-ink: #f5f5f7;
+    --kn-muted: #86868b;
+    --kn-hair: #424245;
+    --kn-material: color-mix(in srgb, #161617 72%, transparent);
+  }
+}
+
+:root[data-theme="dark"] .kn {
+  --kn-page: #000;
+  --kn-tile: #161617;
+  --kn-ink: #f5f5f7;
+  --kn-muted: #86868b;
+  --kn-hair: #424245;
+  --kn-material: color-mix(in srgb, #161617 72%, transparent);
+}
+
+/* One family throughout: the site's base layer gives headings Space Grotesk. */
+.kn :is(h1, h2, h3) {
+  font-family: var(--font-sans);
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────── */
+
+.kn-container {
+  width: min(var(--kn-width), 100% - 2 * var(--kn-gutter));
+  margin-inline: auto;
+}
+
+.kn-wide {
+  width: min(var(--kn-wide), 100% - 2 * var(--kn-gutter));
+  margin-inline: auto;
+}
+
+.kn-section {
+  padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
+  scroll-margin-top: 3rem;
+}
+
+/* ── Type: bold and tight as it grows, open as it shrinks ──────────── */
+
+.kn-eyebrow {
+  color: var(--color-accent);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.kn-hero-title {
+  font-size: clamp(2.75rem, 1.5rem + 5.4vw, 5rem);
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.kn-h2 {
+  font-size: clamp(2.125rem, 1.4rem + 3vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.kn-h3 {
+  font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.026em;
+  font-weight: 650;
+  text-wrap: balance;
+}
+
+.kn-lede {
+  color: var(--kn-muted);
+  font-size: clamp(1.1875rem, 1.05rem + 0.6vw, 1.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.014em;
+  font-weight: 500;
+  text-wrap: pretty;
+}
+
+.kn-small {
+  font-size: 0.875rem;
+  line-height: 1.42;
+  letter-spacing: -0.005em;
+}
+
+.kn-fine {
+  color: var(--kn-muted);
+  font-size: 0.75rem;
+  line-height: 1.33;
+  letter-spacing: 0.005em;
+}
+
+.kn-muted {
+  color: var(--kn-muted);
+}
+
+/* ── Nav: a thin material bar; the hairline appears once content is under it ── */
+
+.kn-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--kn-material);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.kn-nav::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--kn-hair);
+  opacity: 1;
+}
+
+@supports (animation-timeline: scroll()) {
+  .kn-nav::after {
+    animation: kn-appear linear both;
+    animation-timeline: var(--timeline-page);
+    animation-range: 0 40px;
+  }
+}
+
+.kn-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.25rem;
+}
+
+.kn-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: auto;
+  font-weight: 650;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+}
+
+.kn-monogram {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.kn-nav-links {
+  display: none;
+  gap: 0.25rem;
+}
+
+.kn-nav-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.75rem;
+  color: color-mix(in srgb, var(--kn-ink) 80%, transparent);
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  transition: color 150ms;
+}
+
+.kn-nav-links a:hover {
+  color: var(--kn-ink);
+}
+
+@media (min-width: 768px) {
+  .kn-nav-links {
+    display: flex;
+  }
+}
+
+/* ── Actions ─────────────────────────────────────────────────────────── */
+
+.kn-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.35rem;
+  border-radius: 980px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition:
+    scale 100ms ease-out,
+    filter 150ms;
+}
+
+.kn-button:hover {
+  filter: brightness(1.08);
+}
+
+.kn-button-small {
+  min-height: 2rem;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.8125rem;
+}
+
+.kn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  min-height: 2.75rem;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.kn-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kn-button:active,
+  .kn-press:active {
+    scale: 0.97;
+  }
+}
+
+.kn-press {
+  transition: scale 100ms ease-out;
+}
+
+/* ── Status pill ─────────────────────────────────────────────────────── */
+
+.kn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--kn-hair);
+  border-radius: 980px;
+  color: var(--kn-muted);
+  font-size: 0.875rem;
+  letter-spacing: -0.005em;
+}
+
+.kn-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-status-open);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-status-open) 22%, transparent);
+}
+
+/* ── Tiles ───────────────────────────────────────────────────────────── */
+
+.kn-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--kn-radius);
+  background: var(--kn-tile);
+  padding: clamp(1.5rem, 1rem + 2.4vw, 2.75rem);
+}
+
+/* A tile that is dark in both themes: the stage for AttendX's dark console. */
+.kn-tile[data-tone="dark"] {
+  --kn-ink: #f5f5f7;
+  --kn-muted: #a1a1a6;
+  --kn-hair: rgb(255 255 255 / 0.14);
+  --color-accent: oklch(84% 0.14 85);
+  --color-on-accent: oklch(19% 0.045 275);
+  background:
+    radial-gradient(60rem 30rem at 85% 0%, oklch(84% 0.14 85 / 0.12), transparent 60%), #0b0b0f;
+  color: var(--kn-ink);
+  border: 1px solid var(--kn-hair);
+}
+
+.kn-bento {
+  display: grid;
+  gap: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .kn-bento {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .kn-span-2 {
+    grid-column: span 2;
+  }
+
+  .kn-span-3 {
+    grid-column: span 3;
+  }
+
+  .kn-span-4 {
+    grid-column: span 4;
+  }
+}
+
+.kn-figure {
+  font-size: clamp(3rem, 2rem + 4vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+}
+
+.kn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.kn-chips li {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--kn-hair);
+  border-radius: 980px;
+  color: var(--kn-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+/* ── Device frames ───────────────────────────────────────────────────── */
+
+.kn-browser {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--kn-hair);
+  background: var(--kn-tile);
+  box-shadow: var(--kn-shadow);
+}
+
+.kn-browser-bar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--kn-hair);
+}
+
+.kn-browser-bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--kn-hair);
+}
+
+.kn-phone {
+  overflow: hidden;
+  border: 7px solid #0b0b0f;
+  border-radius: 34px;
+  background: #0b0b0f;
+  box-shadow: var(--kn-shadow);
+}
+
+.kn-phone img {
+  border-radius: 27px;
+}
+
+/* The hero composition: a window with a phone resting on its corner. */
+.kn-stage {
+  position: relative;
+  padding-bottom: 6%;
+}
+
+.kn-stage .kn-phone {
+  position: absolute;
+  right: -1%;
+  bottom: 0;
+  width: 22%;
+}
+
+@media (min-width: 768px) {
+  .kn-stage .kn-phone {
+    right: -4%;
+    width: 19%;
+  }
+}
+
+/* ── Gallery: native scroll snapping, so flicks carry real momentum ──── */
+
+.kn-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(78vw, 30rem);
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(var(--kn-gutter), (100% - var(--kn-wide)) / 2);
+  padding-inline: max(var(--kn-gutter), (100% - var(--kn-wide)) / 2);
+  padding-block: 0.5rem 1.5rem;
+  scrollbar-width: none;
+}
+
+.kn-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.kn-gallery > li {
+  scroll-snap-align: start;
+}
+
+.kn-paddle {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--kn-tile);
+  color: var(--kn-ink);
+  font-size: 1.25rem;
+  transition:
+    scale 100ms ease-out,
+    background-color 150ms;
+}
+
+.kn-paddle:hover {
+  background: color-mix(in srgb, var(--kn-tile) 80%, var(--kn-ink));
+}
+
+/* ── Specs table ─────────────────────────────────────────────────────── */
+
+.kn-specs {
+  display: grid;
+  gap: 0 2rem;
+}
+
+@media (min-width: 640px) {
+  .kn-specs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .kn-specs {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.kn-specs > div {
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--kn-hair);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+
+.kn-footer {
+  background: var(--kn-tile);
+  padding-block: 2rem 2.5rem;
+}
+
+.kn-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Motion: content arrives, nothing performs ──────────────────────── */
+
+@keyframes kn-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kn-rise {
+  from {
+    translate: 0 1.25rem;
+  }
+}
+
+@keyframes kn-zoom {
+  from {
+    scale: 0.88;
+    translate: 0 3rem;
+  }
+}
+
+.kn-rise {
+  animation: kn-rise 1s var(--ease-out-soft) both;
+}
+
+@supports (animation-timeline: view()) {
+  .kn-zoom {
+    animation: kn-zoom linear both;
+    animation-timeline: var(--timeline-view);
+    animation-range: entry 0% cover 45%;
+  }
+
+  .kn-reveal {
+    animation: kn-rise linear both;
+    animation-timeline: var(--timeline-view);
+    animation-range: entry 0% entry 70%;
+  }
+}
+
+/* Asked for less transparency or more contrast: the bar goes solid. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .kn-nav {
+    background: var(--kn-page);
+    backdrop-filter: none;
+  }
+}

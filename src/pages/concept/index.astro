@@ -1,0 +1,504 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
+import { glyphs } from '../../components/ui/glyphs';
+import { isExternal } from '../../components/ui/isExternal';
+import ThemeToggle from '../../components/ui/ThemeToggle.astro';
+import ConceptLayout from '../../layouts/ConceptLayout.astro';
+
+import consoleShot from '../../assets/case-studies/attendx/app-admin-console.webp';
+import storePhone from '../../assets/case-studies/urbanpulse/phone-product.webp';
+
+/*
+ * Keynote, a redesign concept (spec 0019). Same content as the home page, in
+ * the language of Apple's product pages. Not linked from the site.
+ */
+const profile = (await getEntry('profile', 'profile'))?.data;
+if (!profile) throw new Error('profile.yaml is missing');
+
+const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
+const projects = (await getCollection('projects')).toSorted(byOrder);
+const skills = (await getCollection('skills')).toSorted(byOrder);
+const services = (await getCollection('services')).toSorted(byOrder);
+const links = (await getCollection('links')).toSorted(byOrder).map((link) => link.data);
+const studies = await getCollection('caseStudies');
+const technologies = skills.flatMap((group) => group.data.items);
+
+const studyOf = (slug: string) => studies.find((study) => study.data.project.id === slug);
+
+// The gallery interleaves both case studies' desktop screens.
+const shotsBy = projects.map(
+  (project) =>
+    studyOf(project.id)
+      ?.data.gallery.filter((shot) => shot.device === 'desktop')
+      .slice(0, 5)
+      .map((shot) => ({ ...shot, project: project.data.title })) ?? [],
+);
+const gallery = Array.from({ length: Math.max(0, ...shotsBy.map((s) => s.length)) }).flatMap(
+  (_, n) => shotsBy.map((s) => s[n]).filter((shot) => shot !== undefined),
+);
+
+const firstName = profile.name.split(/\s+/)[0] ?? profile.name;
+const parts = profile.name.split(/\s+/);
+const initials = `${parts[0]?.charAt(0) ?? ''}${parts.at(-1)?.charAt(0) ?? ''}`;
+const sections = [
+  { id: 'about', label: 'About' },
+  { id: 'work', label: 'Work' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'services', label: 'Services' },
+  { id: 'contact', label: 'Contact' },
+];
+const statusLabel = {
+  open: 'Available for work',
+  limited: 'Limited availability',
+  closed: 'Currently booked',
+};
+const email = links.find((link) => link.icon === 'email');
+const year = new Date().getFullYear();
+---
+
+<ConceptLayout title={`Concept · ${profile.name}`} description={profile.tagline}>
+  <header slot="header" class="kn-nav">
+    <div class="kn-wide kn-nav-row">
+      <a href="#main" class="kn-wordmark kn-press">
+        <span aria-hidden="true" class="kn-monogram">
+          {initials}
+        </span>
+        {parts[0]} {parts.at(-1)}
+      </a>
+      <nav aria-label="Sections" class="kn-nav-links">
+        {sections.map(({ id, label }) => (
+          <a href={`#${id}`}>{label}</a>
+        ))}
+      </nav>
+      <ThemeToggle inline />
+      {email && (
+        <span class="hidden sm:block">
+          <a href={email.href} class="kn-button kn-button-small">
+            Get in touch
+          </a>
+        </span>
+      )}
+      <details class="group/menu relative md:hidden" data-menu>
+        <summary
+          class="grid size-11 cursor-pointer list-none place-items-center rounded-full [&::-webkit-details-marker]:hidden"
+          aria-label="Sections menu"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            class="size-5"
+          >
+            <path
+              d="M4 8h16"
+              class="origin-center transition-transform group-open/menu:translate-y-[4px] group-open/menu:rotate-45"
+            />
+            <path
+              d="M4 16h16"
+              class="origin-center transition-transform group-open/menu:-translate-y-[4px] group-open/menu:-rotate-45"
+            />
+          </svg>
+        </summary>
+        <nav
+          aria-label="Menu"
+          data-menu-panel
+          class="kn-tile absolute top-full right-0 mt-2 w-56 origin-[calc(100%-1.375rem)_-1.875rem] touch-none p-2! shadow-2xl will-change-transform"
+        >
+          <ul role="list" class="grid">
+            {sections.map(({ id, label }) => (
+              <li>
+                <a href={`#${id}`} class="flex min-h-11 items-center rounded-xl px-4 font-medium">
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  {/* 1. Hero */}
+  <section aria-labelledby="kn-hero-title" class="pt-16 text-center md:pt-24">
+    <div class="kn-container">
+      {profile.availability && (
+        <p class="kn-rise kn-pill">
+          <span aria-hidden="true" class="kn-dot"></span>
+          {statusLabel[profile.availability.status]}
+        </p>
+      )}
+      <h1 id="kn-hero-title" class="kn-hero-title kn-rise mt-6 [animation-delay:80ms]">
+        {profile.role}.
+        <span class="block text-[color:var(--kn-muted)]">{firstName} builds the whole thing.</span>
+      </h1>
+      <p class="kn-lede kn-rise mx-auto mt-6 max-w-[34ch] [animation-delay:160ms]">
+        {profile.tagline}
+      </p>
+      <div class="kn-rise mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 [animation-delay:240ms]">
+        <a href="#work" class="kn-button">
+          See the work
+        </a>
+        {email && (
+          <a href={email.href} class="kn-link">
+            Email me <span aria-hidden="true">›</span>
+          </a>
+        )}
+      </div>
+    </div>
+    <div class="kn-wide mt-14 md:mt-20">
+      <figure class="kn-zoom kn-stage mx-auto max-w-[62rem]">
+        <div class="kn-browser">
+          <div aria-hidden="true" class="kn-browser-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <Image
+            src={consoleShot}
+            alt="The AttendX admin console, with attendance, live sessions, students at risk, and fraud flags."
+            widths={[640, 1000, 1600]}
+            sizes="(min-width: 1024px) 62rem, 100vw"
+            loading="eager"
+            class="w-full"
+          />
+        </div>
+        <div class="kn-phone">
+          <Image
+            src={storePhone}
+            alt="The UrbanPulse jersey product page on a phone."
+            widths={[200, 400]}
+            sizes="12rem"
+            loading="eager"
+            class="w-full"
+          />
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  {/* 2. About, as a bento */}
+  <section id="about" aria-labelledby="kn-about" class="kn-section">
+    <div class="kn-wide">
+      <h2 id="kn-about" class="kn-h2 mb-10">
+        The short version.
+      </h2>
+      <div class="kn-bento">
+        <div class="kn-tile kn-reveal kn-span-4">
+          <p class="kn-eyebrow">About</p>
+          <p class="kn-lede mt-3 text-[color:var(--kn-ink)]!">{profile.bio}</p>
+        </div>
+        <div class="kn-tile kn-reveal kn-span-2 flex flex-col justify-between gap-6">
+          <p class="kn-eyebrow">Toolbox</p>
+          <p>
+            <span class="kn-figure block">{technologies.length}</span>
+            <span class="kn-muted mt-2 block">technologies in daily use</span>
+          </p>
+        </div>
+        <div class="kn-tile kn-reveal kn-span-2 flex flex-col justify-between gap-6">
+          <p class="kn-eyebrow">Platforms</p>
+          <p class="kn-h3">Web, iOS, Android, and the API behind them.</p>
+        </div>
+        {profile.availability && (
+          <div class="kn-tile kn-reveal kn-span-2 flex flex-col justify-between gap-6">
+            <p class="kn-eyebrow">Availability</p>
+            <p>
+              <span class="kn-pill">
+                <span aria-hidden="true" class="kn-dot"></span>
+                {statusLabel[profile.availability.status]}
+              </span>
+              {profile.availability.note && (
+                <span class="kn-muted mt-3 block">{profile.availability.note}</span>
+              )}
+            </p>
+          </div>
+        )}
+        <div class="kn-tile kn-reveal kn-span-2 flex flex-col justify-between gap-6">
+          <p class="kn-eyebrow">Based in Ghana</p>
+          <p>
+            <time data-local-clock class="kn-figure block tabular-nums">
+              GMT
+            </time>
+            <span class="kn-muted mt-2 block">Local time, GMT+0</span>
+          </p>
+        </div>
+        {profile.resume && (
+          <a
+            href={profile.resume}
+            download
+            class="kn-tile kn-reveal kn-press md:col-span-6 flex flex-wrap items-center justify-between gap-4"
+          >
+            <span>
+              <span class="kn-eyebrow block">Résumé</span>
+              <span class="kn-h3 mt-1 block">Everything on one page.</span>
+            </span>
+            <span class="kn-link">
+              Download PDF <span aria-hidden="true">↓</span>
+            </span>
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {/* 3. Work: a product tile per project */}
+  {projects.length > 0 && (
+    <section id="work" aria-labelledby="kn-work" class="kn-section pt-0!">
+      <div class="kn-wide grid gap-4">
+        <h2 id="kn-work" class="kn-h2 mb-6">
+          Work, shipped and in use.
+        </h2>
+        {projects.map((project, n) => {
+          const study = studyOf(project.id);
+          const desktop = study?.data.gallery.find((shot) => shot.device === 'desktop');
+          const phone = study?.data.gallery.find((shot) => shot.device === 'phone');
+          const { title, summary, tech, demoUrl, repoUrl } = project.data;
+          return (
+            <article
+              aria-labelledby={`kn-project-${n}`}
+              class="kn-tile kn-reveal grid items-center gap-10 lg:grid-cols-12"
+              data-tone={n === 0 ? 'dark' : undefined}
+            >
+              <div class="lg:col-span-5">
+                <p class="kn-eyebrow">{study ? 'Case study' : 'Project'}</p>
+                <h3 id={`kn-project-${n}`} class="kn-h2 mt-2">
+                  {title}
+                </h3>
+                {study && (
+                  <p class="kn-lede mt-4 text-[color:var(--kn-ink)]!">{study.data.headline}</p>
+                )}
+                <p class="kn-muted kn-small mt-4">{summary}</p>
+                <div class="mt-5 flex flex-wrap gap-x-6">
+                  {study && (
+                    <a href={`/projects/${study.id}/`} class="kn-link">
+                      Read the case study <span aria-hidden="true">›</span>
+                    </a>
+                  )}
+                  {demoUrl && (
+                    <a href={demoUrl} target="_blank" rel="noopener noreferrer" class="kn-link">
+                      Live demo <span aria-hidden="true">↗</span>
+                      <span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  )}
+                  {repoUrl && (
+                    <a href={repoUrl} target="_blank" rel="noopener noreferrer" class="kn-link">
+                      Source <span aria-hidden="true">↗</span>
+                      <span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  )}
+                </div>
+                <ul role="list" aria-label="Tech used" class="kn-chips mt-6">
+                  {tech.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              {desktop && (
+                <div class="kn-stage lg:col-span-7">
+                  <div class="kn-browser">
+                    <div aria-hidden="true" class="kn-browser-bar">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                    <Image
+                      src={desktop.image}
+                      alt={desktop.alt}
+                      widths={[480, 800, 1200]}
+                      sizes="(min-width: 1024px) 38rem, 100vw"
+                      class="w-full"
+                    />
+                  </div>
+                  {phone && (
+                    <div class="kn-phone">
+                      <Image
+                        src={phone.image}
+                        alt={phone.alt}
+                        widths={[200, 400]}
+                        sizes="9rem"
+                        class="w-full"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  {/* 4. Inside the apps: a native, momentum-scrolling gallery */}
+  {gallery.length > 0 && (
+    <section aria-labelledby="kn-inside" class="kn-section pt-0!">
+      <div class="kn-wide mb-6 flex items-end justify-between gap-4">
+        <h2 id="kn-inside" class="kn-h2">
+          Inside the apps.
+        </h2>
+        <div class="hidden gap-3 md:flex">
+          <button
+            type="button"
+            class="kn-paddle kn-press"
+            data-gallery-step="-1"
+            aria-label="Previous screens"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            class="kn-paddle kn-press"
+            data-gallery-step="1"
+            aria-label="Next screens"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+      <ul
+        role="list"
+        tabindex="0"
+        class="kn-gallery"
+        data-gallery
+        aria-label="Screens from both projects"
+      >
+        {gallery.map((shot) => (
+          <li>
+            <figure>
+              <div class="kn-browser">
+                <Image
+                  src={shot.image}
+                  alt={shot.alt}
+                  widths={[480, 800]}
+                  sizes="30rem"
+                  class="w-full"
+                />
+              </div>
+              <figcaption class="kn-small mt-3">
+                <span class="font-semibold">{shot.project}.</span>{' '}
+                <span class="kn-muted">{shot.caption}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {/* 5. Built with */}
+  {skills.length > 0 && (
+    <section id="skills" aria-labelledby="kn-skills" class="kn-section pt-0!">
+      <div class="kn-wide">
+        <h2 id="kn-skills" class="kn-h2 mb-10">
+          Built with.
+        </h2>
+        <div class="kn-specs">
+          {skills.map((group, n) => (
+            <div>
+              <h3 id={`kn-skill-${n}`} class="font-semibold">
+                {group.data.group}
+              </h3>
+              <ul role="list" aria-labelledby={`kn-skill-${n}`} class="kn-muted mt-2 grid gap-1">
+                {group.data.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* 6. Work with me */}
+  {services.length > 0 && (
+    <section id="services" aria-labelledby="kn-services" class="kn-section pt-0!">
+      <div class="kn-wide">
+        <h2 id="kn-services" class="kn-h2 mb-10">
+          Work with me.
+        </h2>
+        <ul role="list" class="kn-bento">
+          {services.map((entry, n) => (
+            <li class="kn-tile kn-reveal kn-span-3">
+              <p class="kn-eyebrow">{String(n + 1).padStart(2, '0')}</p>
+              <h3 class="kn-h3 mt-3">{entry.data.title}</h3>
+              <p class="kn-muted mt-3">{entry.data.blurb}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {/* 7. Contact */}
+  <section id="contact" aria-labelledby="kn-contact" class="kn-section pt-0! text-center">
+    <div class="kn-container">
+      <h2 id="kn-contact" class="kn-hero-title">
+        Let's build your next idea.
+      </h2>
+      <p class="kn-lede mx-auto mt-5 max-w-[36ch]">
+        Have a project or an opportunity in mind? Pick whichever way suits you and I'll get back to
+        you.
+      </p>
+      {email && (
+        <a href={email.href} class="kn-button mt-8">
+          Email {firstName}
+        </a>
+      )}
+      <ul role="list" class="mt-8 flex flex-wrap justify-center gap-x-6">
+        {links
+          .filter((link) => link.icon !== 'email')
+          .map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="kn-link"
+                {...(isExternal(link.href) && { target: '_blank', rel: 'noopener noreferrer' })}
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" class="mr-1.5 size-4 fill-current">
+                  <path d={glyphs[link.icon]} />
+                </svg>
+                {link.label}
+                {isExternal(link.href) && <span class="sr-only"> (opens in a new tab)</span>}
+              </a>
+            </li>
+          ))}
+      </ul>
+    </div>
+  </section>
+
+  <footer slot="footer" class="kn-footer">
+    <div class="kn-container kn-fine flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        © {year} {profile.name}. Designed and built in Ghana.
+      </p>
+      <p>
+        A concept for the next version of this site.{' '}
+        <a href="/" class="text-[color:var(--color-accent)] underline underline-offset-2">
+          See the current one
+        </a>
+        .
+      </p>
+    </div>
+  </footer>
+</ConceptLayout>
+
+<script>
+  // Paddles step the gallery by one screen's width; the scrolling itself is
+  // native, with its own momentum and snapping.
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-gallery-step]')) {
+    button.addEventListener('click', () => {
+      const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+      const card = gallery?.querySelector('li');
+      if (!gallery || !card) return;
+      const step =
+        Number(button.dataset['galleryStep']) * (card.getBoundingClientRect().width + 16);
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      gallery.scrollBy({ left: step, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  }
+</script>

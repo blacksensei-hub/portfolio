@@ -1,0 +1,46 @@
+---
+import SkipLink from '../components/ui/SkipLink.astro';
+import { THEME_HEAD_SCRIPT } from '../lib/theme';
+import '../styles/global.css';
+import '../styles/keynote.css';
+import bodyFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+
+/*
+ * The Keynote concept's shell (spec 0019): the same theme script, font, and
+ * global tokens as the real site, but none of its decoration. Noindexed, and
+ * kept out of the sitemap by astro.config.ts.
+ */
+interface Props {
+  title: string;
+  description?: string | undefined;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline set:html={THEME_HEAD_SCRIPT}></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body class="kn">
+    <SkipLink />
+    <slot name="header" />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+    <script>
+      import { initInteractions } from '../lib/interactions';
+
+      initInteractions();
+    </script>
+  </body>
+</html>

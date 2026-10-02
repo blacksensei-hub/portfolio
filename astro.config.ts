@@ -14,8 +14,11 @@ export default defineConfig({
   output: 'static',
   integrations: [
     react(),
-    // The styleguide is a build check, not content: keep it out of the sitemap.
-    sitemap({ filter: (page) => !new URL(page).pathname.startsWith('/styleguide') }),
+    // The styleguide is a build check and /concept/ a design proposal (spec
+    // 0019), not content: keep both out of the sitemap.
+    sitemap({
+      filter: (page) => !/^\/(styleguide|concept)(\/|$)/.test(new URL(page).pathname),
+    }),
   ],
   vite: {
     plugins: [tailwindcss()],
