@@ -3,7 +3,13 @@
  * across `[data-spotlight]` surfaces, and buttons marked `[data-magnetic]` that
  * lean toward the pointer. Pure enhancement: without this script, or under
  * reduced motion or a touch pointer, every element simply rests in place.
+ *
+ * Spec 0018: the lean rides two independent springs (x and y), so it eases
+ * toward the pointer and back home from wherever it is, and the phone menu
+ * moves on springs too (menu.ts).
  */
+import { initMenus } from './menu';
+import { Spring } from './spring';
 
 type Box = { left: number; top: number; width: number; height: number };
 
@@ -89,17 +95,34 @@ function startTypewriters(root: Document): void {
   }
 }
 
-function closeMenusOnChoice(root: Document): void {
-  for (const menu of root.querySelectorAll<HTMLDetailsElement>('details[data-menu]')) {
-    menu.addEventListener('click', (event) => {
-      if ((event.target as Element).closest('a')) menu.open = false;
+function startMagnets(root: Document): void {
+  for (const el of root.querySelectorAll<HTMLElement>('[data-magnetic]')) {
+    const render = () => {
+      el.style.translate = `${dx.value.toFixed(2)}px ${dy.value.toFixed(2)}px`;
+    };
+    const lean = { damping: 1, response: 0.3 };
+    const home = { damping: 0.8, response: 0.4 };
+    const dx = new Spring(0, render, lean, 0.05);
+    const dy = new Spring(0, render, lean, 0.05);
+    el.addEventListener('pointermove', (event) => {
+      const offset = magnetOffset(el.getBoundingClientRect(), event.clientX, event.clientY);
+      // Measured from where the button rests, not where it has leaned to.
+      const rest = { dx: offset.dx + dx.value * 0.3, dy: offset.dy + dy.value * 0.3 };
+      dx.to(Math.max(-10, Math.min(10, rest.dx)), { params: lean });
+      dy.to(Math.max(-10, Math.min(10, rest.dy)), { params: lean });
+    });
+    el.addEventListener('pointerleave', () => {
+      dx.to(0, { params: home });
+      dy.to(0, { params: home });
     });
   }
 }
 
 export function initInteractions(root: Document = document): void {
   startClocks(root);
-  closeMenusOnChoice(root);
+  initMenus(root);
+  // iOS Safari only applies :active (the press states) when a touch listener exists.
+  root.addEventListener('touchstart', () => {}, { passive: true });
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startTypewriters(root);
 
   const fine = window.matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)');
@@ -120,13 +143,5 @@ export function initInteractions(root: Document = document): void {
     });
   }
 
-  for (const el of root.querySelectorAll<HTMLElement>('[data-magnetic]')) {
-    el.addEventListener('pointermove', (event) => {
-      const { dx, dy } = magnetOffset(el.getBoundingClientRect(), event.clientX, event.clientY);
-      el.style.translate = `${dx}px ${dy}px`;
-    });
-    el.addEventListener('pointerleave', () => {
-      el.style.translate = '';
-    });
-  }
+  startMagnets(root);
 }

@@ -32,7 +32,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
     <ThemeToggle inline />
     <a
       href={`${base}#hero`}
-      class="group/logo hover:bg-on-surface/8 rounded-tag mr-auto flex min-h-11 items-center gap-2.5 pr-3 pl-1.5 transition-colors"
+      class="group/logo hover:bg-on-surface/8 rounded-tag mr-auto flex min-h-11 items-center gap-2.5 pr-3 pl-1.5 transition-[background-color,scale] duration-100 motion-safe:active:scale-95"
     >
       <span
         aria-hidden="true"
@@ -46,7 +46,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
     {/* Phone menu: a plain disclosure, so the sections are reachable with no script. */}
     <details class="group/menu relative md:hidden" data-menu>
       <summary
-        class="hover:bg-on-surface/8 grid size-11 cursor-pointer list-none place-items-center rounded-full transition-colors [&::-webkit-details-marker]:hidden"
+        class="hover:bg-on-surface/8 grid size-11 cursor-pointer list-none place-items-center rounded-full transition-[background-color,scale] duration-100 motion-safe:active:scale-90 [&::-webkit-details-marker]:hidden"
         aria-label="Sections menu"
       >
         <svg
@@ -69,16 +69,18 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
           />
         </svg>
       </summary>
+      {/* Grows out of the button above it: the transform origin is the button (spec 0018). */}
       <nav
         aria-label="Menu"
-        class="rounded-card border-border bg-surface absolute top-full right-0 mt-2 w-56 border p-2 shadow-2xl"
+        data-menu-panel
+        class="rounded-card border-border bg-surface absolute top-full right-0 mt-2 w-56 origin-[calc(100%-1.375rem)_-1.875rem] touch-none border p-2 shadow-2xl will-change-transform"
       >
         <ul role="list" class="grid gap-1">
           {sections.map(({ id, label }) => (
             <li>
               <a
                 href={`${base}#${id}`}
-                class="rounded-tag hover:bg-on-surface/8 hover:text-accent flex min-h-11 items-center px-4 text-sm font-medium transition-colors"
+                class="rounded-tag hover:bg-on-surface/8 hover:text-accent active:bg-on-surface/12 flex min-h-11 items-center px-4 text-sm font-medium transition-colors"
               >
                 {label}
               </a>
@@ -88,7 +90,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
             <li class:list={[n === 0 && 'border-border mt-1 border-t pt-1']}>
               <a
                 href={link.href}
-                class="rounded-tag hover:bg-on-surface/8 hover:text-accent text-muted flex min-h-11 items-center gap-3 px-4 text-sm transition-colors"
+                class="rounded-tag hover:bg-on-surface/8 hover:text-accent active:bg-on-surface/12 text-muted flex min-h-11 items-center gap-3 px-4 text-sm transition-colors"
                 {...(/^https?:/.test(link.href) && {
                   target: '_blank',
                   rel: 'noopener noreferrer',
@@ -119,7 +121,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
           <li>
             <a
               href={`${base}#${id}`}
-              class="rounded-tag text-muted hover:text-on-surface hover:bg-on-surface/8 [&:target-current]:bg-accent [&:target-current]:text-on-accent inline-flex min-h-9 items-center px-3.5 text-sm font-medium transition-colors"
+              class="rounded-tag text-muted hover:text-on-surface hover:bg-on-surface/8 [&:target-current]:bg-accent [&:target-current]:text-on-accent inline-flex min-h-9 items-center px-3.5 text-sm font-medium transition-[color,background-color,scale] duration-150 motion-safe:active:scale-95"
             >
               {label}
             </a>
@@ -133,7 +135,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
           <a
             href={link.href}
             aria-label={link.label}
-            class="text-muted hover:text-accent hover:bg-on-surface/8 grid size-10 place-items-center rounded-full transition-colors"
+            class="text-muted hover:text-accent hover:bg-on-surface/8 grid size-10 place-items-center rounded-full transition-[color,background-color,scale] duration-150 motion-safe:active:scale-90"
             {...(/^https?:/.test(link.href) && { target: '_blank', rel: 'noopener noreferrer' })}
           >
             <svg

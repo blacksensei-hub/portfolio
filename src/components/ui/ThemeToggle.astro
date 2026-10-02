@@ -18,7 +18,7 @@ const { inline = false } = Astro.props;
   data-theme-toggle
   aria-label={themeLabel('system')}
   class:list={[
-    'flex size-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:text-accent',
+    'flex size-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-[color,background-color,scale] duration-150 hover:text-accent motion-safe:active:scale-90',
     inline ? 'hover:bg-on-surface/8 order-last' : 'glass fixed top-4 right-4 z-50',
   ]}
 >
@@ -109,9 +109,20 @@ const { inline = false } = Astro.props;
     button.setAttribute('aria-label', themeLabel(current()));
     button.hidden = false;
 
+    // Tracked here, not read back from the DOM: during a cross-fade the
+    // attribute only changes a frame later, and a quick second click must
+    // still move on to the next choice.
+    let choice = current();
     button.addEventListener('click', () => {
-      const next = nextChoice(current());
-      applyChoice(root, next);
+      const next = nextChoice(choice);
+      choice = next;
+      // Cross-fade between the themes instead of flipping every colour at
+      // once (spec 0018). Browsers without View Transitions switch instantly.
+      if (typeof document.startViewTransition === 'function') {
+        document.startViewTransition(() => applyChoice(root, next));
+      } else {
+        applyChoice(root, next);
+      }
       button.setAttribute('aria-label', themeLabel(next));
       try {
         localStorage.setItem(THEME_STORAGE_KEY, next);

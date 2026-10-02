@@ -137,18 +137,17 @@ test.describe('motion', () => {
   test.describe('reduced motion', () => {
     test.use({ reducedMotion: 'reduce' });
 
-    test('removes every transition', async ({ page }) => {
-      // covers: AC-8
+    test('keeps colour and opacity fades, but nothing that moves', async ({ page }) => {
+      // covers: AC-8, as revised by spec 0018 (reduced motion is gentler, not none)
       await page.goto('/styleguide/');
 
-      await expect(page.getByRole('link', { name: 'internal link' })).toHaveCSS(
-        'transition-duration',
-        '0s',
-      );
-      await expect(page.getByRole('link', { name: 'Primary' })).toHaveCSS(
-        'transition-duration',
-        '0s',
-      );
+      for (const name of ['internal link', 'Primary']) {
+        const property = await page
+          .getByRole('link', { name, exact: true })
+          .evaluate((el) => getComputedStyle(el).transitionProperty);
+        expect(property).toContain('color');
+        expect(property).not.toMatch(/\b(all|transform|translate|scale|rotate)\b/);
+      }
     });
   });
 });
