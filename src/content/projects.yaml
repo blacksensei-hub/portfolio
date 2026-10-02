@@ -1,9 +1,10 @@
 - slug: attendx
   title: AttendX
   summary: >-
-    Class attendance for GCTU. Lecturers open a session, students scan a QR
-    code on the web or the Expo mobile app, and the register fills itself in
-    real time, with location checks, appeals, and exportable reports.
+    Class attendance for GCTU. Students scan a rotating QR code on the web or
+    the Expo app and the register fills itself live, with location checks, a
+    fraud review queue, excused absences, timetables, and an admin console
+    with analytics and an audit trail.
   tech:
     - React
     - React Native
@@ -13,6 +14,7 @@
     - Sequelize
     - PostgreSQL
     - Socket.IO
+    - Framer Motion
   image: ../assets/attendx.webp
   demoUrl: https://atttend-x.vercel.app
   repoUrl: https://github.com/blacksensei-hub/AttendX.git
@@ -22,8 +24,9 @@
   title: UrbanPulse
   summary: >-
     A full-stack storefront for a Ghanaian streetwear brand: a scroll-driven
-    film hero, Paystack checkout in cedis, an installable PWA, and an admin
-    dashboard for orders, stock, and content.
+    film hero, Paystack checkout in cedis, restock alerts, a drop list by
+    email and SMS, order tracking without an account, and an admin that runs
+    the whole shop.
   tech:
     - React
     - Vite
@@ -32,6 +35,7 @@
     - Express.js
     - PostgreSQL
     - Paystack
+    - Framer Motion
   image: ../assets/urbanpulse.png
   demoUrl: https://urbanpulsee.vercel.app
   repoUrl: https://github.com/blacksensei-hub/UrbanPulse-frontend.git
