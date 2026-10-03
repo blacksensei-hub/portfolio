@@ -81,6 +81,9 @@ After Apple's *Designing Fluid Interfaces*. `src/lib/spring.ts` is a small sprin
 - **Theme switch:** a 280ms View Transition cross-fade.
 - **Between pages (spec 0021):** navigations are View Transitions. A project's screens (`DevicePreview` on the home page card and on the case study header) share `shot-<slug>-*` names, so they travel between the two on a spring-shaped `linear()` curve while the page cross-fades.
 - **Wayfinding and feedback (spec 0021):** case studies have "On this page" (sticky beside the write-up on wide screens, fold-away on phones), with the section being read marked `aria-current="location"`. The Contact email row has a copy button that confirms with a tick and a "Copied" label.
+- **Off screen (spec 0022):** perpetual animations (aurora, marquee, pings, scroll cue, carets) carry `data-offscreen` while out of view and pause; the typewriter waits too.
+- **Scan story (spec 0022):** AttendX's case study has a pinned, scroll-driven "How a scan is checked" (`ScanStory`, `scan-story.ts`), a plain list under reduced motion.
+- **Share cards (spec 0022):** each case study has its own 1200×630 `og.png`, drawn with `src/lib/og-card.ts`, shared with the home card.
 
 Under reduced motion, keyframe animations stop at their final frame. Transitions keep only colour, opacity and shadow, and script-driven motion becomes short cross-fades.
 

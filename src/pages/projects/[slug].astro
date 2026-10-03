@@ -5,6 +5,7 @@ import { getImage, Image } from 'astro:assets';
 import ButtonLink from '../../components/ui/ButtonLink.astro';
 import Container from '../../components/ui/Container.astro';
 import DevicePreview from '../../components/ui/DevicePreview.astro';
+import ScanStory from '../../components/sections/ScanStory.astro';
 import MaskText from '../../components/ui/MaskText.astro';
 import SiteHeader from '../../components/ui/SiteHeader.astro';
 import Tag from '../../components/ui/Tag.astro';
@@ -68,8 +69,9 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
   title={`${project.title} case study · ${profile.name}`}
   description={headline}
   social={{
-    image: '/og.png',
-    imageAlt: `${profile.name}, ${profile.role}`,
+    // Its own card (spec 0022): the project's title, headline, and screens.
+    image: `/projects/${study.id}/og.png`,
+    imageAlt: `${project.title} case study: ${headline}`,
     siteName: profile.name,
     jsonLd: {
       '@context': 'https://schema.org',
@@ -293,6 +295,9 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
         </div>
       </Container>
     </section>
+
+    {/* An interactive walkthrough, where the case study asks for one (spec 0022). */}
+    {study.data.story === 'scan' && <ScanStory />}
 
     <section aria-labelledby="gallery-heading" class="pb-section">
       <Container>

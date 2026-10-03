@@ -170,6 +170,23 @@ for (const study of studies) {
       await context.close();
     });
 
+    test('has its own 1200 by 630 share card (spec 0022)', async ({ page, request }) => {
+      await page.goto(path);
+      const image = await page.locator('meta[property="og:image"]').getAttribute('content');
+      expect(new URL(image ?? '').pathname).toBe(`${path}og.png`);
+      await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+        'content',
+        new RegExp(`^${project.title} case study`),
+      );
+
+      const response = await request.get(`${path}og.png`);
+      expect(response.headers()['content-type']).toContain('image/png');
+      // The PNG IHDR chunk holds width and height as big endian ints at bytes 16 and 20.
+      const body = await response.body();
+      expect(body.readUInt32BE(16)).toBe(1200);
+      expect(body.readUInt32BE(20)).toBe(630);
+    });
+
     test('is linked from its project card on the home page', async ({ page }) => {
       await page.goto('/');
 

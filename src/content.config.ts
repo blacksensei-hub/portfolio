@@ -320,6 +320,9 @@ export const caseStudySchema = <R extends z.ZodTypeAny>(image: ImageFunction, pr
       role: nonEmpty.max(80),
       period: nonEmpty.max(40),
       platforms: z.array(nonEmpty).min(1),
+      // An interactive walkthrough shown after the write-up (spec 0022): `scan`
+      // is AttendX's scroll-driven "how a scan is checked".
+      story: z.enum(['scan']).optional(),
       // At most four, so the facts row stays one line on desktop.
       metrics: z
         .array(z.object({ value: nonEmpty.max(12), label: nonEmpty.max(60) }).catchall(unknownKey))

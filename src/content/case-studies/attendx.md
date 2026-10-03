@@ -7,6 +7,7 @@ platforms:
   - Web app
   - iOS and Android (Expo)
   - REST and WebSocket API
+story: scan
 metrics:
   - value: 5s
     label: How long each QR code lives
