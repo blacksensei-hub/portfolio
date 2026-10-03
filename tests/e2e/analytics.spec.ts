@@ -9,6 +9,7 @@ import { expect, test } from '@playwright/test';
 
 const token = process.env['PUBLIC_CF_BEACON_TOKEN']?.trim();
 const BEACON_SRC = 'https://static.cloudflareinsights.com/beacon.min.js';
+const LOADER = 'head script[data-cf-beacon-token]';
 // Spec 0012: the owner dropped the analytics notice; the footer now signs the page.
 const COPYRIGHT = `© ${new Date().getFullYear()} Jeffrey Nii Akwei Ankrah`;
 
@@ -22,21 +23,33 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('the beacon tag matches the build env', async ({ page }) => {
-  // covers: AC-1, AC-2
-  await page.goto('/');
+test('the beacon matches the build env, and loads only after the page has', async ({ page }) => {
+  // covers: AC-1, AC-2, and spec 0023
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  const loader = page.locator(LOADER);
   const beacons = page.locator('head script[data-cf-beacon]');
 
   if (token) {
+    await expect(loader).toHaveAttribute('data-cf-beacon-token', JSON.stringify({ token }));
+    await page.waitForLoadState('load');
+    // Added once the browser is idle after load, never by the HTML itself.
     await expect(beacons).toHaveCount(1);
     await expect(beacons).toHaveAttribute('src', BEACON_SRC);
-    await expect(beacons).toHaveAttribute('defer', '');
     await expect(beacons).toHaveAttribute('data-cf-beacon', JSON.stringify({ token }));
   } else {
+    await expect(loader).toHaveCount(0);
     await expect(beacons).toHaveCount(0);
     await page.waitForLoadState('load');
     expect(beaconRequests).toBe(0);
   }
+});
+
+test('the HTML never carries the beacon itself, so first paint never waits on it', async ({
+  request,
+}) => {
+  // spec 0023
+  const html = await (await request.get('/')).text();
+  expect(html).not.toContain(`src="${BEACON_SRC}"`);
 });
 
 test('the beacon comes after the theme script', async ({ page }) => {
@@ -44,7 +57,9 @@ test('the beacon comes after the theme script', async ({ page }) => {
   test.skip(!token, 'Only production builds carry the beacon');
   await page.goto('/');
   const order = await page.evaluate(() =>
-    [...document.head.querySelectorAll('script')].map((s) => s.hasAttribute('data-cf-beacon')),
+    [...document.head.querySelectorAll('script')].map((s) =>
+      s.hasAttribute('data-cf-beacon-token'),
+    ),
   );
   expect(order[0]).toBe(false);
 });
