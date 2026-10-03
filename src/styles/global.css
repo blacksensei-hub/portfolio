@@ -353,6 +353,14 @@
   }
 }
 
+/* Off screen, perpetual animations rest until they are back in view (spec 0022). */
+[data-offscreen],
+[data-offscreen]::before,
+[data-offscreen]::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must beat every animation utility. */
+  animation-play-state: paused !important;
+}
+
 /* While the phone menu animates shut, its icon is already a hamburger again (spec 0018). */
 details[data-menu][data-closing] > summary path {
   translate: 0 0;

@@ -9,6 +9,7 @@
  * moves on springs too (menu.ts).
  */
 import { initMenus } from './menu';
+import { initOffscreenPause } from './offscreen';
 import { Spring } from './spring';
 
 type Box = { left: number; top: number; width: number; height: number };
@@ -84,6 +85,11 @@ function startTypewriters(root: Document): void {
     let shown = el.textContent ?? '';
     let deleting = true;
     const step = () => {
+      // Off screen it waits, rather than typing for nobody (spec 0022).
+      if (el.hasAttribute('data-offscreen')) {
+        setTimeout(step, 600);
+        return;
+      }
       const next = typewriterStep(shown, words[index] ?? '', deleting);
       if (next.advance) index = (index + 1) % words.length;
       shown = next.text;
@@ -154,6 +160,7 @@ function startCopyButtons(root: Document): void {
 export function initInteractions(root: Document = document): void {
   startClocks(root);
   startCopyButtons(root);
+  initOffscreenPause(root);
   initMenus(root);
   // iOS Safari only applies :active (the press states) when a touch listener exists.
   root.addEventListener('touchstart', () => {}, { passive: true });

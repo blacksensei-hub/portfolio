@@ -55,7 +55,7 @@ function detail(href: string): string {
             const external = isExternal(data.href);
             const email = data.href.startsWith('mailto:') ? detail(data.href) : undefined;
             return (
-              <li class="relative">
+              <li class:list={['relative', email && 'sm:col-span-2']}>
                 <a
                   href={data.href}
                   class="group/link rounded-card border-border bg-surface/40 hover:border-accent flex min-h-11 items-center gap-4 border px-4 py-3 transition-[border-color,background-color,translate] duration-(--duration-hover) ease-(--ease-out-soft) hover:-translate-y-0.5"
