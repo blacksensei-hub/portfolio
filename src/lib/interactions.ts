@@ -118,8 +118,42 @@ function startMagnets(root: Document): void {
   }
 }
 
+/**
+ * Copy buttons (spec 0021): copy their `data-copy` value and confirm on the
+ * spot, with a tick, a "Copied" label, and a polite announcement, for two
+ * seconds. Revealed only where there is a clipboard to write to.
+ */
+function startCopyButtons(root: Document): void {
+  const status = root.querySelector<HTMLElement>('[data-copy-status]');
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return;
+  for (const button of root.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
+    const value = button.dataset['copy'] ?? '';
+    const label = button.getAttribute('aria-label') ?? 'Copy';
+    let timer = 0;
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        if (status) status.textContent = `Couldn't copy. The address is ${value}.`;
+        return;
+      }
+      button.setAttribute('data-copied', '');
+      button.setAttribute('aria-label', 'Email address copied');
+      if (status) status.textContent = 'Email address copied.';
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        button.removeAttribute('data-copied');
+        button.setAttribute('aria-label', label);
+        if (status) status.textContent = '';
+      }, 2000);
+    });
+  }
+}
+
 export function initInteractions(root: Document = document): void {
   startClocks(root);
+  startCopyButtons(root);
   initMenus(root);
   // iOS Safari only applies :active (the press states) when a touch listener exists.
   root.addEventListener('touchstart', () => {}, { passive: true });

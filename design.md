@@ -79,6 +79,8 @@ After Apple's *Designing Fluid Interfaces*. `src/lib/spring.ts` is a small sprin
 - **Materials:** `.glass` turns solid under `prefers-reduced-transparency` and `prefers-contrast: more`. `.scroll-edge` softens content where it slides under the nav.
 - **Type:** tracking is size specific. Hero -0.03em, display -0.022em, h2 -0.015em, h3 -0.01em, sm and xs slightly positive.
 - **Theme switch:** a 280ms View Transition cross-fade.
+- **Between pages (spec 0021):** navigations are View Transitions. A project's screens (`DevicePreview` on the home page card and on the case study header) share `shot-<slug>-*` names, so they travel between the two on a spring-shaped `linear()` curve while the page cross-fades.
+- **Wayfinding and feedback (spec 0021):** case studies have "On this page" (sticky beside the write-up on wide screens, fold-away on phones), with the section being read marked `aria-current="location"`. The Contact email row has a copy button that confirms with a tick and a "Copied" label.
 
 Under reduced motion, keyframe animations stop at their final frame. Transitions keep only colour, opacity and shadow, and script-driven motion becomes short cross-fades.
 

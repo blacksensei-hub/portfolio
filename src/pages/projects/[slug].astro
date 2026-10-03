@@ -4,10 +4,12 @@ import { getImage, Image } from 'astro:assets';
 
 import ButtonLink from '../../components/ui/ButtonLink.astro';
 import Container from '../../components/ui/Container.astro';
+import DevicePreview from '../../components/ui/DevicePreview.astro';
 import MaskText from '../../components/ui/MaskText.astro';
 import SiteHeader from '../../components/ui/SiteHeader.astro';
 import Tag from '../../components/ui/Tag.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { pickPreview } from '../../lib/preview';
 
 /*
  * One page per case study (spec 0016). The write-up is the Markdown body; the
@@ -43,8 +45,12 @@ const ordered = withOrder
 const at = ordered.findIndex((x) => x.s.id === study.id);
 const next = ordered.length > 1 ? ordered[(at + 1) % ordered.length] : undefined;
 
-const { Content } = await render(study);
+const { Content, headings } = await render(study);
 const { headline, role, period, platforms, metrics = [], gallery } = study.data;
+// "On this page" (spec 0021): the write-up's sections.
+const sections = headings.filter((heading) => heading.depth === 2);
+// The same screens as the home page card, so they carry across the navigation (spec 0021).
+const preview = pickPreview(gallery);
 // Every shot also gets a full-size URL: the link a click opens, and the image
 // the full-screen viewer shows (spec 0017). The viewer steps through desktop
 // shots, then phone shots, the order they appear on the page.
@@ -157,28 +163,40 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
           </dl>
         </div>
 
-        {project.image && (
-          <figure class="animate-rise mt-10 [animation-delay:550ms]">
-            <div class="rounded-card border-border bg-surface-raised overflow-hidden border shadow-2xl">
-              <div
-                aria-hidden="true"
-                class="border-border/60 flex items-center gap-2 border-b px-4 py-2.5"
-              >
-                <span class="bg-thread-red size-2.5 rounded-full"></span>
-                <span class="bg-thread-gold size-2.5 rounded-full"></span>
-                <span class="bg-thread-green size-2.5 rounded-full"></span>
-              </div>
-              <Image
-                src={project.image}
-                alt={`${project.title} home page`}
-                widths={[640, 1024, 1600]}
-                sizes="(min-width: 1024px) 62rem, 100vw"
-                loading="eager"
-                fetchpriority="high"
-                class="aspect-video w-full object-cover object-left"
-              />
-            </div>
+        {preview ? (
+          <figure class="mt-10 md:mt-14">
+            <DevicePreview
+              size="hero"
+              decorative
+              slug={project.slug}
+              desktop={preview.desktop}
+              phone={preview.phone}
+            />
           </figure>
+        ) : (
+          project.image && (
+            <figure class="animate-rise mt-10 [animation-delay:550ms]">
+              <div class="rounded-card border-border bg-surface-raised overflow-hidden border shadow-2xl">
+                <div
+                  aria-hidden="true"
+                  class="border-border/60 flex items-center gap-2 border-b px-4 py-2.5"
+                >
+                  <span class="bg-thread-red size-2.5 rounded-full"></span>
+                  <span class="bg-thread-gold size-2.5 rounded-full"></span>
+                  <span class="bg-thread-green size-2.5 rounded-full"></span>
+                </div>
+                <Image
+                  src={project.image}
+                  alt={`${project.title} home page`}
+                  widths={[640, 1024, 1600]}
+                  sizes="(min-width: 1024px) 62rem, 100vw"
+                  loading="eager"
+                  fetchpriority="high"
+                  class="aspect-video w-full object-cover object-left"
+                />
+              </div>
+            </figure>
+          )
         )}
       </Container>
     </header>
@@ -202,21 +220,76 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
     <section aria-label="The write-up" class="py-section">
       <Container>
         <div class="grid gap-12 lg:grid-cols-12">
-          <div class="case-prose lg:col-span-8">
-            <Content />
-          </div>
-          <aside aria-label="Stack" class="lg:col-span-4">
-            <div class="glass rounded-card p-6 lg:sticky lg:top-28">
-              <p class="text-muted mb-4 font-mono text-label uppercase">Built with</p>
-              <ul role="list" class="flex flex-wrap gap-2">
-                {project.tech.map((item) => (
-                  <li>
-                    <Tag>{item}</Tag>
-                  </li>
-                ))}
-              </ul>
+          <div class="lg:col-span-8">
+            {sections.length > 1 && (
+              // Phones and tablets: the contents fold away above the write-up.
+              <details data-toc-menu class="glass rounded-card group/toc mb-10 lg:hidden">
+                <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 px-5 font-mono text-label uppercase [&::-webkit-details-marker]:hidden">
+                  On this page
+                  <span
+                    aria-hidden="true"
+                    class="text-accent transition-transform group-open/toc:rotate-180"
+                  >
+                    ↓
+                  </span>
+                </summary>
+                <nav aria-label="On this page" class="px-5 pb-5">
+                  <ol role="list" class="border-border grid border-l">
+                    {sections.map((heading) => (
+                      <li>
+                        <a
+                          data-toc-link
+                          href={`#${heading.slug}`}
+                          class="toc-link text-muted hover:text-on-surface aria-[current=location]:border-accent aria-[current=location]:text-on-surface -ml-px flex min-h-11 items-center border-l-2 border-transparent pl-4 text-sm transition-colors aria-[current=location]:font-medium"
+                        >
+                          {heading.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              </details>
+            )}
+            <div class="case-prose">
+              <Content />
             </div>
-          </aside>
+          </div>
+          <div class="lg:col-span-4">
+            <div class="grid gap-4 lg:sticky lg:top-28">
+              {sections.length > 1 && (
+                // Wide screens: the contents stay in view beside the write-up, the
+                // section being read lit up (spec 0021).
+                <nav aria-label="On this page" class="glass rounded-card hidden p-6 lg:block">
+                  <p aria-hidden="true" class="text-muted mb-3 font-mono text-label uppercase">
+                    On this page
+                  </p>
+                  <ol role="list" class="border-border grid border-l">
+                    {sections.map((heading) => (
+                      <li>
+                        <a
+                          data-toc-link
+                          href={`#${heading.slug}`}
+                          class="text-muted hover:text-on-surface aria-[current=location]:border-accent aria-[current=location]:text-on-surface -ml-px block border-l-2 border-transparent py-1.5 pl-4 text-sm transition-colors aria-[current=location]:font-medium"
+                        >
+                          {heading.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+              <aside aria-label="Stack" class="glass rounded-card p-6">
+                <p class="text-muted mb-4 font-mono text-label uppercase">Built with</p>
+                <ul role="list" class="flex flex-wrap gap-2">
+                  {project.tech.map((item) => (
+                    <li>
+                      <Tag>{item}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+            </div>
+          </div>
         </div>
       </Container>
     </section>
@@ -429,6 +502,8 @@ const phone = withFull.filter((shot) => shot.device === 'phone');
 
 <script>
   import { initLightbox } from '../../lib/lightbox';
+  import { initToc } from '../../lib/toc';
 
   initLightbox();
+  initToc();
 </script>
