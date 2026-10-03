@@ -5,13 +5,13 @@ import Container from '../components/ui/Container.astro';
 import { glyphs } from '../components/ui/glyphs';
 import SkipLink from '../components/ui/SkipLink.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
-import { beaconAttr } from '../lib/analytics';
+import { BEACON_LOADER, beaconAttr } from '../lib/analytics';
 import { THEME_HEAD_SCRIPT } from '../lib/theme';
 import '../styles/global.css';
 // The two faces on the first screen, preloaded so text paints without waiting
 // for the stylesheet to discover them (spec 0015). Same files the CSS uses, so
 // Vite emits one hashed asset for both.
-import bodyFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import bodyFont from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
 import displayFont from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 interface Props {
@@ -103,14 +103,8 @@ const statusLabel = {
         <script is:inline type="application/ld+json" set:html={jsonLd}></script>
       </>
     )}
-    {beacon && (
-      <script
-        is:inline
-        defer
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon={beacon}
-      ></script>
-    )}
+    {/* The analytics beacon loads after the page has, so it never holds up first paint (spec 0023). */}
+    {beacon && <script is:inline data-cf-beacon-token={beacon} set:html={BEACON_LOADER}></script>}
     <slot name="head" />
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">

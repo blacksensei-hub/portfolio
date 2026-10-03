@@ -117,8 +117,13 @@ test('the three faces load from the site origin and nothing loads from another h
 
   const fonts = requests.filter((url) => url.includes('.woff2'));
   // Spec 0012: Inter for body text, Space Grotesk for headings, JetBrains Mono for labels and buttons.
-  for (const face of ['inter', 'space-grotesk', 'jetbrains-mono']) {
-    expect(fonts.some((url) => url.includes(`${face}-latin-wght-normal`))).toBe(true);
+  // Inter ships with its optical size axis (spec 0023), the others weight only.
+  for (const file of [
+    'inter-latin-opsz',
+    'space-grotesk-latin-wght',
+    'jetbrains-mono-latin-wght',
+  ]) {
+    expect(fonts.some((url) => url.includes(`${file}-normal`))).toBe(true);
   }
   expect(
     requests.filter((url) => !url.startsWith(origin) && !url.startsWith('data:') && !isBeacon(url)),
