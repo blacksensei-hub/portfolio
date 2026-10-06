@@ -78,10 +78,15 @@ export function initScanStory(root: Document = document): void {
   const apply = () => {
     last = '';
     if (pinned.matches) {
+      // The pinned state lands at once rather than fading in from the list:
+      // transitions are off until the browser has applied it (spec 0024).
+      section.setAttribute('data-instant', '');
       section.setAttribute('data-enhanced', '');
       window.addEventListener('scroll', schedule, { passive: true });
       window.addEventListener('resize', schedule);
       update();
+      void section.offsetWidth;
+      section.removeAttribute('data-instant');
       return;
     }
     section.removeAttribute('data-enhanced');

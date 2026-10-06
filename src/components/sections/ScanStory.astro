@@ -476,6 +476,11 @@ const arrivals = ['Ekow Nkrumah', 'Naa Addo', 'Fiifi Mensah'];
       border-color 250ms;
   }
 
+  /* Pinning lands at once, with no fade from the list (spec 0024). */
+  [data-instant] :global(*) {
+    transition: none !important;
+  }
+
   /*
    * ── Enhanced: a pinned stage, one step at a time, driven by scroll ────────
    * Only where the stage fits: a phone on its side keeps the list (spec 0024).
