@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { ghanaTime, localPoint, magnetOffset, typewriterStep } from './interactions';
+import {
+  ghanaTime,
+  localPoint,
+  magnetOffset,
+  typewriterStart,
+  typewriterStep,
+} from './interactions';
 
 const box = { left: 100, top: 50, width: 200, height: 40 };
 
@@ -27,6 +33,22 @@ describe('localPoint', () => {
 describe('ghanaTime', () => {
   it('reads GMT, zero padded', () => {
     expect(ghanaTime(new Date('2026-09-19T07:05:00Z'))).toBe('07:05');
+  });
+});
+
+describe('typewriterStart', () => {
+  const words = ['web app', 'mobile app', 'API', 'next idea'];
+
+  it('picks up from the phrase on the page, so the list carries on in order', () => {
+    expect(typewriterStart('next idea', words)).toEqual({ shown: 'next idea', index: 3 });
+  });
+
+  it('ignores the whitespace around it in the markup', () => {
+    expect(typewriterStart('\n  API\n', words)).toEqual({ shown: 'API', index: 2 });
+  });
+
+  it('starts at the top for text that is not in the list', () => {
+    expect(typewriterStart('something else', words)).toEqual({ shown: 'something else', index: 0 });
   });
 });
 
