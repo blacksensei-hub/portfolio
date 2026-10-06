@@ -31,6 +31,28 @@ test('appears on the AttendX case study only', async ({ page }) => {
   await expect(page.locator('[data-scan-story]')).toHaveCount(0);
 });
 
+test('the stage pins at once on load, with nothing fading out', async ({ page }) => {
+  // Spec 0024: a fade here left text half transparent for the accessibility
+  // scan that runs straight after load.
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(path);
+  await expect(page.locator('[data-scan-story]')).toHaveAttribute('data-enhanced', '');
+  const fading = await page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .filter(
+          (a) =>
+            a instanceof CSSTransition &&
+            a.playState === 'running' &&
+            a.effect instanceof KeyframeEffect &&
+            a.effect.target instanceof Element &&
+            a.effect.target.closest('[data-scan-story]') !== null,
+        ).length,
+  );
+  expect(fading).toBe(0);
+});
+
 test('scrolling steps through the scan, forward and back', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(path);

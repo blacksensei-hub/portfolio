@@ -30,7 +30,10 @@ The stage now pins only where `(prefers-reduced-motion: no-preference) and (min-
 
 600px is a little conservative for wide screens: side by side, the stage would fit down to about 500px. One threshold keeps it simple, and a window that short still gets the whole story as a list.
 
+Pinning also lands at once. The list renders first, and the script used to pin it with the steps' 350 to 450 ms fades still active, so for a moment after load the hidden steps and panels were half transparent. CI's axe scan of the case study, run right after load, caught that and failed the first deploy of this spec. The script now pins with transitions switched off (`data-instant`) until the browser has applied the pinned state.
+
 **AC-2:** at 844 × 390 nothing pins and every step is visible. Turning to 390 × 844 pins the stage and it follows the scroll. Turning back mid-story returns to the list with no step marked current.
+**AC-2b:** straight after load, no transition is running inside the scan story.
 
 ## 3. Pause animations (WCAG 2.2.2 Pause, Stop, Hide)
 
@@ -72,6 +75,6 @@ The detail line under each Contact link (the LinkedIn and GitHub addresses, the 
   - the script is plain ES5
   - the global.css pause rule covers every `PERPETUAL` loop, plus drift and shimmer
 - `motion.spec.ts`: covers AC-3 to AC-5, plus the Tab order and placement, and the typewriter holding a whole phrase.
-- `scan-story.spec.ts`: covers AC-2.
+- `scan-story.spec.ts`: covers AC-2 and AC-2b.
 - `reflow.spec.ts`: covers AC-1 and AC-6.
 - `design-system.spec.ts`: the styleguide's focus walk steps over the new button.
