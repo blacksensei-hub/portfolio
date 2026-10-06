@@ -3,9 +3,11 @@ import { getCollection, getEntry } from 'astro:content';
 
 import Container from '../components/ui/Container.astro';
 import { glyphs } from '../components/ui/glyphs';
+import MotionToggle from '../components/ui/MotionToggle.astro';
 import SkipLink from '../components/ui/SkipLink.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
 import { BEACON_LOADER, beaconAttr } from '../lib/analytics';
+import { MOTION_HEAD_SCRIPT } from '../lib/motion';
 import { THEME_HEAD_SCRIPT } from '../lib/theme';
 import '../styles/global.css';
 // The two faces on the first screen, preloaded so text paints without waiting
@@ -69,6 +71,7 @@ const statusLabel = {
   <head>
     <meta charset="utf-8" />
     <script is:inline set:html={THEME_HEAD_SCRIPT}></script>
+    <script is:inline set:html={MOTION_HEAD_SCRIPT}></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
@@ -111,14 +114,20 @@ const statusLabel = {
     <SkipLink />
     {/*
       One fixed environment layer behind everything (spec 0011): two soft thread
-      colored glows drifting over 90 seconds. Decorative, and still under reduced motion.
+      colored glows drifting over 90 seconds. Decorative, and still under reduced
+      motion or once paused (spec 0024).
     */}
     <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div class="animate-drift absolute will-change-transform -top-1/3 -right-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-gold)_16%,transparent),transparent)]"></div>
       <div class="animate-drift absolute will-change-transform -bottom-1/3 -left-1/4 size-[60vmax] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--color-thread-green)_10%,transparent),transparent)] [animation-direction:reverse]"></div>
     </div>
-    {/* A page with a site header carries the toggle inside it instead. */}
-    {!Astro.slots.has('header') && <ThemeToggle />}
+    {/* A page with a site header carries the toggles inside it instead. */}
+    {!Astro.slots.has('header') && (
+      <>
+        <ThemeToggle />
+        <MotionToggle />
+      </>
+    )}
     {/* Reading progress along the top edge, driven by a CSS scroll timeline (spec 0012). */}
     <div
       aria-hidden="true"

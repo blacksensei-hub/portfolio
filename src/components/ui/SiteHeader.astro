@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { glyphs } from './glyphs';
+import MotionToggle from './MotionToggle.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
@@ -16,9 +17,10 @@ interface Props {
  * Liquid glass nav (specs 0012, 0013). A floating frosted pill that shrinks over
  * the first 240px of scroll (CSS scroll timeline). Left: monogram and name.
  * Centre: a segmented group of section links, the one in view lit through
- * :target-current. Right: quick social icons and the theme toggle. The toggle
- * is first in the DOM (the first Tab stop after the skip link, spec 0008) and
- * placed last visually with `order-last`.
+ * :target-current. Right: quick social icons, the pause button and the theme
+ * toggle. The theme toggle is first in the DOM (the first Tab stop after the
+ * skip link, spec 0008) and placed last visually with `order-last`; the pause
+ * button (spec 0024) follows it in the DOM and sits just before it.
  */
 const { name, sections, links, base = '' } = Astro.props;
 const parts = name.split(/\s+/);
@@ -30,6 +32,7 @@ const quick = links.filter((link) => link.icon !== 'phone').slice(0, 3);
 <header class="px-gutter pointer-events-none fixed inset-x-0 top-0 z-40">
   <div class="glass glass-nav rounded-tag pointer-events-auto mx-auto mt-3 flex max-w-[62rem] items-center gap-2 py-1.5 pr-1.5 pl-2 md:mt-4">
     <ThemeToggle inline />
+    <MotionToggle inline />
     <a
       href={`${base}#hero`}
       class="group/logo hover:bg-on-surface/8 rounded-tag mr-auto flex min-h-11 items-center gap-2.5 pr-3 pl-1.5 transition-[background-color,scale] duration-100 motion-safe:active:scale-95"

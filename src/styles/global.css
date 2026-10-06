@@ -362,6 +362,25 @@
   animation-play-state: paused !important;
 }
 
+/*
+ * Paused from the header (spec 0024, WCAG 2.2.2): every endless loop holds its
+ * frame. Entrance animations are not listed, so they still finish. Keep this
+ * list in step with PERPETUAL in offscreen.ts; motion.test.ts checks it.
+ */
+:root[data-motion="paused"]
+:is(
+  .animate-aurora,
+  .animate-drift,
+  .animate-marquee,
+  .animate-ping,
+  .animate-scroll-cue,
+  .shimmer-text
+),
+:root[data-motion="paused"] .caret::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must beat every animation utility. */
+  animation-play-state: paused !important;
+}
+
 /* While the phone menu animates shut, its icon is already a hamburger again (spec 0018). */
 details[data-menu][data-closing] > summary path {
   translate: 0 0;

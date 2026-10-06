@@ -71,7 +71,10 @@ function detail(href: string): string {
                   </span>
                   <span class="flex min-w-0 flex-col">
                     <span class="font-display font-semibold">{data.label}</span>
-                    <span class="text-muted truncate font-mono text-xs">{detail(data.href)}</span>
+                    {/* Wrapped, never cut off (spec 0024): the address is the useful part. */}
+                    <span class="text-muted font-mono text-xs [overflow-wrap:anywhere]">
+                      {detail(data.href)}
+                    </span>
                   </span>
                   <span
                     aria-hidden="true"

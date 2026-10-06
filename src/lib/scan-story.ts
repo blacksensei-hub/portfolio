@@ -2,11 +2,15 @@
  * AttendX's "How a scan is checked" (spec 0022): a pinned stage that steps
  * through one scan as the page scrolls. Native scroll position is the only
  * source of truth, so it plays forward and backward exactly. Under reduced
- * motion, or without this script, the steps read as a plain list beside the
+ * motion, without this script, or on a screen too short for the stage (a
+ * phone on its side, spec 0024), the steps read as a plain list beside the
  * finished state.
  */
 
 export const STEPS = 5;
+
+/** Where the stage pins. Same query as the enhanced block in ScanStory.astro. */
+export const PINNED = '(prefers-reduced-motion: no-preference) and (min-height: 600px)';
 const CHECKS = 4;
 
 /** How far through the track the page has scrolled, 0 to 1. */
@@ -39,15 +43,15 @@ export function initScanStory(root: Document = document): void {
   const track = section?.querySelector<HTMLElement>('[data-scan-track]');
   const stage = section?.querySelector<HTMLElement>('[data-scan-stage]');
   if (!section || !track || !stage) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  const pinned = matchMedia(PINNED);
   const items = [...section.querySelectorAll<HTMLElement>('[data-scan-step]')];
-  section.setAttribute('data-enhanced', '');
 
   let queued = false;
   let last = '';
   const update = () => {
     queued = false;
+    if (!pinned.matches) return;
     const box = track.getBoundingClientRect();
     const progress = trackProgress(box.top, box.height, window.innerHeight);
     const { step, within } = stepAt(progress);
@@ -69,7 +73,23 @@ export function initScanStory(root: Document = document): void {
     queued = true;
     requestAnimationFrame(update);
   };
-  window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', schedule);
-  update();
+  // Turning the phone, or changing the motion setting, moves between the
+  // pinned stage and the list.
+  const apply = () => {
+    last = '';
+    if (pinned.matches) {
+      section.setAttribute('data-enhanced', '');
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      update();
+      return;
+    }
+    section.removeAttribute('data-enhanced');
+    window.removeEventListener('scroll', schedule);
+    window.removeEventListener('resize', schedule);
+    for (const key of ['step', 'checks', 'code']) delete stage.dataset[key];
+    for (const item of items) item.removeAttribute('aria-current');
+  };
+  pinned.addEventListener('change', apply);
+  apply();
 }

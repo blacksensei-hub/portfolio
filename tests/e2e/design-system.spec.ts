@@ -47,6 +47,7 @@ test.describe('keyboard', () => {
 
     await page.keyboard.press('Tab'); // the skip link
     await page.keyboard.press('Tab'); // the theme toggle (spec 0008)
+    await page.keyboard.press('Tab'); // the pause button (spec 0024)
     for (let i = 0; i < count; i++) {
       await page.keyboard.press('Tab');
       const outline = await page.evaluate(() => {

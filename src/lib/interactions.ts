@@ -9,6 +9,7 @@
  * moves on springs too (menu.ts).
  */
 import { initMenus } from './menu';
+import { isPaused } from './motion';
 import { initOffscreenPause } from './offscreen';
 import { Spring } from './spring';
 
@@ -87,6 +88,15 @@ function startTypewriters(root: Document): void {
     const step = () => {
       // Off screen it waits, rather than typing for nobody (spec 0022).
       if (el.hasAttribute('data-offscreen')) {
+        setTimeout(step, 600);
+        return;
+      }
+      // Paused (spec 0024): a whole phrase, holding still until resumed. A
+      // phrase cut short mid-type or mid-delete is shown in full.
+      if (isPaused(root.documentElement)) {
+        if (!words.includes(shown)) shown = words[index] ?? '';
+        deleting = true;
+        el.textContent = shown;
         setTimeout(step, 600);
         return;
       }

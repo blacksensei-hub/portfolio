@@ -2,7 +2,8 @@ import { expect, type Page, test } from '@playwright/test';
 
 /*
  * Spec 0022: AttendX's "How a scan is checked". Scroll position picks the
- * step, in both directions; without motion it is a plain list.
+ * step, in both directions; without motion, or on a screen too short for the
+ * stage (spec 0024), it is a plain list.
  */
 
 const path = '/projects/attendx/';
@@ -49,6 +50,34 @@ test('scrolling steps through the scan, forward and back', async ({ page }) => {
   await scrollTrackTo(page, 0.3);
   await expect(current(page)).toHaveText('A phone scans it');
   await expect(page.locator('[data-scan-stage]')).toHaveAttribute('data-checks', '0');
+});
+
+test('a phone on its side reads the list, and turning it back pins the stage', async ({ page }) => {
+  // Spec 0024: 390px tall is too short for the stage, so nothing pins there.
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto(path);
+  const story = page.locator('[data-scan-story]');
+  const stage = story.locator('[data-scan-stage]');
+  await expect(story).not.toHaveAttribute('data-enhanced');
+  await expect(stage).toHaveCSS('position', 'static');
+  await expect(stage).not.toHaveAttribute('data-step');
+  for (const step of await story.locator('[data-scan-step]').all()) {
+    await step.scrollIntoViewIfNeeded();
+    await expect(step).toBeInViewport({ ratio: 0.95 });
+    await expect(step).toHaveCSS('opacity', '1');
+  }
+
+  // Upright: the stage pins and follows the scroll.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(story).toHaveAttribute('data-enhanced', '');
+  await scrollTrackTo(page, 0.5);
+  await expect(current(page)).toHaveText('Four checks');
+
+  // On its side again, mid story: back to the list, nothing marked current.
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(story).not.toHaveAttribute('data-enhanced');
+  await expect(stage).not.toHaveAttribute('data-step');
+  await expect(story.locator('[aria-current]')).toHaveCount(0);
 });
 
 test.describe('under reduced motion', () => {

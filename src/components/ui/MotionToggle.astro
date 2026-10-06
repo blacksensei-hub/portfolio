@@ -1,0 +1,97 @@
+---
+// Pause animations (spec 0024, WCAG 2.2.2). Renders hidden; its script
+// reveals it, so without JavaScript, when nothing could switch it, it never
+// shows. Under reduced motion every loop already rests, so it stays hidden
+// there too. Icons are Lucide (ISC licence): pause, play.
+import { MOTION_LABEL } from '../../lib/motion';
+
+interface Props {
+  /** Sits inside the site header, just before the theme toggle. */
+  inline?: boolean;
+}
+
+const { inline = false } = Astro.props;
+---
+
+<button
+  type="button"
+  hidden
+  data-motion-toggle
+  aria-pressed="false"
+  aria-label={MOTION_LABEL}
+  class:list={[
+    'flex size-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-[color,background-color,scale] duration-150 hover:text-accent motion-safe:active:scale-90',
+    inline ? 'hover:bg-on-surface/8 order-1' : 'glass fixed top-4 right-17 z-50',
+  ]}
+>
+  <svg
+    data-icon="pause"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+    <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+  </svg>
+  <svg
+    data-icon="play"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+  </svg>
+</button>
+
+<style>
+  /* Pause while the loops run, play once they are held. */
+  svg {
+    display: none;
+  }
+  :global(:root:not([data-motion='paused'])) [data-icon='pause'],
+  :global(:root[data-motion='paused']) [data-icon='play'] {
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { applyPaused, isPaused, MOTION_STORAGE_KEY } from '../../lib/motion';
+
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+
+  if (button) {
+    button.setAttribute('aria-pressed', String(isPaused(root)));
+    button.hidden = false;
+
+    button.addEventListener('click', () => {
+      const paused = !isPaused(root);
+      applyPaused(root, paused);
+      button.setAttribute('aria-pressed', String(paused));
+      try {
+        localStorage.setItem(MOTION_STORAGE_KEY, paused ? 'paused' : 'running');
+      } catch {
+        // Blocked storage: the pause still holds for this page view.
+      }
+    });
+  }
+</script>
