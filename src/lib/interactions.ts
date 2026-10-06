@@ -59,6 +59,16 @@ export function typewriterStep(
   return { text, deleting, delay: deleting ? 45 : 90, advance: false };
 }
 
+/**
+ * Where the typewriter picks up: the phrase already on the page, and its
+ * place in the list, so the next one typed is the one after it. The page
+ * shows the last phrase, so the first typed is the first in the list.
+ */
+export function typewriterStart(text: string, words: string[]): { shown: string; index: number } {
+  const shown = text.trim();
+  return { shown, index: Math.max(0, words.indexOf(shown)) };
+}
+
 function startClocks(root: Document): void {
   const clocks = root.querySelectorAll<HTMLElement>('[data-local-clock]');
   if (clocks.length === 0) return;
@@ -82,8 +92,7 @@ function startTypewriters(root: Document): void {
       continue;
     }
     if (words.length === 0) continue;
-    let index = 0;
-    let shown = el.textContent ?? '';
+    let { shown, index } = typewriterStart(el.textContent ?? '', words);
     let deleting = true;
     const step = () => {
       // Off screen it waits, rather than typing for nobody (spec 0022).

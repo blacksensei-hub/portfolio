@@ -66,6 +66,31 @@ test.describe('contact section', () => {
     expect((await request.get(profile.resume)).ok()).toBe(true);
   });
 
+  test('the typewriter goes through its phrases in order from the one shown', async ({ page }) => {
+    await page.goto('/');
+    const typed = page.locator('[data-typewriter]');
+    await typed.scrollIntoViewIfNeeded();
+    const phrases: string[] = JSON.parse((await typed.getAttribute('data-typewriter')) ?? '[]');
+    const first = ((await typed.textContent()) ?? '').trim();
+    expect(phrases).toContain(first);
+
+    // Each finished phrase holds for 1.8s, so polling every 50ms sees every one.
+    const next = await typed.evaluate(
+      (el, { phrases, first }) =>
+        new Promise<string>((resolve) => {
+          const poll = setInterval(() => {
+            const text = (el.textContent ?? '').trim();
+            if (text !== first && phrases.includes(text)) {
+              clearInterval(poll);
+              resolve(text);
+            }
+          }, 50);
+        }),
+      { phrases, first },
+    );
+    expect(next).toBe(phrases[(phrases.indexOf(first) + 1) % phrases.length]);
+  });
+
   for (const colorScheme of ['light', 'dark'] as const) {
     test(`has no detectable accessibility violations in ${colorScheme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme });
