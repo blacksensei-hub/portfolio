@@ -82,7 +82,8 @@ After Apple's *Designing Fluid Interfaces*. `src/lib/spring.ts` is a small sprin
 - **Between pages (spec 0021):** navigations are View Transitions. A project's screens (`DevicePreview` on the home page card and on the case study header) share `shot-<slug>-*` names, so they travel between the two on a spring-shaped `linear()` curve while the page cross-fades.
 - **Wayfinding and feedback (spec 0021):** case studies have "On this page" (sticky beside the write-up on wide screens, fold-away on phones), with the section being read marked `aria-current="location"`. The Contact email row has a copy button that confirms with a tick and a "Copied" label.
 - **Off screen (spec 0022):** perpetual animations (aurora, marquee, pings, scroll cue, carets) carry `data-offscreen` while out of view and pause; the typewriter waits too.
-- **Scan story (spec 0022):** AttendX's case study has a pinned, scroll-driven "How a scan is checked" (`ScanStory`, `scan-story.ts`), a plain list under reduced motion.
+- **Pause animations (spec 0024):** a button beside the theme toggle (`MotionToggle`, `src/lib/motion.ts`) sets `data-motion="paused"` on `<html>` and remembers it. Every endless loop (drift, aurora, marquee, pings, scroll cue, shimmer, carets, the scan beam) then holds its frame, and the typewriter holds a whole phrase. Entrance animations still finish. WCAG 2.2.2.
+- **Scan story (spec 0022):** AttendX's case study has a pinned, scroll-driven "How a scan is checked" (`ScanStory`, `scan-story.ts`), a plain list under reduced motion and on screens under 600px tall (spec 0024), such as a phone on its side.
 - **Share cards (spec 0022):** each case study has its own 1200×630 `og.png`, drawn with `src/lib/og-card.ts`, shared with the home card.
 
 Under reduced motion, keyframe animations stop at their final frame. Transitions keep only colour, opacity and shadow, and script-driven motion becomes short cross-fades.
@@ -95,7 +96,7 @@ Under reduced motion, keyframe animations stop at their final frame. Transitions
 
 ## Components
 
-All live in `src/components/ui/`. They are `.astro` only and ship no client JavaScript, except ThemeToggle's small bundled script.
+All live in `src/components/ui/`. They are `.astro` only and ship no client JavaScript, except the small bundled scripts of ThemeToggle and MotionToggle.
 
 ### Container
 The one width wrapper: `max-w-content`, centered, with the side gutter. No props. Use it when content needs the column but not a full Section.
@@ -163,3 +164,6 @@ No props. "Skip to content", pointing at `#main` and visually hidden until focus
 
 ### ThemeToggle
 No props. A round 44px icon button fixed to the top right (`top-4 right-4`, `bg-surface-raised`, border, `hover:text-accent`) that cycles the theme: system, light, dark (spec 0008). Its `aria-label` names the current choice and the next one, and one Lucide icon (monitor, sun, moon) shows, picked by CSS from `data-theme-choice` on `<html>`. It renders `hidden` and its script reveals it, so without JavaScript it never shows. `BaseLayout` renders it right after SkipLink, and an inline head script (`THEME_HEAD_SCRIPT` in `src/lib/theme.ts`) applies the saved choice before first paint. It uses `z-50`, the one raw z-index on the site, since there is no z-index scale.
+
+### MotionToggle
+`inline` prop as ThemeToggle. A round 44px "Pause animations" button (spec 0024) with `aria-pressed`, showing a Lucide pause icon, or play once pressed. In the header it follows the theme toggle in the Tab order and sits just before it (`order-1`); on pages without a header it floats at `top-4 right-17`, beside the theme toggle. It renders `hidden`, so it never shows without JavaScript, and stays hidden under reduced motion, where nothing loops. `MOTION_HEAD_SCRIPT` in `src/lib/motion.ts` applies a saved pause before first paint.

@@ -476,8 +476,12 @@ const arrivals = ['Ekow Nkrumah', 'Naa Addo', 'Fiifi Mensah'];
       border-color 250ms;
   }
 
-  /* ── Enhanced: a pinned stage, one step at a time, driven by scroll ──────── */
-  @media (prefers-reduced-motion: no-preference) {
+  /*
+   * ── Enhanced: a pinned stage, one step at a time, driven by scroll ────────
+   * Only where the stage fits: a phone on its side keeps the list (spec 0024).
+   * Same query as PINNED in scan-story.ts.
+   */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
     [data-enhanced] .track {
       height: calc(100svh + 5 * 70svh);
     }
@@ -579,6 +583,10 @@ const arrivals = ['Ekow Nkrumah', 'Naa Addo', 'Fiifi Mensah'];
     [data-step='1'] .beam {
       opacity: 1;
       animation: scan-beam 1.4s ease-in-out infinite alternate;
+    }
+    /* Paused from the header (spec 0024). */
+    :global(:root[data-motion='paused']) [data-step='1'] .beam {
+      animation-play-state: paused;
     }
 
     /* The checks tick off in order. */
