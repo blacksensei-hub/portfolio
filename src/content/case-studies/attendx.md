@@ -87,16 +87,16 @@ I wanted the register to take seconds, and to make signing for someone else hard
 AttendX has three roles, and each one sees the same register differently.
 
 - **Lecturers** open a session, or let the timetable open it for them. A QR code goes up on the projector and changes every five seconds, and names arrive on their screen as students scan. Each class has its own page with every student's rate against the minimum, and any student can be opened for their full record. Lecturers can share a class with co-lecturers and teaching assistants, who get only the powers their role needs, and they can export attendance as a grade.
-- **Students** scan from their seat with the mobile app or any phone browser. A planner works out what each class still needs from the sessions left this semester. Their timetable shows how each class went, sends reminders, and can be subscribed to from their own calendar. They can ask for an absence to be excused, appeal one they think is wrong, and download an attendance statement.
+- **Students** scan from their seat with the mobile app. A planner works out what each class still needs from the sessions left this semester. Their timetable shows how each class went, sends reminders, and can be subscribed to from their own calendar. They can ask for an absence to be excused, appeal one they think is wrong, and download an attendance statement.
 - **Admins** get a separate console for the whole campus. It covers an audit trail of every sensitive change, bulk import of accounts from a spreadsheet with emailed invites, a fraud review queue, analytics with a PDF report, an academic calendar, announcements with read receipts, and policy settings. There is a command palette for getting around it and a live wall for a big screen.
 
 ## Making it hard to fake
 
-The interesting part of attendance isn't recording it. It's making the record mean something. Every scan from the app has to pass four checks:
+The interesting part of attendance isn't recording it. It's making the record mean something. Every scan has to pass four checks:
 
 1. **The code is fresh.** Each QR code works for five seconds after it appears, plus a two-second grace period, and each new code ends the one before. A photo sent to the group chat is out of date before anyone opens it.
-2. **The phone is in the room.** A scan from the app carries the phone's location, and the server measures its distance from the classroom. Coordinates that can't be real are rejected, and so is a mocked GPS location on Android.
-3. **The phone belongs to the student.** Each student's app is bound to one phone. A new phone needs an admin to reset it.
+2. **The phone is in the room.** The scan carries the phone's location, and the server measures its distance from the classroom. A scan with location turned off is refused, and so are coordinates that can't be real and a mocked GPS location on Android.
+3. **The phone belongs to the student.** Each student is bound to one phone, and a scan has to come from the app on it. A new phone needs an admin to reset it.
 4. **One phone, one person.** If the same phone marks several accounts in one session, the lecturer is told on the spot.
 
 These checks and the class permissions are covered by automated tests that run on every change.
@@ -116,6 +116,7 @@ Arrivals stream to the lecturer's screen over WebSockets. Each session is its ow
 - **A roster anyone could read.** Adding co-lecturers meant asking "who is allowed to see this class?" everywhere, and the answer turned up a hole: any signed-in user could read any class's roster, names and emails included. One access check now decides it for sessions, reports, appeals, schedules, and live updates alike.
 - **Timetabled sessions took a shortcut.** Sessions opened by the timetable skipped the location check, could open twice for the same class, and were announced to every connected user instead of that class. All three are fixed, and holidays and exam weeks on the calendar now stop them opening at all.
 - **Latency eating the five-second window.** A valid scan could arrive already expired if the database connection was cold. I started recording how far past expiry every rejected token was, which separated a genuinely late scan from one where the server itself was the slow part.
+- **A side door.** Writing tests for the check-in path showed that a scan sent from a browser skipped both the location and the phone checks, and that turning location off skipped the room check too. Scanning is now app only, and a class with a classroom zone refuses a scan without a location.
 - **Honest numbers.** An early dashboard drew its trend from placeholder data, and the at-risk count counted a student once for every class they were slipping in. Both now count what they say.
 - **Shipping a mobile app.** An iOS update broke the app's startup, which meant moving to the new scene lifecycle and updating Expo. A clean native rebuild also kept deleting a machine-specific build file, so the build now writes it every time.
 
@@ -127,5 +128,4 @@ Arrivals stream to the lecturer's screen over WebSockets. Each session is its ow
 
 ## What I'd do next
 
-- Asking for the phone's location on browser scans too, so the classroom check covers every scan and not only those from the app.
 - Letting a scan made in a hall with no signal queue on the phone and submit when it reconnects, still inside the time and place it was taken.
