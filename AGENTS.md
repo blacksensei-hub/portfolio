@@ -58,7 +58,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title/index.md`, with the reas
 - Read content through `getCollection` and `getEntry`, never by importing a data file directly.
 - Design tokens are CSS variables in the `@theme` block of `src/styles/global.css`. Tailwind 4 configures in CSS, so there is no `tailwind.config.js`.
 - `pnpm build` must pass with no type errors. `strictest` means indexed access returns `T | undefined`, and env vars need bracket access (`process.env['CI']`).
-- Unit tests are `*.test.ts` beside the code they cover. End to end tests live in `tests/e2e/` and run against the built site, never the dev server.
+- Unit tests are `*.test.ts` beside the code they cover. End to end tests live in `tests/e2e/` and run against the built site, never the dev server. Playwright serves that build on port 4322 with `--strictPort`, so stop anything else on 4322 before a run.
 - The dark/light theme setter is an inline `<head>` script, never a React island, so the right theme applies before first paint.
 - `SITE_URL` sets the site origin for canonical links and the sitemap. It is not a secret. Production uses `https://jeffrey-ankrah.pages.dev`, set in `.github/workflows/deploy.yml` and mirrored in `.env.example` (keep the two in step). When unset, for example in local tests, it falls back to `https://example.com`.
 - Biome lints and formats `.ts`, `.tsx`, `.json`, and `.css`. Prettier with `prettier-plugin-astro` formats `.astro`, because Biome parses only the frontmatter and reports every template variable as unused. Both run from `pnpm lint`.
@@ -70,6 +70,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title/index.md`, with the reas
 - branch prefix: `feat/`
 - commit: per-milestone
 - style: Conventional Commits
+- `main` is protected: a pull request merges only once the `check` job in `.github/workflows/deploy.yml` passes (admins can still override). Pull requests can use auto-merge, which waits for `check` and then merges.
 
 ## Agent skills
 
