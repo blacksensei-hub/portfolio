@@ -92,12 +92,14 @@ AttendX has three roles, and each one sees the same register differently.
 
 ## Making it hard to fake
 
-The interesting part of attendance isn't recording it. It's making the record mean something. Every scan has to pass four checks:
+The interesting part of attendance isn't recording it. It's making the record mean something. Every scan from the app has to pass four checks:
 
-1. **The code is fresh.** Each QR token is single use and expires five seconds after it appears, plus a two-second grace period. A photo sent to the group chat is out of date before anyone opens it.
-2. **The phone is in the room.** The scan carries the phone's location, and the server measures its distance from the classroom. Coordinates that can't be real are rejected, and so is a mocked GPS location on Android.
-3. **The phone belongs to the student.** Each student is bound to one phone. A new phone needs an admin to reset it.
+1. **The code is fresh.** Each QR code works for five seconds after it appears, plus a two-second grace period, and each new code ends the one before. A photo sent to the group chat is out of date before anyone opens it.
+2. **The phone is in the room.** A scan from the app carries the phone's location, and the server measures its distance from the classroom. Coordinates that can't be real are rejected, and so is a mocked GPS location on Android.
+3. **The phone belongs to the student.** Each student's app is bound to one phone. A new phone needs an admin to reset it.
 4. **One phone, one person.** If the same phone marks several accounts in one session, the lecturer is told on the spot.
+
+These checks and the class permissions are covered by automated tests that run on every change.
 
 Checks on single scans only go so far, so the refused ones are kept too. Six patterns across them raise a flag for review: one phone used by several students, a location-spoofing app, repeated scans from outside the room, repeated sign-ins from the wrong phone, several students at the exact same GPS position, and too many phone resets. A flag never blocks anyone by itself. An admin looks at the evidence and decides, and that decision goes in the audit trail.
 
@@ -125,5 +127,5 @@ Arrivals stream to the lecturer's screen over WebSockets. Each session is its ow
 
 ## What I'd do next
 
-- An automated test suite around the check-in path and the permission rules, which carry the most risk.
+- Asking for the phone's location on browser scans too, so the classroom check covers every scan and not only those from the app.
 - Letting a scan made in a hall with no signal queue on the phone and submit when it reconnects, still inside the time and place it was taken.
